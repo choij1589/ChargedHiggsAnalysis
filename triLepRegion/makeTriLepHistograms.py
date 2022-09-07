@@ -1,9 +1,9 @@
-import os; os.environ['WORKDIR'] = "/home/choij/workspace/ChargedHiggsAnalysis"
-import sys; sys.path.insert(0, os.environ['WORKDIR'])
+import os, sys
+sys.path.insert(0, os.environ['WORKDIR'])
 
 from libPython.HistTools import HistogramWriter
 from libPython.MCCorrection import MCCorrection
-from libPython.DataDriven import FakeEstimator, Conversion
+from libPython.DataDriven import FakeEstimator
 from libPython.Selection import pass_baseline, select
 from libPython.DataFormat import get_muons, get_electrons, get_jets
 from libPython.DataFormat import Particle
@@ -17,8 +17,6 @@ parser.add_argument("--sample", "-s", default="DYJets",
                     type=str, help="sample name")
 parser.add_argument("--isData", "-d", action="store_true",
                     default=False, help="DATA or MC")
-parser.add_argument("--scaleConv", "-c", action="store_true",
-                    default=False, help="scale conversion samples or not")
 args = parser.parse_args()
 
 Systematics = ["Central",
@@ -30,13 +28,8 @@ Systematics = ["Central",
                "MuonIDSFUp", "MuonIDSFDown",
                "DblMuonTrigSFUp", "DblMuonTrigSFDown"]
 
-if args.sample in ["DYJets", "ZGToLLG"] and args.scaleConv:
-    Systematics = ["Central",
-                   "ConversionUp", "ConversionDown"]
 
 # Loops
-
-
 def DataLoop(evt, writer, fakeEstimator):
     muons = get_muons(evt)
     electrons = get_electrons(evt)
@@ -256,7 +249,7 @@ def DataLoop(evt, writer, fakeEstimator):
             f"3Mu/{region}/NonpromptDown/{measure}/xZCand", xZCand, weight)
 
 
-def MCLoop(evt, writer, mcCorr, conv, syst):
+def MCLoop(evt, writer, mcCorr, syst):
     muon_momentum_shift = 0
     if syst == "MuonMomentumShiftUp":
         muon_momentum_shift = 1
@@ -318,12 +311,6 @@ def MCLoop(evt, writer, mcCorr, conv, syst):
         sys_muon_trigsf = 1
     if syst == "DblMuonTrigSFDown":
         sys_muon_trigsf = -1
-    if args.scaleConv:
-        sys_conv = 0
-        if syst == "ConversionUp":
-            sys_conv = 1
-        if syst == "ConversionDown":
-            sys_conv = -1
 
     weight = evt.GenWeight * evt.TrigLumi
     weight *= mcCorr.GetL1PrefireWeight(evt, sys_prefire)
@@ -331,11 +318,6 @@ def MCLoop(evt, writer, mcCorr, conv, syst):
     weight *= mcCorr.GetMuonIDSF(muons, sys_muon_idsf)
     weight *= mcCorr.GetDblMuonTriggerSF(muons, sys_muon_trigsf)
     weight *= mcCorr.GetBtaggingWeight(jets)
-    if args.scaleConv:
-        if args.sample == "DYJets":
-            weight *= conv.GetScale("DYJets", sys_conv)
-        else:  # ZGmma
-            weight *= conv.GetScale("ZGamma", sys_conv)
 
     writer.fill_muons(f"3Mu/Baseline/{syst}/Incl/muons", muons, weight)
     writer.fill_electrons(
@@ -413,12 +395,11 @@ if __name__ == "__main__":
         mcCorr = MCCorrection(era=args.era)
         mcCorr.SetBtaggingHandler(
             tagger="DeepJet", wp="Medium", syst="central")
-        conv = Conversion(era=args.era)
         f = TFile.Open(
             f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__/Selector_{args.sample}.root")
         for evt in f.Events:
             for syst in Systematics:
-                MCLoop(evt, writer, mcCorr, conv, syst)
+                MCLoop(evt, writer, mcCorr, syst)
 
     f.Close()
     writer.close()

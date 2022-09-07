@@ -1,0 +1,14 @@
+universe            = vanilla
+executable          = run.sh
+getenv              = true
+argument            = argument.$(Process)
+
+output              = condor/out.$(Process)
+error               = condor/err.$(Process)
+log                 = condor/log.$(Process)
+
+request_cpus        = 10
+request_memory      = 20GB
+request_gpus        = 2
+
+queue 10

@@ -15,3 +15,30 @@
 	3  -  MemoryUsage of job (MB)
 	2708  -  ResidentSetSize of job (KB)
 ...
+006 (208769.000.000) 2022-09-07 14:14:24 Image size of job updated: 3938728
+	3  -  MemoryUsage of job (MB)
+	2708  -  ResidentSetSize of job (KB)
+...
+040 (208769.000.000) 2022-09-07 14:14:24 Started transferring output files
+...
+040 (208769.000.000) 2022-09-07 14:14:24 Finished transferring output files
+...
+005 (208769.000.000) 2022-09-07 14:14:24 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:02, Sys 0 00:00:01  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:02, Sys 0 00:00:01  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	2116  -  Run Bytes Sent By Job
+	496  -  Run Bytes Received By Job
+	2116  -  Total Bytes Sent By Job
+	496  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated Assigned
+	   Cpus                 :        0       10        10 
+	   Disk (KB)            :       80        1    127803 
+	   Gpus (Average)       :        0        2         2 "GPU-ebb73fb1,GPU-5aaacc6f"
+	   GpusMemory (MB)      :      311                    
+	   Memory (MB)          :        3    20480     20480 
+
+	Job terminated of its own accord at 2022-09-07T05:14:24Z.
+...

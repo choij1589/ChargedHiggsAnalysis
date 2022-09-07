@@ -1,5 +1,5 @@
-import os; os.environ['WORKDIR'] = "/home/choij/workspace/ChargedHiggsAnalysis"
-import sys; sys.path.insert(0, os.environ['WORKDIR'])
+import os, sys
+sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
 #import warnings; warnings.filterwarnings("ignore")
 
