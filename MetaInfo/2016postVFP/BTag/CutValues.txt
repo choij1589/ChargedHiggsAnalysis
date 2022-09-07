@@ -1,0 +1,7 @@
+### taken from https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL16postVFP on 25 Jan. 2021 (JB)
+2016postVFP	DeepCSV	Loose	0.1918
+2016postVFP	DeepCSV	Medium	0.5847
+2016postVFP	DeepCSV	Tight	0.8767
+2016postVFP	DeepJet	Loose	0.0480
+2016postVFP	DeepJet	Medium	0.2489
+2016postVFP	DeepJet	Tight	0.6377

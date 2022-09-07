@@ -1,0 +1,10 @@
+executable          = Test/gpu_test.py
+universe            = vanilla
+output              = condor/job.out
+error               = condor/job.err
+log                 = condor/job.log
+getenv              = true
+request_cpus        = 10
+request_memory      = 20GB
+request_gpus        = 2
+queue 1

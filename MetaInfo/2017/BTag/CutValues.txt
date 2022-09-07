@@ -1,0 +1,7 @@
+### taken from https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17 on 13 Apr 2021 (Won)
+2017	DeepCSV	Loose	0.1355
+2017	DeepCSV	Medium	0.4506
+2017	DeepCSV	Tight	0.7738
+2017	DeepJet	Loose	0.0532
+2017	DeepJet	Medium	0.3040
+2017	DeepJet	Tight	0.7476

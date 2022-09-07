@@ -17,8 +17,8 @@ if [[ $HOSTNAME == *"tamsa2"* ]]; then
     source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/ROOT/6.26.04/x86_64-centos7-gcc8-opt/ROOT-env.sh
     
     # install torch and torch_geometric
-    pip install --user torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-    pip install --user torch-scatter==2.0.9 torch-sparse==0.6.15 torch-cluster==1.6.0 torch-spline-conv==1.2.1 torch-geometric -f https://data.pyg.org/whl/torch-1.12.1+cu113.html
+    #pip install --user torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
+    #pip install --user torch-scatter==2.0.9 torch-sparse==0.6.15 torch-cluster==1.6.0 torch-spline-conv==1.2.1 torch-geometric -f https://data.pyg.org/whl/torch-1.12.1+cu113.html
 
 
 elif [[ $HOSTNAME == fedora ]]; then
