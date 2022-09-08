@@ -1,8 +1,6 @@
 from ROOT import TFile
 import pandas as pd
 import os
-os.environ['WORKDIR'] = '/home/choij/workspace/ChargedHiggsAnalysis'
-
 
 class FakeEstimator():
     def __init__(self, era):

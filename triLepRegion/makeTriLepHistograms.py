@@ -379,10 +379,7 @@ def MCLoop(evt, writer, mcCorr, syst):
 
 
 if __name__ == "__main__":
-    if args.scaleConv:
-        outfile_path = f"./output/ROOT/Skim3Mu__/withConv/{args.era}/{args.sample}.root"
-    else:
-        outfile_path = f"./output/ROOT/Skim3Mu__/{args.era}/{args.sample}.root"
+    outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/Skim3Mu__/{args.era}/{args.sample}.root"
     writer = HistogramWriter(
         outfile=outfile_path)
     if args.isData:

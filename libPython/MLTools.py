@@ -9,7 +9,8 @@ import torch
 import torch.nn.functional as F
 from   torch.nn import Sequential,Linear, ReLU
 
-from torch_geometric.nn import knn_graph, global_mean_pool
+#from torch_geometric.nn import knn_graph, global_mean_pool
+from torch_geometric.nn import global_mean_pool
 from torch_geometric.nn import GCNConv, GraphConv
 from torch_geometric.nn import GraphNorm
 from torch_geometric.nn import MessagePassing
@@ -106,7 +107,7 @@ class DynamicEdgeConv(EdgeConv):
 
 
 class ParticleNet(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels, dynamic=True):
+    def __init__(self, num_features, num_classes, hidden_channels, dynamic=False):
         super(ParticleNet, self).__init__()
         self.dynamic = dynamic
         self.gn0 = GraphNorm(num_features)
