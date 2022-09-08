@@ -35,7 +35,7 @@ signal_list = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
                "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
                "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
                "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
-background_list = ["TTLL_powheg"]
+background_list = ["TTLL_powheg", "VV"]
 
 if not args.signal in signal_list:
     print(f"Wrong signal model {args.signal}")
@@ -48,7 +48,7 @@ if not args.era in ["All", "2016preVFP", "2016postVFP", "2017", "2018"]:
     exit(1)
 
 #### pilot mode
-max_size = 200000 if not args.pilot else 5000
+max_size = -1 if not args.pilot else 5000
 epochs = 300 if not args.pilot else 10
 
 #### Load dataset
@@ -60,15 +60,26 @@ else:
     f_sig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
     f_bkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__/Selector_{args.background}.root")
 
-sig_datalist = rtfile_to_datalist(f_sig, channel="3Mu", is_signal=True, max_size=max_size); f_sig.Close()
-bkg_datalist = rtfile_to_datalist(f_bkg, channel="3Mu", is_signal=False, max_size=max_size); f_bkg.Close()
+is_prompt = True if args.background == "VV" else False
+sig_datalist = rtfile_to_datalist(f_sig, 
+                                  channel="3Mu", 
+                                  is_signal=True, 
+                                  is_prompt=True, 
+                                  max_size=max_size)
+f_sig.Close()
+bkg_datalist = rtfile_to_datalist(f_bkg, 
+                                  channel="3Mu", 
+                                  is_signal=False, 
+                                  is_prompt=is_prompt, 
+                                  max_size=max_size)
+f_bkg.Close()
 sig_datalist = shuffle(sig_datalist, random_state=953)[:200000]
 bkg_datalist = shuffle(bkg_datalist, random_state=953)[:200000]
 datalist = shuffle(sig_datalist+bkg_datalist, random_state=953)
 
-train_dataset = MyDataset(datalist[:int(max_size*2*0.4)])
-val_dataset = MyDataset(datalist[int(max_size*2*0.4):int(max_size*2*0.5)])
-test_dataset = MyDataset(datalist[int(max_size*2*0.5):])
+train_dataset = MyDataset(datalist[:int(200000*2*0.4)])
+val_dataset = MyDataset(datalist[int(200000*2*0.4):int(200000*2*0.5)])
+test_dataset = MyDataset(datalist[int(200000*2*0.5):])
 
 train_loader = DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)

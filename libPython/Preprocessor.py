@@ -12,7 +12,7 @@ from libPython.Selection import pass_baseline
 
 class MyDataset(InMemoryDataset):
     def __init__(self, data_list):
-        super(MyDataset, self).__init__("./tmp/MyDataset")
+        super(MyDataset, self).__init__("./tmp/data")
         self.data_list = data_list
         self.data, self.slices = self.collate(data_list)
 
@@ -35,12 +35,7 @@ def get_edge_indices(node_list, k):
     
     return (torch.tensor(edge_index, dtype=torch.long), torch.tensor(edge_attribute, dtype=torch.float))
 
-def rtfile_to_datalist(rtfile, channel, is_signal, reduce_noise=True, max_size=-1):
-    if reduce_noise:
-        print("[DataFormat::rtfile_to_datalist] Warning: only prompt events considered for signal samples")
-        print("[DataFormat::rtfile_to_datalist] For other prompt background, should change the is_prompt_evt condition")
-
-
+def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
     data_list = []
     for evt in rtfile.Events:
         muons = get_muons(evt)
@@ -51,14 +46,13 @@ def rtfile_to_datalist(rtfile, channel, is_signal, reduce_noise=True, max_size=-
         if not pass_baseline(channel, evt, muons, electrons, jets, bjets, "loose"):
             continue
 
-        if reduce_noise:
-            muons_prompt = list(filter(lambda x: x.LepType() > 0, muons))
-            electrons_prompt = list(filter(lambda x: x.LepType() > 0, electrons))
-            is_prompt_evt = (len(muons) == len(muons_prompt) and len(electrons) == len(electrons_prompt))
-            if is_signal and not is_prompt_evt:
-                continue
-            if not is_signal and is_prompt_evt:
-                continue
+        muons_prompt = list(filter(lambda x: x.LepType() > 0, muons))
+        electrons_prompt = list(filter(lambda x: x.LepType() > 0, electrons))
+        prompt_leptons = (len(muons) == len(muons_prompt) and len(electrons) == len(electrons_prompt))
+        if is_prompt:
+            if not prompt_leptons: continue
+        else:
+            if prompt_leptons: continue
 
         # Convert each event to a graph
         node_list = []

@@ -28,3 +28,4 @@ elif [[ $HOSTNAME == fedora ]]; then
 fi
 
 alias splitFile="${WORKDIR}/libCpp/splitFile"
+alias copyFile="${WORKDIR}/libCpp/copyFile"
