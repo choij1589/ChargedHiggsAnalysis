@@ -48,8 +48,14 @@ if not args.era in ["All", "2016preVFP", "2016postVFP", "2017", "2018"]:
     exit(1)
 
 #### pilot mode
-max_size = -1 if not args.pilot else 5000
-epochs = 300 if not args.pilot else 10
+if args.pilot:
+    max_size = 5000
+    split1, split2 = 4000, 5000
+    epochs = 10
+else:
+    max_size = -1
+    split1, split2 = 150000, 200000
+    epochs = 300
 
 #### Load dataset
 print("@@@@ Loading datasets...")
@@ -77,16 +83,17 @@ sig_datalist = shuffle(sig_datalist, random_state=953)[:200000]
 bkg_datalist = shuffle(bkg_datalist, random_state=953)[:200000]
 datalist = shuffle(sig_datalist+bkg_datalist, random_state=953)
 
-train_dataset = MyDataset(datalist[:int(200000*2*0.4)])
-val_dataset = MyDataset(datalist[int(200000*2*0.4):int(200000*2*0.5)])
-test_dataset = MyDataset(datalist[int(200000*2*0.5):])
+
+train_dataset = MyDataset(datalist[:split1])
+val_dataset = MyDataset(datalist[split1:split2])
+test_dataset = MyDataset(datalist[split2:])
 
 train_loader = DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
+        train_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=True)
 val_loader = DataLoader(
-        val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4)
+        val_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 test_loader = DataLoader(
-        test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4)
+        test_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 num_features, num_classes = train_dataset[0].num_node_features, train_dataset.num_classes
 
 #### GPU settings
