@@ -1,21 +1,20 @@
-import os, sys
-import sys; sys.path.insert(0, os.environ['WORKDIR'])
-
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from   sklearn import metrics
-import torch
-import torch.nn.functional as F
-from   torch.nn import Sequential,Linear, ReLU
-
-#from torch_geometric.nn import knn_graph, global_mean_pool
-from torch_geometric.nn import global_mean_pool
-from torch_geometric.nn import GCNConv, GraphConv
-from torch_geometric.nn import GraphNorm
 from torch_geometric.nn import MessagePassing
+from torch_geometric.nn import GraphNorm
+from torch_geometric.nn import GCNConv, GraphConv
+from torch_geometric.nn import global_mean_pool, knn_graph
+from torch.nn import Sequential, Linear, ReLU
+import torch.nn.functional as F
+import torch
+from sklearn import metrics
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import sys
+import sys
+sys.path.insert(0, os.environ['WORKDIR'])
 
-# Modules
+
 class GCN(torch.nn.Module):
     def __init__(self, num_features, num_classes, hidden_channels):
         super(GCN, self).__init__()
@@ -102,7 +101,8 @@ class DynamicEdgeConv(EdgeConv):
 
     def forward(self, x, edge_index=None, batch=None):
         if edge_index is None:
-            edge_index = knn_graph(x, self.k, batch, loop=False, flow=self.flow)
+            edge_index = knn_graph(
+                x, self.k, batch, loop=False, flow=self.flow)
         return super().forward(x, edge_index)
 
 
@@ -157,14 +157,15 @@ class EarlyStopping():
             self.save_checkpoint(val_loss, model)
         elif score <= self.best_score + self.delta:
             self.counter += 1
-            print(f"[EarlyStopping counter] {self.counter} out of {self.patience}")
-            if self.counter >= self.patience: 
+            print(
+                f"[EarlyStopping counter] {self.counter} out of {self.patience}")
+            if self.counter >= self.patience:
                 self.early_stop = True
         else:
             self.best_score = score
             self.save_checkpoint(val_loss, model)
             self.counter = 0
-    
+
     def save_checkpoint(self, val_loss, model):
         torch.save(model.state_dict(), self.path)
         self.val_loss_min = val_loss
@@ -233,10 +234,22 @@ def predict(model, loader):
 
     return np.array(answers), np.array(predictions)
 
+# predict probability without batch mode
+
+
+def predict_proba(model, x, edge_index):
+    model.eval()
+    with torch.no_grad():
+        out = model(x, edge_index)
+        proba = out.numpy()[0][1]
+    return proba
+
+
 def prepare_roc(answers, predictions):
     fpr, tpr, _ = metrics.roc_curve(answers, predictions, pos_label=1)
     auc = metrics.auc(fpr, tpr)
     return (fpr, tpr, auc)
+
 
 def plot_roc(fpr, tpr, auc, path):
     if not os.path.exists(os.path.dirname(path)):
@@ -247,9 +260,12 @@ def plot_roc(fpr, tpr, auc, path):
 
     plt.figure(figsize=(12, 12))
     plt.title("ROC curve")
-    plt.plot(tpr["train"], 1.-fpr["train"], "r--", label=f"Train ROC (AUC: {auc['train']:.3}")
-    plt.plot(tpr["valid"], 1.-fpr["valid"], "b--", label=f"Validation ROC (AUC: {auc['valid']:.3}")
-    plt.plot(tpr["test"], 1.-fpr["test"], "g--", label=f"Test ROC (AUC: {auc['test']:.3}")
+    plt.plot(tpr["train"], 1.-fpr["train"], "r--",
+             label=f"Train ROC (AUC: {auc['train']:.3})")
+    plt.plot(tpr["valid"], 1.-fpr["valid"], "b--",
+             label=f"Validation ROC (AUC: {auc['valid']:.3})")
+    plt.plot(tpr["test"], 1.-fpr["test"], "g--",
+             label=f"Test ROC (AUC: {auc['test']:.3})")
     plt.legend(loc="best")
     plt.xlabel("sig eff.")
     plt.ylabel("bkg rej.")

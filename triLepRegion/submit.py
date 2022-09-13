@@ -9,8 +9,10 @@ MASSPOINTs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
 BACKGROUNDs = ["TTLL_powheg", "VV"]
 
 #### hyperparameters
-optimizer = "Adam"
-schedulers = ["CyclicLR", "StepLR"]
+# For CyclicLR, try RMSprop for optimizer
+# Adam fits badly with CyclicLR
+optimizer = "RMSprop"
+schedulers = ["CyclicLR", "StepLR", "ExponentialLR"]
 initial_lrs = [0.001, 0.002, 0.005, 0.01, 0.05]
 batch_size = 1024
 hidden_layer = 128
