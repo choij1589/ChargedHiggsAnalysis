@@ -1,16 +1,17 @@
-from torch_geometric.nn import MessagePassing
-from torch_geometric.nn import GraphNorm
-from torch_geometric.nn import GCNConv, GraphConv
-from torch_geometric.nn import global_mean_pool, knn_graph
-from torch.nn import Sequential, Linear, ReLU
-import torch.nn.functional as F
-import torch
-from sklearn import metrics
-import seaborn as sns
+from webbrowser import BackgroundBrowser
+from libPython.Preprocessor import evt_to_graph
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
+from sklearn import metrics
+import torch
+import torch.nn.functional as F
+from torch.nn import Sequential, Linear, ReLU
+from torch_geometric.nn import global_mean_pool, knn_graph
+from torch_geometric.nn import GCNConv, GraphConv
+from torch_geometric.nn import GraphNorm
+from torch_geometric.nn import MessagePassing
 import os
-import sys
 import sys
 sys.path.insert(0, os.environ['WORKDIR'])
 
@@ -270,3 +271,53 @@ def plot_roc(fpr, tpr, auc, path):
     plt.xlabel("sig eff.")
     plt.ylabel("bkg rej.")
     plt.savefig(path)
+
+
+class MVAManager():
+    def __init__(self):
+        self.models = {}
+
+        # read from $WORKDIR/MetaInfo/models.csv file
+        csv = pd.read_csv(f"{os.environ['WORKDIR']}/MetaInfo/models.csv.bak")
+        csv.set_index(['signal', ' background'], inplace=True)
+        for signal, background in csv.index:
+            idx = (signal, background)
+            background = background[1:]
+            # model path
+            optim = csv.loc[idx, " optim"][1:]
+            initial_lr = csv.loc[idx, ' inital_lr'][1:]
+            scheduler = csv.loc[idx, ' scheduler'][1:]
+
+            model_path = f"{os.environ['WORKDIR']}/.models/All/{signal}_vs_{background}/ParticleNet_nhidden-128_{optim}_initial_lr-{initial_lr.replace('.', 'p')}_{scheduler}_nbatch-1024.pt"
+            try:
+                self.models[f"{signal}vs{background}"] = ParticleNet(
+                    num_features=9, num_classes=2, hidden_channels=128)
+                self.models[f"{signal}vs{background}"].load_state_dict(
+                    torch.load(model_path, map_location=torch.device('cpu')))
+            except:
+                print(f"[MLTools::MVAManager] Failed to load the classifier for {signal}vs{background}")
+                # failed to load model, clear the content
+                self.models.pop(f"{signal}vs{background}")
+        del csv
+
+    def getScores(self, objects):
+        scores = {}
+        # first make objects to graph
+        node_list = []
+        for object in objects:
+            node_list.append([object.Pt(),
+                              object.Eta(),
+                              object.Phi(),
+                              object.M(),
+                              object.Charge(),
+                              object.IsMuon(),
+                              object.IsElectron(),
+                              object.IsJet(),
+                              object.BtagScore()])
+        # the function don't need to know it's actual answer, so just set y=1
+        data = evt_to_graph(node_list, y=1, k=3)
+
+        # now fill the scores
+        for key, model in self.models.items():
+            scores[key] = predict_proba(model, data.x, data.edge_index)
+        return scores
