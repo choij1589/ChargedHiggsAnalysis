@@ -9,32 +9,27 @@ MASSPOINTs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
               "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 BACKGROUNDs = ["TTLL_powheg", "VV"]
-MASSPOINTs = ["MHc-70_MA-15"]
-BACKGROUNDs = ["VV"]
 
 #### hyperparameters
 models = ["GCN", "GNN", "ParticleNet"]
 optimizers = ["RMSprop", "Adam"]
 schedulers = ["StepLR", "ExponentialLR"]
 initLRs = [0.001, 0.002, 0.005, 0.008, 0.01]
-batchSize = 512
-hiddenLayers = 128
+nBatch = 1024
+nHidden = 128
 
-def makeJobCommand(sig, bkg, optim, scheduler, initLR):
-    command = f"python triLepRegion/trainModels.py --signal {sig} --background {bkg} --batch_size {batchSize} --optimizer {optim} --scheduler {scheduler} --initial_lr {initLR} --hidden_layers {hiddenLayers} --pilot"
-    return command
+def makeJobCommands():
+    job_list = product(MASSPOINTs, BACKGROUNDs, optimizers, schedulers, initLRs)
+    queue = deque()
+    for sig, bkg, optim, scheduler, initLR in job_list:
+        command = f"python triLepRegion/trainModels.py --signal {sig} --background {bkg} --batch_size {nBatch} --optimizer {optim} --scheduler {scheduler} --initial_lr {initLR} --hidden_layers {nHidden}"
+        queue.append(command)
+    return queue
 
-def checkDeviceStatus(procs, freeMemory=2e9, maxRunningJobs=6):
+def checkDeviceStatus(procs, freeMemory=2e9, maxRunningJobs=11):
     runningJobs = list(filter(lambda proc: proc.poll() is None, procs))
     free, max = cuda.mem_get_info()
     return (free > freeMemory) and (len(runningJobs) < maxRunningJobs)
-
-
-job_list = product(MASSPOINTs, BACKGROUNDs, optimizers, schedulers, initLRs)
-queue = deque()
-for sig, bkg, optim, scheduler, initial_lr in job_list:
-    command = makeJobCommand(sig, bkg, optim, scheduler, initial_lr)
-    queue.append(command)
 
 # device number gpus
 multiProcs = {}
@@ -42,6 +37,7 @@ for i in range(cuda.device_count()):
     device = f"cuda:{i}"
     multiProcs[device] = []
 
+queue = makeJobCommands()
 # submit all jobs till the queue empty
 while queue:
     for device, procs in multiProcs.items():
