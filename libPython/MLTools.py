@@ -1,4 +1,3 @@
-from webbrowser import BackgroundBrowser
 from libPython.Preprocessor import evt_to_graph
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -108,7 +107,7 @@ class DynamicEdgeConv(EdgeConv):
 
 
 class ParticleNet(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels, dynamic=False):
+    def __init__(self, num_features, num_classes, hidden_channels, dynamic=True):
         super(ParticleNet, self).__init__()
         self.dynamic = dynamic
         self.gn0 = GraphNorm(num_features)

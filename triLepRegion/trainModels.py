@@ -29,6 +29,7 @@ parser.add_argument("--batch_size", "-n", default=1024, type=int, help="batch si
 parser.add_argument("--scheduler", "-c", default="ExponentialLR", type=str, help="learning rate scheducler")
 parser.add_argument("--era", "-e", default="All", type=str, help="Era")
 parser.add_argument("--pilot", "-p", action="store_true", default=False, help="pilot run")
+parser.add_argument("--device", "-d", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
 
 signal_list = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
@@ -97,9 +98,9 @@ test_loader = DataLoader(
 num_features, num_classes = train_dataset[0].num_node_features, train_dataset.num_classes
 
 #### GPU settings
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"@@@@ Using device {DEVICE}...")
-if DEVICE == "cuda":
+#DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+#print(f"@@@@ Using device {DEVICE}...")
+if "cuda" in args.device:
     torch.backends.cudnn.benchmark = True
     torch.backends.cudnn.enabled = True
 
@@ -108,8 +109,8 @@ def train(model, criterion, loader, optimizer, scheduler):
     model.train()
 
     for data in loader:
-        out = model(data.x.to(DEVICE), data.edge_index.to(DEVICE), data.batch.to(DEVICE))
-        loss = criterion(out, data.y.to(DEVICE))
+        out = model(data.x.to(args.device), data.edge_index.to(args.device), data.batch.to(args.device))
+        loss = criterion(out, data.y.to(args.device))
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
@@ -121,9 +122,9 @@ def test(model, criterion, loader):
     loss = 0.
     correct = 0.
     for data in loader:
-        out = model(data.x.to(DEVICE), data.edge_index.to(DEVICE), data.batch.to(DEVICE))
+        out = model(data.x.to(args.device), data.edge_index.to(args.device), data.batch.to(args.device))
         pred = out.argmax(dim=1)
-        answer = data.y.to(DEVICE)
+        answer = data.y.to(args.device)
         loss += float(criterion(out, answer).sum())
         correct += int((pred == answer).sum())
     loss /= len(loader.dataset)
@@ -133,11 +134,11 @@ def test(model, criterion, loader):
 #### Hyperparameter settings
 print(f"@@@@ Using model {args.model}...")
 if args.model == "GCN":
-    model = GCN(num_features, num_classes, args.hidden_layers).to(DEVICE)
+    model = GCN(num_features, num_classes, args.hidden_layers).to(args.device)
 elif args.model == "GNN":
-    model = GNN(num_features, num_classes, args.hidden_layers).to(DEVICE)
+    model = GNN(num_features, num_classes, args.hidden_layers).to(args.device)
 elif args.model == "ParticleNet":
-    model = ParticleNet(num_features, num_classes, args.hidden_layers).to(DEVICE)
+    model = ParticleNet(num_features, num_classes, args.hidden_layers).to(args.device)
 else:
     print(f"[trainModels] Wrong model name {args.model}")
     exit(1)
@@ -174,9 +175,9 @@ if __name__ == "__main__":
     model_name = f"{args.model}_nhidden-{args.hidden_layers}_{args.optimizer}_initial_lr-{str(args.initial_lr).replace('.', 'p')}_{args.scheduler}_nbatch-{args.batch_size}"
     checkpoint_path = f"{os.environ['WORKDIR']}/.models/{args.era}/{args.signal}_vs_{args.background}/{model_name}.pt"
     writer_name = f"writer_{model_name}"
-    summary_path = f"{os.environ['WORKDIR']}/triLepRegion/output/plots/{args.era}/{args.signal}_vs_{args.background}/training-{model_name}.png"
-    roc_path = f"{os.environ['WORKDIR']}/triLepRegion/output/plots/{args.era}/{args.signal}_vs_{args.background}/roc-{model_name}.png"
-    outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/output/ROOT/{args.era}/{args.signal}_vs_{args.background}/{model_name}.root"
+    summary_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/{args.signal}_vs_{args.background}/training-{model_name}.png"
+    roc_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/{args.signal}_vs_{args.background}/roc-{model_name}.png"
+    outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/{args.era}/{args.signal}_vs_{args.background}/{model_name}.root"
 
     criterion = torch.nn.CrossEntropyLoss()
     early_stopper = EarlyStopping(patience=8, path=checkpoint_path)
