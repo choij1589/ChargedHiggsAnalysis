@@ -26,9 +26,9 @@ def makeJobCommands():
         queue.append(command)
     return queue
 
-def checkDeviceStatus(procs, freeMemory=2e9, maxRunningJobs=11):
+def checkDeviceStatus(device, procs, freeMemory=2e9, maxRunningJobs=13):
     runningJobs = list(filter(lambda proc: proc.poll() is None, procs))
-    free, max = cuda.mem_get_info()
+    free, max = cuda.mem_get_info(device)
     return (free > freeMemory) and (len(runningJobs) < maxRunningJobs)
 
 # device number gpus
@@ -41,7 +41,7 @@ queue = makeJobCommands()
 # submit all jobs till the queue empty
 while queue:
     for device, procs in multiProcs.items():
-        if checkDeviceStatus(procs):
+        if checkDeviceStatus(device, procs):
             command = f"{queue.popleft()} --device {device}"
             print(f"submit {command}...")
             proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
