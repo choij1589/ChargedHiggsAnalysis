@@ -1,7 +1,6 @@
 import os, sys
 sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
-#import warnings; warnings.filterwarnings("ignore")
 
 from sklearn.utils          import shuffle
 from ROOT                   import TFile
