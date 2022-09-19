@@ -1,0 +1,42 @@
+# data
+DoubleMuon_B
+DoubleMuon_C
+DoubleMuon_D
+DoubleMuon_E
+DoubleMuon_F
+# signal samples
+TTToHcToWAToMuMu_MHc-70_MA-15
+TTToHcToWAToMuMu_MHc-70_MA-40
+TTToHcToWAToMuMu_MHc-70_MA-65
+# TTToHcToWAToMuMu_MHc-100_MA-15
+TTToHcToWAToMuMu_MHc-100_MA-60
+TTToHcToWAToMuMu_MHc-100_MA-95
+TTToHcToWAToMuMu_MHc-130_MA-15
+TTToHcToWAToMuMu_MHc-130_MA-55
+TTToHcToWAToMuMu_MHc-130_MA-90
+TTToHcToWAToMuMu_MHc-130_MA-125
+# TTToHcToWAToMuMu_MHc-160_MA-15
+TTToHcToWAToMuMu_MHc-160_MA-85
+TTToHcToWAToMuMu_MHc-160_MA-120
+TTToHcToWAToMuMu_MHc-160_MA-155
+# VV
+WZTo3LNu_amcatnlo
+WZTo3LNu_mllmin4p0_powheg
+ZZTo4L_powheg
+ZGToLLG
+# tt+X
+ttWToLNu
+ttZToLLNuNu
+ttHToNonbb
+tZq
+tHq
+# rare
+WWW
+WWZ
+WZZ
+ZZZ
+WWG
+TTG
+TTTT
+VBF_HToZZTo4L
+GluGluHToZZTo4L
