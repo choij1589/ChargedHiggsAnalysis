@@ -22,8 +22,8 @@ args = parser.parse_args()
 
 NHIDDEN = 128
 OPTIMIZERs = ["RMSprop", "Adam"]
-INITIAL_LRs = [0.001, 0.002, 0.005, 0.01, 0.05]
-SCHEDULERs = ["ExponentialLR", "StepLR", "CyclicLR"]
+INITIAL_LRs = [0.001, 0.002, 0.005, 0.008, 0.01]
+SCHEDULERs = ["ExponentialLR", "StepLR"]
 NBATCH = 1024
 
 max_size = -1
@@ -32,7 +32,7 @@ split1, split2 = 150000, 200000
 
 # helper functions
 def checkKSTest(sig, bkg, optimizer, initial_lr, scheduler):
-    file_path = f"{os.environ['WORKDIR']}/triLepRegion/output/ROOT/All/{sig}_vs_{bkg}/ParticleNet_nhidden-{NHIDDEN}_{optimizer}_initial_lr-{str(initial_lr).replace('.', 'p')}_{scheduler}_nbatch-{NBATCH}.root"
+    file_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/All/{sig}_vs_{bkg}/ParticleNet_nhidden-{NHIDDEN}_{optimizer}_initial_lr-{str(initial_lr).replace('.', 'p')}_{scheduler}_nbatch-{NBATCH}.root"
     resultFile = TFile.Open(file_path)
     train_score = resultFile.Get("train/signal/score")
     train_score.Add(resultFile.Get("train/background/score"))
