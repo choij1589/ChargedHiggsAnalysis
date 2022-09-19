@@ -13,7 +13,7 @@ with open("SampleList.txt", "r") as f:
 
 # make split directory
 if not os.path.exists(f"{prefix}/Split"):
-    os.makedirs("{prefix}/Split")
+    os.makedirs(f"{prefix}/Split")
 
 def splitSample(samplename):
     # open file
