@@ -26,4 +26,3 @@ for background in BACKGROUNDs:
     for proc in procs:
         proc.communicate()
         assert proc.returncode == 0
-
