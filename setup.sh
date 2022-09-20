@@ -12,8 +12,8 @@ if [[ $HOSTNAME == *"tamsa2"* ]]; then
     #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/pip/22.0.4/x86_64-centos7-gcc8-opt/pip-env.sh
     #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/blas/0.3.20.openblas/x86_64-centos7-gcc8-opt/blas-env.sh
     # ROOT setup
-    #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/tbb/2020_U2/x86_64-centos7-gcc8-opt/tbb-env.sh
-    #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/ROOT/6.26.04/x86_64-centos7-gcc8-opt/ROOT-env.sh
+    source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/tbb/2020_U2/x86_64-centos7-gcc8-opt/tbb-env.sh
+    source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/ROOT/6.26.04/x86_64-centos7-gcc8-opt/ROOT-env.sh
     
     # install torch and torch_geometric
     #pip install --user torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113

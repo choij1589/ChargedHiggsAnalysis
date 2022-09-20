@@ -23,6 +23,8 @@ TTToHcToWAToMuMu_MHc-160_MA-155
 WZTo3LNu_amcatnlo
 WZTo3LNu_mllmin4p0_powheg
 ZZTo4L_powheg
+# conv
+DYJets
 ZGToLLG
 # tt+X
 ttWToLNu
