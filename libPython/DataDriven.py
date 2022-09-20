@@ -44,6 +44,6 @@ class Conversion():
         }
         del csv_dyjets, csv_zgamma
 
-    def GetScale(self, measure, sys=0):
+    def getScale(self, measure, sys=0):
         value, error = self.scale_dict[measure]
         return value + sys*error

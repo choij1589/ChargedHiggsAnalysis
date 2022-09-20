@@ -1,5 +1,6 @@
 #!/bin/sh
-ERAs=( 2016preVFP 2016postVFP 2017 2018)
+#ERAs=( 2016preVFP 2016postVFP 2017 2018)
+ERAs=( 2017 )
 REGION=$1
 
 
@@ -9,7 +10,7 @@ if [ $REGION = "ZGammaRegion" ]
 then
 	for ERA in "${ERAs[@]}"
 	do
-		mkdir -p output/plots/${ERA}/${REGION}
+		mkdir -p plots/${ERA}/${REGION}
 		python drawPlots.py --era $ERA --var muons/1/pt --region $REGION
 		python drawPlots.py --era $ERA --var muons/1/eta --region $REGION
 		python drawPlots.py --era $ERA --var muons/1/phi --region $REGION
@@ -41,12 +42,18 @@ then
 		python drawPlots.py --era $ERA --var ZCand/pt --region $REGION
 		python drawPlots.py --era $ERA --var ZCand/eta --region $REGION
 		python drawPlots.py --era $ERA --var ZCand/phi --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION
 	done
 elif [ $REGION = "ZFakeRegion" ]
 then
 	for ERA in "${ERAs[@]}"
 	do
-		mkdir -p output/plots/${ERA}/${REGION}
+		mkdir -p plots/${ERA}/${REGION}
 		python drawPlots.py --era $ERA --var muons/1/pt --region $REGION
 		python drawPlots.py --era $ERA --var muons/1/eta --region $REGION
 		python drawPlots.py --era $ERA --var muons/1/phi --region $REGION
@@ -82,6 +89,12 @@ then
 		python drawPlots.py --era $ERA --var xZCand/pt --region $REGION
 		python drawPlots.py --era $ERA --var xZCand/eta --region $REGION
 		python drawPlots.py --era $ERA --var xZCand/phi --region $REGION
+		python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION
 	done
 else	#signalregion
 	echo SignalRegion is not defined yet
