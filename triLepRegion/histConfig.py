@@ -162,5 +162,42 @@ hist_configs = {
                    "y_title": "Events / 5 GeV",
                    "x_range": [0., 300.],
                    "rebin": 5
-                   } 
+                   },
+    # scores
+    "MHc-70_MA-15vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 5
+                                  },
+    "MHc-70_MA-40vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 5
+                                  },
+    "MHc-70_MA-65vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 5
+                                  },
+    "MHc-70_MA-15vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 5
+                                  },
+    "MHc-70_MA-40vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 5
+                                  },
+    "MHc-70_MA-65vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 5
+                                  },
 }

@@ -3,28 +3,6 @@ from ROOT import TCanvas, TPad, TLegend, TLatex
 from ROOT import THStack
 
 
-# class Comparison():
-#    def __init__(self):
-#        self.cvs = TCanvas("c", "", 720, 900)
-#        self.pad_up = TCanvas("c", "", 720, 900)
-#        self.pad_up = TPad("up", "", 0, 0.25, 1, 1)
-#        self.pad_up.SetBottomMargin(0.02)
-#        self.pad_down = TPad("down", "", 0, 0, 1, 0.25)
-#        self.pad_down.SetGrid(True)
-#        self.pad_down.SetTopMargin(0.08)
-#        self.pad_down.SetBottomMargin(0.3)
-
-#        self.lumi = TLatex()
-#        self.lumi.SetTextSize(0.035)
-#        self.lumi.SetTextFont(42)
-#        self.cms = TLatex()
-#        self.cms.SetTextSize(0.04)
-#        self.cms.SetTextFont(61)
-#        self.preliminary = TLatex()
-#        self.preliminary.SetTextSize(0.035)
-#        self.preliminary.SetTextFont(52)
-
-
 class Canvas():
     def __init__(self, config=None):
         #super(Canvas, self).__init__()
@@ -84,8 +62,12 @@ class Canvas():
         maximum = 0.
         for hist in self.histograms.values():
             maximum = max(maximum, hist.GetMaximum())
+        setLogY = "logY" in self.config.keys()
         for hist in self.histograms.values():
-            hist.GetYaxis().SetRangeUser(0, maximum*2.)
+            if setLogY:
+                hist.GetYaxis().SetRangeUser(1, maximum*10.)
+            else:
+                hist.GetYaxis().SetRangeUser(0, maximum*2.)
 
         self.data, *self.predictions = self.histograms.values()
         self.data.SetTitle("")
@@ -182,6 +164,9 @@ class Canvas():
         self.preliminary.DrawLatexNDC(0.15, 0.78, "Work in progress")
 
     def finalize(self):
+        # log
+        setLogY = "logY" in self.config.keys()
+        if setLogY: self.pad_up.SetLogy()
         self.cvs.cd()
         self.pad_up.Draw()
         self.pad_down.Draw()
