@@ -1,6 +1,7 @@
 import os, sys
 sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
+from MetaInfo.periodInfo import PeriodDict
 
 from ROOT import TFile
 from libPython.Selection import pass_baseline, select
@@ -16,6 +17,15 @@ parser.add_argument("--era", "-e", required=True, type=str, help="era")
 parser.add_argument("--sample", "-s", default="DoubleMuon",
                     type=str, help="sample name")
 args = parser.parse_args()
+
+periodList = PeriodDict[args.era]
+try:
+    idx = int(args.sample[-1])
+    args.sample = args.sample.replace(str(idx), periodList[idx])
+    print(args.sample)
+except:
+    # running full era
+    pass
 
 # define event loop
 def Loop(evt, fakeEstimator, manager, writer):

@@ -8,7 +8,7 @@ if [[ $HOSTNAME == *"tamsa2"* ]]; then
     #source /cvmfs/sft.cern.ch/lcg/releases/cudnn/8.2.4.15-ca3b5/x86_64-centos7-gcc8-opt/cudnn-env.sh
 
     # Python setup
-    #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/Python/3.9.12/x86_64-centos7-gcc8-opt/Python-env.sh
+    source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/Python/3.9.12/x86_64-centos7-gcc8-opt/Python-env.sh
     #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/pip/22.0.4/x86_64-centos7-gcc8-opt/pip-env.sh
     #source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/blas/0.3.20.openblas/x86_64-centos7-gcc8-opt/blas-env.sh
     # ROOT setup
