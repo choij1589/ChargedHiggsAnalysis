@@ -35,7 +35,7 @@ def makeRunSh():
     f.write("cd $WORKDIR\n")
     f.write("source /opt/conda/bin/activate\n")
     f.write("conda activate torch\n")
-    f.write(f"python triLepRegion/makeMCHistograms.py --era 2017 --sample $SAMPLE --split")
+    f.write(f"python triLepRegion/makeMCHistograms.py --era {args.era} --sample $SAMPLE --split")
     f.close()
 
 def isJobStatusDone(clusterID):
