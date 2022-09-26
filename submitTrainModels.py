@@ -26,7 +26,7 @@ def makeJobCommands():
         queue.append(command)
     return queue
 
-def checkDeviceStatus(device, procs, freeMemory=2e9, maxRunningJobs=13):
+def checkDeviceStatus(device, procs, freeMemory=2e9, maxRunningJobs=14):
     runningJobs = list(filter(lambda proc: proc.poll() is None, procs))
     free, max = cuda.mem_get_info(device)
     return (free > freeMemory) and (len(runningJobs) < maxRunningJobs)

@@ -1,4 +1,5 @@
 import os
+import sys
 import uuid
 import argparse
 
@@ -10,6 +11,7 @@ args = parser.parse_args()
 
 # make random string
 process = uuid.uuid4().hex.upper()[:6]
+
 
 def makeSubmitJds():
     f = open(f"condor/temp_{process}/submit.jds", "w")

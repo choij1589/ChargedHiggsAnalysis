@@ -34,4 +34,3 @@ def splitSample(samplename):
 
 for sample in sampleList:
     splitSample(sample)
-

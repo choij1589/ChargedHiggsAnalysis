@@ -98,7 +98,7 @@ def Loop(evt, manager, mcCorr, syst, writer):
     writer.fill_jets(f"{prefix}/bjets", bjets, weight)
     writer.fill_object(f"{prefix}/METv", METv, weight)
     for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
     
     prefix = f"3Mu/Baseline/{syst}/{measure}"
     writer.fill_muons(f"{prefix}/muons", muons, weight)
@@ -107,7 +107,7 @@ def Loop(evt, manager, mcCorr, syst, writer):
     writer.fill_jets(f"{prefix}/bjets", bjets, weight)
     writer.fill_object(f"{prefix}/METv", METv, weight)
     for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
 
     # Signal / Control regions    
     if region is None:
@@ -144,7 +144,7 @@ def Loop(evt, manager, mcCorr, syst, writer):
     writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
     writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
     for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
     
     prefix = f"3Mu/{region}/{syst}/{measure}"
     writer.fill_muons(f"{prefix}/muons", muons, weight)
@@ -155,7 +155,7 @@ def Loop(evt, manager, mcCorr, syst, writer):
     writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
     writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
     for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
     
 if __name__ == "__main__":
     file_path = f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__"
