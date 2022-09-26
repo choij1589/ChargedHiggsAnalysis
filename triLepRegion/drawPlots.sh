@@ -45,9 +45,31 @@ then
 		python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION
 		python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION
 		python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-100_MA-15vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-100_MA-60vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-100_MA-95vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-130_MA-15vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-130_MA-55vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-130_MA-90vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-130_MA-125vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-160_MA-15vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-160_MA-85vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-160_MA-120vsTTLL_powheg/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-160_MA-155vsTTLL_powheg/score --region $REGION
 		python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION
 		python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION
 		python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION
+		python drawPlots.py --era $ERA --var MHc-100_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-60vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-95vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-55vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-90vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-125vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-85vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-120vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-155vsVV/score --region $REGION
 	done
 elif [ $REGION = "ZFakeRegion" ]
 then
@@ -92,9 +114,31 @@ then
 		python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION
         python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION
         python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-15vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-60vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-95vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-15vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-55vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-90vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-125vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-15vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-85vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-120vsTTLL_powheg/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-155vsTTLL_powheg/score --region $REGION
         python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION
         python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION
         python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-60vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-100_MA-95vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-55vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-90vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-130_MA-125vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-15vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-85vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-120vsVV/score --region $REGION
+        python drawPlots.py --era $ERA --var MHc-160_MA-155vsVV/score --region $REGION
 	done
 else	#signalregion
 	echo SignalRegion is not defined yet
