@@ -4,6 +4,12 @@ from ROOT import THStack
 
 
 class Canvas():
+    lumi_info = {
+            "2016preVFP": "L^{int} = 19.5 fb^{-1} (13TeV)",
+            "2016postVFP": "L^{int} = 16.8 fb^{-1} (13TeV)",
+            "2017": "L^{int} = 41.5 fb^{-1} (13TeV) ",
+            "2018": "L^{int} = 59.8 fb^{-1} (13TeV)"
+        }
     def __init__(self, config=None):
         #super(Canvas, self).__init__()
         self.config = config
@@ -40,6 +46,7 @@ class Canvas():
         for name, hist in self.histograms.items():
             hist.SetStats(0)
 
+        # Rebin
         if "rebin" in self.config.keys():
             rebin = self.config['rebin']
             for hist in self.histograms.values():
@@ -79,7 +86,6 @@ class Canvas():
         self.data.SetMarkerSize(0.5)
         self.data.SetMarkerColor(1)
 
-        # legend setting?
         # stack
         for hist in self.predictions:
             self.stack.Add(hist)
@@ -133,10 +139,6 @@ class Canvas():
         self.ratio_syst.SetFillColorAlpha(12, 0.6)
         self.ratio_syst.SetFillStyle(3144)
 
-        self.pad_down.cd()
-        self.ratio.Draw("p&hist")
-        self.ratio_syst.Draw("e2&f&same")
-
     def draw_legend(self):
         # legend location?
         self.legend = TLegend(0.65, 0.55, 0.90, 0.80)
@@ -147,26 +149,27 @@ class Canvas():
             self.legend.AddEntry(hist, hist.GetName(), "f")
         self.legend.AddEntry(self.systematics, "stat+syst", "f")
 
-        self.pad_up.cd()
-        self.legend.Draw()
-
-    def draw_latex(self, era):
-        lumi_info = {
-            "2016preVFP": "L^{int} = 19.5 fb^{-1} (13TeV)",
-            "2016postVFP": "L^{int} = 16.8 fb^{-1} (13TeV)",
-            "2017": "L^{int} = 41.5 fb^{-1} (13TeV) ",
-            "2018": "L^{int} = 59.8 fb^{-1} (13TeV)"
-        }
-        # CMS texts, etc...
-        self.pad_up.cd()
-        self.lumi.DrawLatexNDC(0.62, 0.91, lumi_info[era])
-        self.cms.DrawLatexNDC(0.15, 0.83, "CMS")
-        self.preliminary.DrawLatexNDC(0.15, 0.78, "Work in progress")
-
-    def finalize(self):
+    def finalize(self, era):
         # log
         setLogY = "logY" in self.config.keys()
         if setLogY: self.pad_up.SetLogy()
+        self.pad_up.cd()
+        self.data.Draw("p&hist")
+        self.stack.Draw("hist&pfc&same")
+        self.systematics.Draw("e2&f&same")
+        self.data.Draw("p&hist&same")
+        self.data.Draw("e1&same")
+        self.legend.Draw()
+        self.lumi.DrawLatexNDC(0.62, 0.91, self.lumi_info[era])
+        self.cms.DrawLatexNDC(0.15, 0.83, "CMS")
+        self.preliminary.DrawLatexNDC(0.15, 0.78, "Work in progress")
+        self.pad_up.RedrawAxis()
+
+        self.pad_down.cd()
+        self.ratio.Draw("p&hist")
+        self.ratio_syst.Draw("e2&f&same")
+        self.pad_down.RedrawAxis()
+        
         self.cvs.cd()
         self.pad_up.Draw()
         self.pad_down.Draw()

@@ -164,40 +164,172 @@ hist_configs = {
                    "rebin": 5
                    },
     # scores
-    "MHc-70_MA-15vsTTLL_powheg/score": {"x_title": "score",
+    "MHc-70_MA-150vsTTLL_powheg/score": {"x_title": "score",
                                   "y_title": "Events",
                                   "x_range": [0., 1.],
                                   "logY": True,
-                                  "rebin": 5
+                                  "rebin": 50
                                   },
     "MHc-70_MA-40vsTTLL_powheg/score": {"x_title": "score",
                                   "y_title": "Events",
                                   "x_range": [0., 1.],
                                   "logY": True,
-                                  "rebin": 5
+                                  "rebin": 50
                                   },
-    "MHc-70_MA-65vsTTLL_powheg/score": {"x_title": "score",
+    "MHc-70_MA-650vsTTLL_powheg/score": {"x_title": "score",
                                   "y_title": "Events",
                                   "x_range": [0., 1.],
                                   "logY": True,
-                                  "rebin": 5
+                                  "rebin": 50
                                   },
-    "MHc-70_MA-15vsVV/score": {"x_title": "score",
+    "MHc-100_MA-150vsTTLL_powheg/score": {"x_title": "score",
                                   "y_title": "Events",
                                   "x_range": [0., 1.],
                                   "logY": True,
-                                  "rebin": 5
+                                  "rebin": 50
+                                  },
+    "MHc-100_MA-60vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-100_MA-950vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-150vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-5050vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-90vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-1250vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-150vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-850vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-120vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-15050vsTTLL_powheg/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-70_MA-150vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
                                   },
     "MHc-70_MA-40vsVV/score": {"x_title": "score",
                                   "y_title": "Events",
                                   "x_range": [0., 1.],
                                   "logY": True,
-                                  "rebin": 5
+                                  "rebin": 50
                                   },
-    "MHc-70_MA-65vsVV/score": {"x_title": "score",
+    "MHc-70_MA-650vsVV/score": {"x_title": "score",
                                   "y_title": "Events",
                                   "x_range": [0., 1.],
                                   "logY": True,
-                                  "rebin": 5
+                                  "rebin": 50
+                                  },
+    "MHc-100_MA-150vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-100_MA-60vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-100_MA-950vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-150vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-5050vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-90vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-130_MA-1250vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-150vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-850vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-120vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
+                                  },
+    "MHc-160_MA-15050vsVV/score": {"x_title": "score",
+                                  "y_title": "Events",
+                                  "x_range": [0., 1.],
+                                  "logY": True,
+                                  "rebin": 50
                                   },
 }
