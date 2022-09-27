@@ -3,28 +3,38 @@ sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
 
 from math import pow, sqrt
-from ROOT import kBlack, kGray, kRed, kBlue, kGreen, kMagenta, kCyan, kAzure, kViolet
+from ROOT import kBlack, kYellow, kGray, kRed, kBlue, kGreen, kMagenta, kCyan, kAzure, kViolet
 from ROOT import TFile
 from libPython.DataDriven import Conversion
-from plotter.comparison import Canvas
 from histConfig import hist_configs
 
 # Agruments
 parser = argparse.ArgumentParser()
-parser.add_argument("--era", "-e", default="2017",
-                    required=True, type=str, help="era")
-parser.add_argument("--var", "-v", required=True, type=str, help="observable")
-parser.add_argument("--region", "-r", required=True, type=str,
-                    help="SignalRegion / ZFakeRegion / ZGammaRegion")
+parser.add_argument("--era", required=True, type=str, help="era")
+parser.add_argument("--var", required=True, type=str, help="observable")
+parser.add_argument("--region", required=True, type=str, help="SignalRegion/ZFakeRegion/ZGammaRegion")
+parser.add_argument("--blind", action="store_true", default=False, help="blind mode")
+parser.add_argument("--signalset", type=str, help="charged Higgs mass")
 args = parser.parse_args()
 
 DataStream = "DoubleMuon"
 Conv = ["DYJets", "ZGToLLG"]
 VV = ["WZTo3LNu_mllmin4p0_powheg", "ZZTo4L_powheg"]
+#VV = ["WZTo3LNu_mllmin4p0_powheg"] 
 ttX = ["ttWToLNu", "ttZToLLNuNu", "ttHToNonbb", "tZq", "tHq"]
-Rare = ["WWW", "WWZ", "WZZ", "ZZZ", "WWG", "TTG",
-        "TTTT", "VBF_HToZZTo4L", "GluGluHToZZTo4L"]
+Rare = ["WWW", "WWZ", "WZZ", "ZZZ", "WWG", "TTG", "TTTT", "VBF_HToZZTo4L", "GluGluHToZZTo4L"]
 MCSamples = Conv + VV + ttX + Rare
+
+if args.signalset == "mixed":
+    MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+elif args.signalset == "70":
+    MASSPOINTs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65"]
+elif args.signalset == "100":
+    MASSPOINTs = ["MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95"]
+elif args.signalset == "130":
+    MASSPOINTs = ["MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125"]
+elif args.signalset == "160":
+    MASSPOINTs = ["MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA_155"]
 
 Systematics = ["Central",
                ["L1PrefireUp", "L1PrefireDown"],
@@ -59,7 +69,17 @@ for bin in range(h_fake.GetNcells()):
     this_error = sqrt(this_error)
     h_fake.SetBinError(bin, this_error)
 
-# MC
+# Signals
+signals = {}
+for masspoint in MASSPOINTs:
+    f = TFile.Open(f"ROOT/Skim3Mu__/{args.era}/TTToHcToWAToMuMu_{masspoint}.root")
+    h = f.Get(f"3Mu/{args.region}/Central/Incl/{args.var}")
+    h.SetDirectory(0)
+    f.Close()
+    signals[masspoint] = h.Clone(masspoint)
+    del h
+
+# MC Backgrounds
 MCcoll = {}
 ConvSF = Conversion(era=args.era)
 for sample in MCSamples:
@@ -115,18 +135,11 @@ for sample in MCSamples:
 histograms = {}
 colors = {}
 histograms['data'] = None
-colors['data'] = kBlack
 histograms['fake'] = None
-colors['fake'] = kGray
 histograms['conv'] = None
-colors['conv'] = kCyan
 histograms['VV'] = None
-colors['VV'] = kGreen
 histograms['ttX'] = None
-colors['ttX'] = kBlue
 histograms['rare'] = None
-colors['rare'] = kRed
-
 
 def add_histogram(name, hist, histograms):
     # first clone or add histogram
@@ -155,14 +168,36 @@ for sample in Rare:
         continue
     add_histogram("rare", MCcoll[sample], histograms)
 
+# colors
+colors['data'] = kBlack
+colors['fake'] = kGray
+colors['conv'] = kCyan
+colors['VV'] = kGreen
+colors['ttX'] = kBlue
+colors['rare'] = kRed
+
+colorList = [kRed, kGreen, kGray, kCyan]
+for i, masspoint in enumerate(MASSPOINTs):
+    colors[masspoint] = colorList[i]
+
 # Draw plots
 config = hist_configs[args.var]
 config['ratio'] = [0., 2.]
-c = Canvas(config=config)
-c.draw_distributions(histograms, colors)
-c.draw_ratio()
-c.draw_legend()
-c.draw_latex(args.era)
-c.finalize()
-c.savefig(
-    f"./plots/{args.era}/{args.region}/{args.var.replace('/', '_')}.png")
+
+if args.blind:
+    from plotter.kinematics import Canvas
+    histograms.pop("data")
+    c = Canvas(config=config)
+    c.draw_signals(signals, colors)
+    c.draw_backgrounds(histograms, colors)
+    c.draw_legend()
+    c.finalize(args.era)
+    c.savefig(f"./plots/{args.era}/{args.region}/MHc-{args.signalset}/{args.var.replace('/', '_')}.png")
+else:
+    from plotter.comparison import Canvas
+    c = Canvas(config=config)
+    c.draw_distributions(histograms, colors)
+    c.draw_ratio()
+    c.draw_legend()
+    c.finalize(args.era)
+    c.savefig(f"./plots/{args.era}/{args.region}/{args.var.replace('/', '_')}.png")
