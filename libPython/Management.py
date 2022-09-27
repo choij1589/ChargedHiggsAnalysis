@@ -58,7 +58,7 @@ class MVAManager():
                               object.IsJet(),
                               object.BtagScore()])
         # the function don't need to know it's actual answer, so just set y=1
-        data = evt_to_graph(node_list, y=1, k=3)
+        data = evt_to_graph(node_list, y=1, k=4)
 
         # now fill the scores
         for key, model in self.models.items():

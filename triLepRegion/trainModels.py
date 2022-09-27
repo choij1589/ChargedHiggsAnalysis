@@ -15,6 +15,7 @@ from libPython.MLTools      import SummaryWriter
 from libPython.MLTools      import GCN, GNN, ParticleNet
 from libPython.MLTools      import EarlyStopping
 from libPython.MLTools      import predict, prepare_roc, plot_roc
+#from libPython.Messenger    import Messenger
 
 #### Parse arguments
 parser = argparse.ArgumentParser()
@@ -172,11 +173,11 @@ else:
 
 if __name__ == "__main__":
     model_name = f"{args.model}_nhidden-{args.hidden_layers}_{args.optimizer}_initial_lr-{str(args.initial_lr).replace('.', 'p')}_{args.scheduler}_nbatch-{args.batch_size}"
-    checkpoint_path = f"{os.environ['WORKDIR']}/.models/{args.era}/{args.signal}_vs_{args.background}/{model_name}.pt"
+    checkpoint_path = f"{os.environ['WORKDIR']}/.models/{args.era}/k_4/{args.signal}_vs_{args.background}/{model_name}.pt"
     writer_name = f"writer_{model_name}"
-    summary_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/{args.signal}_vs_{args.background}/training-{model_name}.png"
-    roc_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/{args.signal}_vs_{args.background}/roc-{model_name}.png"
-    outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/{args.era}/{args.signal}_vs_{args.background}/{model_name}.root"
+    summary_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/k_4/{args.signal}_vs_{args.background}/training-{model_name}.png"
+    roc_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/k_4/{args.signal}_vs_{args.background}/roc-{model_name}.png"
+    outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/{args.era}/k_4/{args.signal}_vs_{args.background}/{model_name}.root"
 
     criterion = torch.nn.CrossEntropyLoss()
     early_stopper = EarlyStopping(patience=8, path=checkpoint_path)
@@ -230,3 +231,6 @@ if __name__ == "__main__":
     tpr['test'], fpr['test'], auc['test'] = prepare_roc(answers, predictions)
     plot_roc(tpr, fpr, auc, roc_path)
     h_writer.close()
+
+    #messenger = Messenger()
+    #messenger.sendMessage(f"[triLepRegion::trainModels] Finished training {model_name} for {args.signal}_vs_{args.background}")

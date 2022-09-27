@@ -57,7 +57,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, 1.)
         writer.fill_object(f"{prefix}/METv", METv, 1.)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, 1., 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, 1., 1000, 0., 1.)
 
         prefix = f"3Mu/Baseline/Central/{measure}"
         writer.fill_muons(f"{prefix}/muons", muons, 1.)
@@ -66,7 +66,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, 1.)
         writer.fill_object(f"{prefix}/METv", METv, 1.)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, 1., 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, 1., 1000, 0., 1.)
     else:
         # Nonprompt
         weight = fakeEstimator.get_fake_weight(muons)
@@ -77,7 +77,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, weight)
         writer.fill_object(f"{prefix}/METv", METv, weight)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1)
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1)
 
         prefix = f"3Mu/Baseline/Nonprompt/{measure}"
         writer.fill_muons(f"{prefix}/muons", muons, weight)
@@ -86,7 +86,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, weight)
         writer.fill_object(f"{prefix}/METv", METv, weight)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.) 
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.) 
         
         # NonpromptUp
         weight = fakeEstimator.get_fake_weight(muons, 1)
@@ -97,7 +97,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, weight)
         writer.fill_object(f"{prefix}/METv", METv, weight)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
 
         prefix = f"3Mu/Baseline/NonpromptUp/{measure}"
         writer.fill_muons(f"{prefix}/muons", muons, weight)
@@ -106,7 +106,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, weight)
         writer.fill_object(f"{prefix}/METv", METv, weight)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)  
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)  
         
         # NonpromptDown
         weight = fakeEstimator.get_fake_weight(muons, -1)
@@ -117,7 +117,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, weight)
         writer.fill_object(f"{prefix}/METv", METv, weight)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
 
         prefix = f"3Mu/Baseline/NonpromptDown/{measure}"
         writer.fill_muons(f"{prefix}/muons", muons, weight)
@@ -126,7 +126,7 @@ def Loop(evt, fakeEstimator, manager, writer):
         writer.fill_jets(f"{prefix}/bjets", bjets, weight)
         writer.fill_object(f"{prefix}/METv", METv, weight)
         for classifier, score in scores.items():
-            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 100 , 0., 1.) 
+            writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000 , 0., 1.) 
 
     if region is None:
         return None

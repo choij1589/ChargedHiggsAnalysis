@@ -1,4 +1,4 @@
-from libPython.Selection import pass_baseline
+from libPython.Selection import pass_baseline, select
 from libPython.DataFormat import Particle, get_muons, get_electrons, get_jets
 from torch_geometric.data import InMemoryDataset
 from torch_geometric.data import Data
@@ -36,7 +36,7 @@ def get_edge_indices(node_list, k):
     return (torch.tensor(edge_index, dtype=torch.long), torch.tensor(edge_attribute, dtype=torch.float))
 
 
-def evt_to_graph(node_list, y, k=3):
+def evt_to_graph(node_list, y, k=4):
     x = torch.tensor(node_list, dtype=torch.float)
     edge_index, edge_attribute = get_edge_indices(node_list, k=k)
     data = Data(x=x,
@@ -56,6 +56,8 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
 
         if not pass_baseline(channel, evt, muons, electrons, jets, bjets, "loose"):
             continue
+        #if not select(channel, evt, muons, electrons, jets, bjets, "loose") == "SignalRegion":
+        #    continue
 
         muons_prompt = list(filter(lambda x: x.LepType() > 0, muons))
         electrons_prompt = list(filter(lambda x: x.LepType() > 0, electrons))
@@ -85,7 +87,7 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
         # make edges
         # NOTE: Each event is a directed graph!
         # for each node, find 3 nearest particles and connect them
-        edge_index, edge_attribute = get_edge_indices(node_list, k=3)
+        edge_index, edge_attribute = get_edge_indices(node_list, k=4)
         data = Data(x=x,
                     y=int(is_signal),
                     edge_index=edge_index.t().contiguous(),

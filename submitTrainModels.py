@@ -14,7 +14,7 @@ BACKGROUNDs = ["TTLL_powheg", "VV"]
 models = ["GCN", "GNN", "ParticleNet"]
 optimizers = ["RMSprop", "Adam"]
 schedulers = ["StepLR", "ExponentialLR"]
-initLRs = [0.001, 0.002, 0.005, 0.008, 0.01]
+initLRs = [0.0001, 0.0005, 0.001, 0.002, 0.005]
 nBatch = 1024
 nHidden = 128
 
