@@ -2,10 +2,11 @@ import os
 import sys; sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
 
-import torch
-from torch_geometric.loader import DataLoader
 from sklearn.utils          import shuffle
 from ROOT                   import TFile
+
+import torch
+from torch_geometric.loader import DataLoader
 
 from libPython.Preprocessor import MyDataset
 from libPython.Preprocessor import rtfile_to_datalist
@@ -87,8 +88,8 @@ else:
 #### pilot mode
 #### It is used in both debugging and finding optimal hyperparameter
 if args.pilot:
-    maxSize = 10000
-    epochs = 5
+    maxSize = 50000
+    epochs = 20
 else:
     maxSize = 200000
     epochs = 300

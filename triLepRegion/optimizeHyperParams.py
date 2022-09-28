@@ -1,17 +1,14 @@
 import os
-import sys
-from threading import currentThread; sys.path.insert(0, os.environ['WORKDIR'])
+import sys; sys.path.insert(0, os.environ['WORKDIR'])
+import argparse
 import subprocess
-import torch 
-
-from collections import deque
-from time import sleep
-from pprint import pprint
 
 from libPython.GATools import GeneticModule
 
-MASSPOINT = "MHc-130_MA-90"
-BACKGROUND = "TTLL_powheg"
+parser = argparse.ArgumentParser()
+parser.add_argument("--signal", "-s", required=True, type=str, help="signal mass point")
+parser.add_argument("--background", "-b", required=True, type=str, help="background")
+args = parser.parse_args()
 
 # Let's run the model linearly first
 #### Hyper parameters
@@ -23,8 +20,9 @@ initLRs = [0.00001, 0.00002, 0.00005, 0.0001, 0.0002, 0.0005,
 nBatch = 1024
 nHidden = 128
 criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
-nPop = 6
-thresholds = [0.7, 0.7, 0.9, 0.7]
+nPop = 14
+thresholds = [0.7, 0.8, 0.95, 0.8]
+maxIter = 5
 
 def evalFitness(population):
     procs = []
@@ -33,13 +31,13 @@ def evalFitness(population):
         if population[idx]['fitness'] is not None:
             continue
         model, optimizer, initLR, scheduler = population[idx]['chromosome']
-        command = f"python triLepRegion/trainModels.py --signal {MASSPOINT} --background {BACKGROUND}"
+        command = f"python {os.environ['WORKDIR']}/triLepRegion/trainModels.py --signal {args.signal} --background {args.background}"
         command += f" --model {model}"
         command += f" --optimizer {optimizer}"
         command += f" --initLR {initLR}"
         command += f" --scheduler {scheduler}"
         command += f" --device cuda --pilot"
-        #print(f"sumbit {command}...")
+        print(f"sumbit {command}...")
         proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         procs.append(proc)
         
@@ -56,14 +54,16 @@ gaModule.getGeneValues(initLRs)
 gaModule.getGeneValues(schedulers)
 gaModule.generatePool(criteria)
 
-maxIter = 3
 gaModule.randomGeneration(nPop=nPop)
 for iter in range(maxIter):
     print(f"@@@@ generation {iter}")
     evalFitness(gaModule.population)
-    gaModule.updatePopulation(MASSPOINT, BACKGROUND)
+    gaModule.updatePopulation(args.signal, args.background)
     gaModule.evolution(thresholds=thresholds, ratio=0.5)
     print(gaModule.meanFitness())
+
+# final evalFitness
+evalFitness(gaModule.population)
     
-path = f"{os.environ['WORKDIR']}/models/{MASSPOINT}_vs_{BACKGROUND}/GAOptimization.csv"
+path = f"{os.environ['WORKDIR']}/models/{args.signal}_vs_{args.background}/GAOptimization.csv"
 gaModule.savePopulation(path=path)
