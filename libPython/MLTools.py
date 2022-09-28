@@ -1,7 +1,10 @@
-import matplotlib.pyplot as plt
-import pandas as pd
+import os
+import sys; sys.path.insert(0, os.environ['WORKDIR'])
+
 import numpy as np
-from sklearn import metrics
+import pandas as pd
+import matplotlib.pyplot as plt
+
 import torch
 import torch.nn.functional as F
 from torch.nn import Sequential, Linear, ReLU
@@ -9,10 +12,7 @@ from torch_geometric.nn import global_mean_pool, knn_graph
 from torch_geometric.nn import GCNConv, GraphConv
 from torch_geometric.nn import GraphNorm
 from torch_geometric.nn import MessagePassing
-import os
-import sys
-sys.path.insert(0, os.environ['WORKDIR'])
-
+from sklearn import metrics
 
 class GCN(torch.nn.Module):
     def __init__(self, num_features, num_classes, hidden_channels):
@@ -184,25 +184,32 @@ class SummaryWriter():
     def get_scalar(self, key):
         return np.array(self.scalar_dict[key])
 
+    def store_csv(self, path):
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+
+        df = pd.DataFrame(self.scalar_dict)
+        df.to_csv(path)
+
     def visualize_training(self, path):
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
 
         assert "loss/train" in self.scalar_dict.keys()
-        assert "loss/validation" in self.scalar_dict.keys()
-        assert "accuracy/train" in self.scalar_dict.keys()
-        assert "accuracy/validation" in self.scalar_dict.keys()
+        assert "loss/valid" in self.scalar_dict.keys()
+        assert "acc/train" in self.scalar_dict.keys()
+        assert "acc/valid" in self.scalar_dict.keys()
 
         train_loss = self.get_scalar("loss/train")
-        val_loss = self.get_scalar("loss/validation")
-        train_acc = self.get_scalar("accuracy/train")
-        val_acc = self.get_scalar("accuracy/validation")
+        val_loss = self.get_scalar("loss/valid")
+        train_acc = self.get_scalar("acc/train")
+        val_acc = self.get_scalar("acc/valid")
         epochs = np.arange(1, len(train_loss)+1)
 
         plt.figure(figsize=(24, 12))
         plt.subplot(1, 2, 1)
         plt.plot(epochs, train_loss, label="train loss")
-        plt.plot(epochs, val_loss, label="validation loss")
+        plt.plot(epochs, val_loss, label="valid loss")
         plt.xlabel("epoch")
         plt.ylabel("loss")
         plt.legend(loc="best")
@@ -210,7 +217,7 @@ class SummaryWriter():
 
         plt.subplot(1, 2, 2)
         plt.plot(epochs, train_acc, label="train accuracy")
-        plt.plot(epochs, val_acc, label="validation accuracy")
+        plt.plot(epochs, val_acc, label="valid accuracy")
         plt.xlabel("epoch")
         plt.ylabel("accuracy")
         plt.legend(loc="best")
