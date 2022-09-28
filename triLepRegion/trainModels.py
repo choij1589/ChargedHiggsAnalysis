@@ -1,114 +1,133 @@
-import os, sys
-sys.path.insert(0, os.environ['WORKDIR'])
+import os
+import sys; sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
-
-from sklearn.utils          import shuffle
-from ROOT                   import TFile
 
 import torch
 from torch_geometric.loader import DataLoader
+from sklearn.utils          import shuffle
+from ROOT                   import TFile
 
 from libPython.Preprocessor import MyDataset
 from libPython.Preprocessor import rtfile_to_datalist
-from libPython.HistTools    import HistogramWriter
-from libPython.MLTools      import SummaryWriter
 from libPython.MLTools      import GCN, GNN, ParticleNet
 from libPython.MLTools      import EarlyStopping
 from libPython.MLTools      import predict, prepare_roc, plot_roc
-#from libPython.Messenger    import Messenger
+from libPython.MLTools      import SummaryWriter
 
 #### Parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--signal", "-s", required=True, type=str, help="signal sample")
 parser.add_argument("--background", "-b", required=True, type=str, help="background sample")
-parser.add_argument("--model", "-m", default="ParticleNet", type=str, help="model")
-parser.add_argument("--hidden_layers", "-l", default=128, type=int, help="the number of hidden layers")
-parser.add_argument("--optimizer", "-z", default="Adam", type=str, help="optimizer")
-parser.add_argument("--initial_lr", "-i", default=0.15, type=float, help="initial learning rate")
-parser.add_argument("--batch_size", "-n", default=1024, type=int, help="batch size")
-parser.add_argument("--scheduler", "-c", default="ExponentialLR", type=str, help="learning rate scheducler")
-parser.add_argument("--era", "-e", default="All", type=str, help="Era")
+parser.add_argument("--model", "-m", required=True, type=str, help="model type")
+parser.add_argument("--nhidden", "-l", default=128, type=int, help="the number of hidden layers")
+parser.add_argument("--optimizer", "-z", required=True, type=str, help="optimizer")
+parser.add_argument("--initLR", "-i", required=True, type=float, help="initial learning rate")
+parser.add_argument("--nbatch", "-n", default=1024, type=int, help="batch size")
+parser.add_argument("--scheduler", "-c", required=True, type=str, help="learning rate scheducler")
+#parser.add_argument("--era", "-e", default="All", type=str, help="Era")
 parser.add_argument("--pilot", "-p", action="store_true", default=False, help="pilot run")
 parser.add_argument("--device", "-d", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
 
-signal_list = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
-               "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
-               "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
-               "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
-background_list = ["TTLL_powheg", "VV"]
+# check arguments
+signalList = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
+              "MHc-100_MA-60", "MHc-100_MA-95",
+              "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
+              "MHc-160_MA-85", "MHc-160_MA-155"]
+backgroundList = ["TTLL_powheg"]
 
-if not args.signal in signal_list:
-    print(f"Wrong signal model {args.signal}")
+if not args.signal in signalList:
+    print(f"[trainModels] Wrong signal model {args.signal}")
     exit(1)
-if not args.background in background_list:
-    print(f"Wrong background model {args.background}")
+if not args.background in backgroundList:
+    print(f"[trainModels] Wrong background {args.background}")
     exit(1)
-if not args.era in ["All", "2016preVFP", "2016postVFP", "2017", "2018"]:
-    print(f"Wrong era {args.era}")
+
+#### Hyperparameter settings
+nFeatures = 9
+nClasses = 2
+print(f"@@@@ Using model {args.model}...")
+if args.model == "GCN":
+    model = GCN(nFeatures, nClasses, args.nhidden).to(args.device)
+elif args.model == "GNN":
+    model = GNN(nFeatures, nClasses, args.nhidden).to(args.device)
+elif args.model == "ParticleNet":
+    model = ParticleNet(nFeatures, nClasses, args.nhidden).to(args.device)
+else:
+    print(f"[trainModels] Wrong model name {args.model}")
+    exit(1)
+
+print(f"@@@@ Using optimizer {args.optimizer}...")
+if args.optimizer == "RMSprop":
+    optimizer = torch.optim.RMSprop(model.parameters(), lr=args.initLR, momentum=0.9)
+elif args.optimizer == "AdamW":
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.initLR)
+elif args.optimizer == "Adam":
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.initLR)
+elif args.optimizer == "Adadelta":
+    optimizer = torch.optim.Adadelta(model.parameters(), lr=args.initLR)
+else:
+    print(f"[trainModels] Wrong optimizer name {args.optimizer}")
+    exit(1)
+
+print(f"@@@@ Using lr scheduler {args.scheduler}...")
+if args.scheduler == "StepLR":
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.9)
+elif args.scheduler == "ExponentialLR":
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+elif args.scheduler == "CyclicLR":
+    cycle_momentum = True if args.optimizer == "RMSprop" else False
+    scheduler = torch.optim.lr_scheduler.CyclicLR(
+            optimizer, base_lr=0.001, max_lr=0.2, step_size_up=3, step_size_down=5,
+            gamma=0.95, mode='exp_range', cycle_momentum=cycle_momentum)
+else:
+    print(f"[trainModels] Wrong scheduler name {args.scheduler}")
     exit(1)
 
 #### pilot mode
+#### It is used in both debugging and finding optimal hyperparameter
 if args.pilot:
-    max_size = 5000
-    split1, split2 = 4000, 5000
-    epochs = 10
+    maxSize = 10000
+    epochs = 5
 else:
-    max_size = -1
-    split1, split2 = 150000, 200000
+    maxSize = 200000
     epochs = 300
 
 #### Load dataset
-print("@@@@ Loading datasets...")
-if args.era == "All":
-    f_sig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Selector_TTToHcToWAToMuMu_{args.signal}.root")
-    f_bkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Selector_{args.background}.root")
-else:
-    f_sig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
-    f_bkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__/Selector_{args.background}.root")
+rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Selector_TTToHcToWAToMuMu_{args.signal}.root")
+rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Selector_{args.background}.root")
 
-is_prompt = True if args.background == "VV" else False
-sig_datalist = rtfile_to_datalist(f_sig, 
-                                  channel="3Mu", 
-                                  is_signal=True, 
-                                  is_prompt=True, 
-                                  max_size=max_size)
-f_sig.Close()
-bkg_datalist = rtfile_to_datalist(f_bkg, 
-                                  channel="3Mu", 
-                                  is_signal=False, 
-                                  is_prompt=is_prompt, 
-                                  max_size=max_size)
-f_bkg.Close()
-sig_datalist = shuffle(sig_datalist, random_state=953)[:200000]
-bkg_datalist = shuffle(bkg_datalist, random_state=953)[:200000]
-datalist = shuffle(sig_datalist+bkg_datalist, random_state=953)
+isPrompt = False if args.background == "TTLL_powheg" else True
+sigDatalist = rtfile_to_datalist(rtSig, channel="3Mu", is_signal=True, is_prompt=True, max_size=maxSize)
+bkgDatalist = rtfile_to_datalist(rtBkg, channel="3Mu", is_signal=False, is_prompt=isPrompt, max_size=maxSize)
+rtSig.Close()
+rtBkg.Close()
 
+sigDatalist = shuffle(sigDatalist, random_state=42)[:maxSize]
+bkgDatalist = shuffle(bkgDatalist, random_state=42)[:maxSize]
+datalist = shuffle(sigDatalist+bkgDatalist, random_state=42)
 
-train_dataset = MyDataset(datalist[:split1])
-val_dataset = MyDataset(datalist[split1:split2])
-test_dataset = MyDataset(datalist[split2:])
+trainDataset = MyDataset(datalist[:int(maxSize*2*0.4)])
+validDataset = MyDataset(datalist[int(maxSize*2*0.4):int(maxSize*2*0.5)])
+testDataset = MyDataset(datalist[int(maxSize*2*0.5):])
 
-train_loader = DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=True)
-val_loader = DataLoader(
-        val_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
-test_loader = DataLoader(
-        test_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True)
-num_features, num_classes = train_dataset[0].num_node_features, train_dataset.num_classes
+trainLoader = DataLoader(trainDataset, batch_size=args.nbatch, shuffle=True, pin_memory=True)
+validLoader = DataLoader(validDataset, batch_size=args.nbatch, shuffle=False, pin_memory=True)
+testLoader = DataLoader(testDataset, batch_size=args.nbatch, shuffle=False, pin_memory=True)
 
 #### GPU settings
-#DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-#print(f"@@@@ Using device {DEVICE}...")
 if "cuda" in args.device:
     torch.backends.cudnn.benchmark = True
     torch.backends.cudnn.enabled = True
 
-#### Helper functions
-def train(model, criterion, loader, optimizer, scheduler):
+
+
+
+#### helper functions
+def train(model, criterion, optimizer, scheduler):
     model.train()
 
-    for data in loader:
+    for data in trainLoader:
         out = model(data.x.to(args.device), data.edge_index.to(args.device), data.batch.to(args.device))
         loss = criterion(out, data.y.to(args.device))
         loss.backward()
@@ -131,106 +150,48 @@ def test(model, criterion, loader):
     correct /= len(loader.dataset)
     return (loss, correct)
 
-#### Hyperparameter settings
-print(f"@@@@ Using model {args.model}...")
-if args.model == "GCN":
-    model = GCN(num_features, num_classes, args.hidden_layers).to(args.device)
-elif args.model == "GNN":
-    model = GNN(num_features, num_classes, args.hidden_layers).to(args.device)
-elif args.model == "ParticleNet":
-    model = ParticleNet(num_features, num_classes, args.hidden_layers).to(args.device)
-else:
-    print(f"[trainModels] Wrong model name {args.model}")
-    exit(1)
-
-print(f"@@@@ Using optimizer {args.optimizer}...")
-if args.optimizer == "RMSprop":
-    optimizer = torch.optim.RMSprop(model.parameters(), lr=args.initial_lr, momentum=0.9)
-elif args.optimizer == "AdamW":
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.initial_lr)
-elif args.optimizer == "Adam":
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.initial_lr)
-elif args.optimizer == "Adadelta":
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.initial_lr)
-else:
-    print(f"[trainModels] Wrong optimizer name {args.optimizer}")
-    exit(1)
-
-print(f"@@@@ Using lr scheduler {args.scheduler}...")
-if args.scheduler == "StepLR":
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.9)
-elif args.scheduler == "ExponentialLR":
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
-elif args.scheduler == "CyclicLR":
-    cycle_momentum = True if args.optimizer == "RMSprop" else False
-    scheduler = torch.optim.lr_scheduler.CyclicLR(
-            optimizer, base_lr=0.001, max_lr=0.2, step_size_up=3, step_size_down=5, 
-            gamma=0.95, mode='exp_range', cycle_momentum=cycle_momentum)
-else:
-    print(f"[trainModels] Wrong scheduler name {args.scheduler}")
-    exit(1)
-
-
 if __name__ == "__main__":
-    model_name = f"{args.model}_nhidden-{args.hidden_layers}_{args.optimizer}_initial_lr-{str(args.initial_lr).replace('.', 'p')}_{args.scheduler}_nbatch-{args.batch_size}"
-    checkpoint_path = f"{os.environ['WORKDIR']}/.models/{args.era}/k_4/{args.signal}_vs_{args.background}/{model_name}.pt"
-    writer_name = f"writer_{model_name}"
-    summary_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/k_4/{args.signal}_vs_{args.background}/training-{model_name}.png"
-    roc_path = f"{os.environ['WORKDIR']}/triLepRegion/plots/{args.era}/k_4/{args.signal}_vs_{args.background}/roc-{model_name}.png"
-    outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/{args.era}/k_4/{args.signal}_vs_{args.background}/{model_name}.root"
+    modelName = f"{args.model}_{args.optimizer}_initLR-{str(args.initLR).replace('.', 'p')}_{args.scheduler}"
+    checkpointPath = f"{os.environ['WORKDIR']}/models/{args.signal}_vs_{args.background}/{modelName}.pt"
+    logPath = f"{os.environ['WORKDIR']}/triLepRegion/temp/logs/{args.signal}_vs_{args.background}/{modelName}.log"
+    summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/temp/{args.signal}_vs_{args.background}/training-{modelName}.png"
+    rocPath = f"{os.environ['WORKDIR']}/triLepRegion/temp/{args.signal}_vs_{args.background}/roc-{modelName}.png"
 
     criterion = torch.nn.CrossEntropyLoss()
-    early_stopper = EarlyStopping(patience=8, path=checkpoint_path)
-    s_writer = SummaryWriter(name=writer_name)
-    h_writer = HistogramWriter(outfile=outfile_path)
-    print(f"@@@@ Start training {model_name}...")
+    earlyStopper = EarlyStopping(patience=8, path=checkpointPath)
+    summaryWriter = SummaryWriter(name=modelName)
+    print(f"@@@@ Start training {modelName}...")
     for epoch in range(epochs):
-        train(model, criterion, train_loader, optimizer, scheduler)
-        train_loss, train_acc = test(model, criterion, train_loader)
-        val_loss, val_acc = test(model, criterion, val_loader)
-        s_writer.add_scalar("loss/train", train_loss)
-        s_writer.add_scalar("loss/validation", val_loss)
-        s_writer.add_scalar("accuracy/train", train_acc)
-        s_writer.add_scalar("accuracy/validation", val_acc)
-        print(f"[EPOCH {epoch}]\tTrain Acc: {train_acc:.4f}\tTrain Loss: {train_loss:.4f}")
-        print(f"[EPOCH {epoch}]\tVlaid Acc: {val_acc:.4f}\tValid Loss: {val_loss:.4f}\n")
-        early_stopper.update(val_loss, model)
-        if early_stopper.early_stop:
+        train(model, criterion, optimizer, scheduler)
+        trainLoss, trainAcc = test(model, criterion, trainLoader)
+        validLoss, validAcc = test(model, criterion, validLoader)
+        summaryWriter.add_scalar("loss/train", trainLoss)
+        summaryWriter.add_scalar("loss/valid", validLoss)
+        summaryWriter.add_scalar("acc/train", trainAcc)
+        summaryWriter.add_scalar("acc/valid", validAcc)
+        print(f"[EPOCH {epoch}]\tTrain Acc: {trainAcc:.4f}\tTrain Loss: {trainLoss:.4f}")
+        print(f"[EPOCH {epoch}]\tVlaid Acc: {validAcc:.4f}\tValid Loss: {validLoss:.4f}\n")
+        earlyStopper.update(validLoss, model)
+        if earlyStopper.early_stop:
             print(f"Early stopping in epoch {epoch}")
             break
     
     print(f"@@@@ Saving final model...")
-    torch.save(model.state_dict(), checkpoint_path)
-    
-    print(f"@@@@ Visualizing results....")
-    # train / validation loss, accuracy
-    s_writer.visualize_training(summary_path)
+    torch.save(model.state_dict(), checkpointPath)
+
+    print(f"@@@@ Visualising results...")
+    # train / validation loss, accuraccy
+    summaryWriter.store_csv(summaryPath.replace("png", "csv"))
+    summaryWriter.visualize_training(summaryPath)
     # ROC curve
     model.to("cpu")
-    tpr = {}; fpr = {}; auc = {}
-    answers, predictions = predict(model, train_loader)
-    for ans, pred in zip(answers, predictions):
-        if ans == 1:
-            h_writer.fill_hist("train/signal/score", pred, 1., 100, 0., 1.)
-        else:
-            h_writer.fill_hist("train/background/score", pred, 1., 100, 0., 1.)
+    tpr = {}
+    fpr = {}
+    auc = {}
+    answers, predictions = predict(model, trainLoader)
     tpr['train'], fpr['train'], auc['train'] = prepare_roc(answers, predictions)
-    answers, predictions = predict(model, val_loader)
-    for ans, pred in zip(answers, predictions):
-        if ans == 1:
-            h_writer.fill_hist("validation/signal/score", pred, 1., 100, 0., 1.)
-        else:
-            h_writer.fill_hist("validation/background/score", pred, 1., 100, 0., 1.)
+    answers, predictions = predict(model, validLoader)
     tpr['valid'], fpr['valid'], auc['valid'] = prepare_roc(answers, predictions)
-    answers, predictions = predict(model, test_loader)
-    for ans, pred in zip(answers, predictions):
-        if ans == 1:
-            h_writer.fill_hist("test/signal/score", pred, 1., 100, 0., 1.)
-        else:
-            h_writer.fill_hist("test/background/score", pred, 1., 100, 0., 1.)
+    answers, predictions = predict(model, testLoader)
     tpr['test'], fpr['test'], auc['test'] = prepare_roc(answers, predictions)
-    plot_roc(tpr, fpr, auc, roc_path)
-    h_writer.close()
-
-    #messenger = Messenger()
-    #messenger.sendMessage(f"[triLepRegion::trainModels] Finished training {model_name} for {args.signal}_vs_{args.background}")
+    plot_roc(tpr, fpr, auc, rocPath)
