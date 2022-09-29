@@ -55,15 +55,16 @@ gaModule.getGeneValues(schedulers)
 gaModule.generatePool(criteria)
 
 gaModule.randomGeneration(nPop=nPop)
-for iter in range(maxIter):
+evalFitness(gaModule.population)
+gaModule.updatePopulation(args.signal, args.background)
+print("@@@@ generation 0")
+print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
+for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
+    gaModule.evolution(thresholds=thresholds, ratio=0.5)
     evalFitness(gaModule.population)
     gaModule.updatePopulation(args.signal, args.background)
-    gaModule.evolution(thresholds=thresholds, ratio=0.5)
-    print(gaModule.meanFitness())
-
-# final evalFitness
-evalFitness(gaModule.population)
+    print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
     
 path = f"{os.environ['WORKDIR']}/models/{args.signal}_vs_{args.background}/GAOptimization.csv"
 gaModule.savePopulation(path=path)
