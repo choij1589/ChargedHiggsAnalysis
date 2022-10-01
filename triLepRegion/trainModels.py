@@ -153,10 +153,16 @@ def test(model, criterion, loader):
 
 if __name__ == "__main__":
     modelName = f"{args.model}_{args.optimizer}_initLR-{str(args.initLR).replace('.', 'p')}_{args.scheduler}"
-    checkpointPath = f"{os.environ['WORKDIR']}/models/{args.signal}_vs_{args.background}/{modelName}.pt"
-    logPath = f"{os.environ['WORKDIR']}/triLepRegion/temp/logs/{args.signal}_vs_{args.background}/{modelName}.log"
-    summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/temp/{args.signal}_vs_{args.background}/training-{modelName}.png"
-    rocPath = f"{os.environ['WORKDIR']}/triLepRegion/temp/{args.signal}_vs_{args.background}/roc-{modelName}.png"
+    if args.pilot:
+        checkpointPath = f"{os.environ['WORKDIR']}/models/pilot/{args.signal}_vs_{args.background}/{modelName}.pt"
+        logPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/logs/{args.signal}_vs_{args.background}/{modelName}.log"
+        summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.signal}_vs_{args.background}/training-{modelName}.png"
+        rocPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.signal}_vs_{args.background}/roc-{modelName}.png"
+    else:
+        checkpointPath = f"{os.environ['WORKDIR']}/models/full/{args.signal}_vs_{args.background}/{modelName}.pt"
+        logPath = f"{os.environ['WORKDIR']}/triLepRegion/full/logs/{args.signal}_vs_{args.background}/{modelName}.log"
+        summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.signal}_vs_{args.background}/training-{modelName}.png"
+        rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.signal}_vs_{args.background}/roc-{modelName}.png"
 
     criterion = torch.nn.CrossEntropyLoss()
     earlyStopper = EarlyStopping(patience=8, path=checkpointPath)
