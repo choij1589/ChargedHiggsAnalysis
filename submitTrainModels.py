@@ -14,7 +14,7 @@ SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
 BACKGROUNDs = ["TTLL_powheg"]
 
 def makePopulation(sig, bkg):
-    path = f"{os.environ['WORKDIR']}/models/{sig}_vs_{bkg}/GAOptimization.csv"
+    path = f"{os.environ['WORKDIR']}/models/pilot/{sig}_vs_{bkg}/GAOptimization.csv"
     csv = pd.read_csv(path).T
     
     population = []
@@ -46,8 +46,15 @@ def checkDeviceStatus(device, procs, freeMemory=2e9, maxRunningJobs=14):
     return (free > freeMemory) and (len(runningJobs) < maxRunningJobs)
 
 if __name__ == "__main__":
+    multiProcs = {}
+    for i in range(cuda.device_count()):
+        device = f"cuda:{i}"
+        multiProcs[device] = []
+
+    queue = deque()
     for sig, bkg in product(SIGNALs, BACKGROUNDs):    
         addJobCommands(queue, sig, bkg)
+    
     # submit all jobs till the queue empty
     while queue:
         for device, procs in multiProcs.items():
