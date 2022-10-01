@@ -8,5 +8,5 @@ python scripts/submitOptimizeHyperparameters.py --signal MHc-130_MA-15 --backgro
 python scripts/submitOptimizeHyperparameters.py --signal MHc-130_MA-55 --background TTLL_powheg
 python scripts/submitOptimizeHyperparameters.py --signal MHc-130_MA-90 --background TTLL_powheg
 python scripts/submitOptimizeHyperparameters.py --signal MHc-130_MA-125 --background TTLL_powheg
-python scripts/submitOptimizeHyperparameters.py --signal MHc-160_MA-185 --background TTLL_powheg
+python scripts/submitOptimizeHyperparameters.py --signal MHc-160_MA-85 --background TTLL_powheg
 python scripts/submitOptimizeHyperparameters.py --signal MHc-160_MA-155 --background TTLL_powheg
