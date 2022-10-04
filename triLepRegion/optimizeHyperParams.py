@@ -66,5 +66,5 @@ for iter in range(1, maxIter):
     gaModule.updatePopulation(args.signal, args.background)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
     
-path = f"{os.environ['WORKDIR']}/models/{args.signal}_vs_{args.background}/GAOptimization.csv"
+path = f"{os.environ['WORKDIR']}/models/pilot/{args.signal}_vs_{args.background}/GAOptimization.csv"
 gaModule.savePopulation(path=path)
