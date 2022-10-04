@@ -95,19 +95,30 @@ class GeneticModule():
         return mutation
     
     def evolution(self, thresholds, ratio):
-        parents = sorted(self.population.values(), key=lambda x: x['fitness'], reverse=True) 
+        parents = sorted(self.population.values(), key=lambda x: x['fitness'], reverse=True)
         children = []
         nPop = len(self.population)
         nbirth = int(len(self.population)*ratio)
         for _ in range(nbirth):
-            p1, p2 = self.rankSelection()
-            child = self.uniformCrossOver(p1, p2)
-            mutation = self.displacementMutation(child, thresholds)  
-            children.append(mutation)
-        
+            temp_population = []
+            for gene in parents+children:
+                temp_population.append(gene['chromosome'])
+            while True:
+                p1, p2 = self.rankSelection()
+                child = self.uniformCrossOver(p1, p2)
+                mutation = self.displacementMutation(child, thresholds)  
+                # don't allow the same mutation
+                # with parents or already produced mutation
+                if mutation['chromosome'] in temp_population:
+                    continue
+                children.append(mutation) 
+                break
+
         self.population = {}
         for idx in range(nbirth):
             self.population[idx] = children[idx]
+            # delete bad parents from pool
+            self.pool.remove(parents[idx]['chromosome'])
         for idx in range(nbirth, nPop):
             self.population[idx] = parents[idx]
 
