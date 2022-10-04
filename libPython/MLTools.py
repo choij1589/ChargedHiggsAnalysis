@@ -26,13 +26,13 @@ class GCN(torch.nn.Module):
         self.dense = Linear(hidden_channels, hidden_channels)
         self.output = Linear(hidden_channels, num_classes)
 
-    def forward(self, x, edge_index, batch):
+    def forward(self, x, edge_index, batch=None):
         # Convolution layers
-        x = self.gn0(x)
+        x = self.gn0(x, batch)
         x = F.relu(self.conv1(x, edge_index))
-        x = self.gn1(x)
+        x = self.gn1(x, batch)
         x = F.relu(self.conv2(x, edge_index))
-        x = self.gn2(x)
+        x = self.gn2(x, batch)
         x = F.relu(self.conv3(x, edge_index))
 
         # readout layers
@@ -58,13 +58,13 @@ class GNN(torch.nn.Module):
         self.dense = Linear(hidden_channels, hidden_channels)
         self.output = Linear(hidden_channels, num_classes)
 
-    def forward(self, x, edge_index, batch):
+    def forward(self, x, edge_index, batch=None):
         # Convolution layers
-        x = self.gn0(x)
+        x = self.gn0(x, batch)
         x = F.relu(self.conv1(x, edge_index))
-        x = self.gn1(x)
+        x = self.gn1(x, batch)
         x = F.relu(self.conv2(x, edge_index))
-        x = self.gn2(x)
+        x = self.gn2(x, batch)
         x = F.relu(self.conv3(x, edge_index))
 
         # readout layers
@@ -85,8 +85,8 @@ class EdgeConv(MessagePassing):
                               Linear(out_channels, out_channels), ReLU(),
                               Linear(out_channels, out_channels))
 
-    def forward(self, x, edge_index):
-        return self.propagate(edge_index, x=x)
+    def forward(self, x, edge_index, batch=None):
+        return self.propagate(edge_index, x=x, batch=batch)
 
     def message(self, x_i, x_j):
         tmp = torch.cat([x_i, x_j - x_i], dim=1)
@@ -102,7 +102,7 @@ class DynamicEdgeConv(EdgeConv):
         if edge_index is None:
             edge_index = knn_graph(
                 x, self.k, batch, loop=False, flow=self.flow)
-        return super().forward(x, edge_index)
+        return super().forward(x, edge_index, batch=batch)
 
 
 class ParticleNet(torch.nn.Module):
@@ -120,14 +120,14 @@ class ParticleNet(torch.nn.Module):
 
     def forward(self, x, edge_index, batch=None):
         # Convolution layers
-        #x = self.gn0(x)
-        x = self.conv1(x, edge_index)
-        x = self.gn1(x)
-        x = self.conv2(x) if self.dynamic else self.conv2(x, edge_index)
-        x = self.gn2(x)
-        x = self.conv3(x) if self.dynamic else self.conv3(x, edge_index)
+        x = self.gn0(x, batch=batch)
+        x = self.conv1(x, edge_index, batch=batch)
+        x = self.gn1(x, batch=batch)
+        x = self.conv2(x, batch=batch) if self.dynamic else self.conv2(x, edge_index, batch=batch)
+        x = self.gn2(x, batch=batch)
+        x = self.conv3(x, batch=batch) if self.dynamic else self.conv3(x, edge_index, batch=batch)
         # readout layers
-        x = global_mean_pool(x, batch)
+        x = global_mean_pool(x, batch=batch)
 
         # dense layers
         x = F.dropout(x, p=0.5, training=self.training)

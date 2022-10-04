@@ -32,7 +32,7 @@ class GeneticModule():
         # get hyperparams
         for idx in range(len(self.population)):
             model, optimizer, initLR, scheduler = self.population[idx]['chromosome']
-            path = f"{os.environ['WORKDIR']}/triLepRegion/temp/{masspoint}_vs_{background}/training-{model}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
+            path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{masspoint}_vs_{background}/training-{model}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
             csv = pd.read_csv(path)
             self.population[idx]['fitness'] = float(csv.iloc[-1].loc['loss/valid'])
     

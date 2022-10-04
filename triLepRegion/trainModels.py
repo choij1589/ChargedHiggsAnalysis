@@ -89,7 +89,7 @@ else:
 #### It is used in both debugging and finding optimal hyperparameter
 if args.pilot:
     maxSize = 50000
-    epochs = 20
+    epochs = 30
 else:
     maxSize = 200000
     epochs = 300

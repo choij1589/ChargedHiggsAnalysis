@@ -19,6 +19,8 @@ TTToHcToWAToMuMu_MHc-160_MA-15
 TTToHcToWAToMuMu_MHc-160_MA-85
 TTToHcToWAToMuMu_MHc-160_MA-120
 TTToHcToWAToMuMu_MHc-160_MA-155
+# TTLL
+TTLL_powheg
 # VV
 WZTo3LNu_amcatnlo
 WZTo3LNu_mllmin4p0_powheg

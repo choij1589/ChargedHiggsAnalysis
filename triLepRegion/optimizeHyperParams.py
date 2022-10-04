@@ -20,7 +20,7 @@ initLRs = [0.00001, 0.00002, 0.00005, 0.0001, 0.0002, 0.0005,
 nBatch = 1024
 nHidden = 128
 criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
-nPop = 14
+nPop = 6
 thresholds = [0.7, 0.8, 0.95, 0.8]
 maxIter = 5
 

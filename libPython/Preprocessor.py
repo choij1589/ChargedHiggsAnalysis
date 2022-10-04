@@ -72,7 +72,9 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
 
         # Convert each event to a graph
         node_list = []
-        for particle in muons+electrons+jets:
+        objects = muons+electrons+jets
+        objects.append(METv)
+        for particle in objects:
             node_list.append([particle.Pt(),
                               particle.Eta(),
                               particle.Phi(),
