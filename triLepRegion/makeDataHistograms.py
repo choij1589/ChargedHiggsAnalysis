@@ -2,8 +2,8 @@ import os, sys; sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
 from MetaInfo.periodInfo import PeriodDict
 
-import torch
 from ROOT import TFile
+import torch
 from libPython.Preprocessor import evt_to_graph
 from libPython.Management import predict_proba
 from libPython.MLTools import ParticleNet

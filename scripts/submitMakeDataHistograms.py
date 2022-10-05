@@ -68,7 +68,7 @@ if __name__ == "__main__":
             break
         else:
             sleep(1)
-    
+    sleep(10)
     # now hadd the outputs
     basedir = f"triLepRegion/ROOT/Skim3Mu__/{args.era}"
     os.system(f"hadd -f {basedir}/{args.sample}.root {basedir}/{args.sample}_*.root")
