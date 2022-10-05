@@ -18,20 +18,20 @@ periodList = PeriodDict[args.era]
 process = uuid.uuid4().hex.upper()[:6]
 
 def makeSubmitJds(queue):
-    f = open(f"condor/temp_{process}/submit.jds", "w")
-    f.write(f"executable = condor/temp_{process}/run.sh\n")
+    f = open(f"condor/{args.sample}_{process}/submit.jds", "w")
+    f.write(f"executable = condor/{args.sample}_{process}/run.sh\n")
     f.write(f"arguments = {args.sample}_$(ProcId)\n")
     f.write('+singularityimage = "/data6/Users/choij/Singularity/torch"\n')
     f.write("requirements = HasSingularity\n")
     f.write("request_memory = 4 GB\n")
-    f.write(f"log = condor/temp_{process}/job_$(ProcId).log\n")
-    f.write(f"output = condor/temp_{process}/job_$(ProcId).out\n")
-    f.write(f"error = condor/temp_{process}/job_$(ProcId).err\n")
+    f.write(f"log = condor/{args.sample}_{process}/job_$(ProcId).log\n")
+    f.write(f"output = condor/{args.sample}_{process}/job_$(ProcId).out\n")
+    f.write(f"error = condor/{args.sample}_{process}/job_$(ProcId).err\n")
     f.write(f"queue {queue}")
     f.close()
 
 def makeRunSh():
-    f = open(f"condor/temp_{process}/run.sh", "w")
+    f = open(f"condor/{args.sample}_{process}/run.sh", "w")
     f.write("#/bin/bash\n")
     f.write("SAMPLE=$1\n")
     f.write('export WORKDIR="/data6/Users/choij/ChargedHiggsAnalysis"\n')
@@ -49,13 +49,13 @@ def isJobStatusDone(clusterID):
     return isDone
 
 if __name__ == "__main__":
-    os.makedirs(f"condor/temp_{process}")
-    print(f"Running condor job in condor/temp_{process}...")
+    os.makedirs(f"condor/{args.sample}_{process}")
+    print(f"Running condor job in condor/{args.sample}_{process}...")
     # decide the number of procs to submit
     makeSubmitJds(len(periodList))
     makeRunSh()
-    os.chmod(f"condor/temp_{process}/run.sh", 0o755)
-    result = subprocess.run(f"condor_submit condor/temp_{process}/submit.jds".split(),
+    os.chmod(f"condor/{args.sample}_{process}/run.sh", 0o755)
+    result = subprocess.run(f"condor_submit condor/{args.sample}_{process}/submit.jds".split(),
                             capture_output=True,
                             encoding="utf-8")
     result = result.stdout.split("\n")[-2]
@@ -72,6 +72,6 @@ if __name__ == "__main__":
     # now hadd the outputs
     basedir = f"triLepRegion/ROOT/Skim3Mu__/{args.era}"
     os.system(f"hadd -f {basedir}/{args.sample}.root {basedir}/{args.sample}_*.root")
-    #for period in periodList:
-    #    os.remove(f"{basedir}/{args.sample}_{period}.root")
+    for period in periodList:
+        os.remove(f"{basedir}/{args.sample}_{period}.root")
 
