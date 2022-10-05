@@ -1,13 +1,15 @@
-import os, sys
-sys.path.insert(0, os.environ['WORKDIR'])
+import os, sys; sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
+import torch
 
 from ROOT import TFile
+from libPython.Preprocessor import evt_to_graph
+from libPython.Management import predict_proba
+from libPython.MLTools import ParticleNet
 from libPython.Selection        import pass_baseline, select
 from libPython.DataFormat       import get_muons, get_electrons, get_jets
 from libPython.DataFormat       import Particle
 from libPython.MCCorrection     import MCCorrection
-from libPython.Management       import MVAManager
 from libPython.HistTools        import HistogramWriter
 
 # parse arguments
@@ -17,6 +19,7 @@ parser.add_argument("--sample", "-s", default="DYJets", type=str, help="sample n
 parser.add_argument("--split", action="store_true", default=False, help="Using splitted samples")
 args = parser.parse_args()
 
+MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
 Systematics = ["Central",
                "L1PrefireUp", "L1PrefireDown",
                "PileUpCorrUp", "PileUpCorrDown",
@@ -24,9 +27,46 @@ Systematics = ["Central",
                "JetEnShiftUp", "JetEnShiftDown",
                "JetResShiftUp", "JetResShiftDown",
                "MuonIDSFUp", "MuonIDSFDown",
-               "DblMuonTrigSFUp", "DblMuonTrigSFDown"]
+               "DblMuonTrigSFUp", "DblMuonTrigSFDown"
+               ]
 
-def Loop(evt, manager, mcCorr, syst, writer):
+def getScore(model, objects):
+    model.eval()
+    node_list = []
+    for obj in objects:
+        node_list.append([obj.Pt(),
+                          obj.Eta(),
+                          obj.Phi(),
+                          obj.M(),
+                          obj.Charge(),
+                          obj.IsMuon(),
+                          obj.IsElectron(),
+                          obj.IsJet(),
+                          obj.BtagScore()])
+    data = evt_to_graph(node_list, y=None, k=4)
+    return predict_proba(model, data.x, data.edge_index)
+
+def makeACand(muons, mA):
+    ACand = Particle(0., 0., 0., 0.)
+    xACand = Particle(0., 0., 0., 0.)
+    # make pairs
+    if abs(muons[0].Charge() + muons[1].Charge()) == 2:
+        pair1 = muons[0] + muons[2]
+        pair2 = muons[1] + muons[2]
+    elif abs(muons[0].Charge() + muons[2].Charge()) == 2:
+        pair1 = muons[0] + muons[1]
+        pair2 = muons[1] + muons[2]
+    else:   # 1 == 2
+        pair1 = muons[0] + muons[1]
+        pair2 = muons[0] + muons[2]
+        
+    if abs(pair1.M() - mA) < abs(pair2.M() - mA):
+        ACand, xACand = pair1, pair2
+    else:
+        ACand, xACand = pair2, pair1
+    return (ACand, xACand)
+
+def Loop(evt, classifiers, mcCorr, syst, writer):
     muonMomentumShift = 0
     if syst == "MuonMomentumShiftUp":
         muonMomentumShift = 1
@@ -47,11 +87,12 @@ def Loop(evt, manager, mcCorr, syst, writer):
         jetResShift = 1
     if syst == "jetResShiftDown":
         jetResShift = -1
-    
+        
     muons = get_muons(evt, muonMomentumShift)
     electrons = get_electrons(evt, electronEnShift, electronResShift)
     jets, bjets = get_jets(evt, jetEnShift, jetResShift)
     METv = Particle(evt.METvPt, 0., evt.METvPhi, 0.)
+    objects = muons+electrons+jets; objects.append(METv)
     
     if not pass_baseline("3Mu", evt, muons, electrons, jets, bjets, "tight"):
         return None
@@ -62,13 +103,15 @@ def Loop(evt, manager, mcCorr, syst, writer):
     if not len(list(filter(lambda x: x.LepType() > 0, electrons))) == 0:
         return None
     
+    #region
     region = select("3Mu", evt, muons, electrons, jets, bjets, "tight")
-    scores = manager.getScores(muons+electrons+jets)
-    
+    #measure
     if muons[0].Pt() < 20. or muons[1].Pt() < 20. or muons[2].Pt() < 20.:
         measure = "DYJets"
     else:
         measure = "ZGamma"
+        
+    ZCand, xZCand = makeACand(muons, mA=91.2)
         
     systPrefire = 0
     systPileup = 0
@@ -91,51 +134,54 @@ def Loop(evt, manager, mcCorr, syst, writer):
     weight *= mcCorr.GetBtaggingWeight(jets)
     
     # fill baseline
-    prefix = f"3Mu/Baseline/{syst}/Incl"
+    prefix = f"3Mu/Baseline/{syst}/Incl/Inputs"
     writer.fill_muons(f"{prefix}/muons", muons, weight)
     writer.fill_electrons(f"{prefix}/electrons", electrons, weight)
     writer.fill_jets(f"{prefix}/jets", jets, weight)
     writer.fill_jets(f"{prefix}/bjets", bjets, weight)
     writer.fill_object(f"{prefix}/METv", METv, weight)
-    for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
+    writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
+    writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
     
-    prefix = f"3Mu/Baseline/{syst}/{measure}"
+    prefix = f"3Mu/Baseline/{syst}/{measure}/Inputs"
     writer.fill_muons(f"{prefix}/muons", muons, weight)
     writer.fill_electrons(f"{prefix}/electrons", electrons, weight)
     writer.fill_jets(f"{prefix}/jets", jets, weight)
     writer.fill_jets(f"{prefix}/bjets", bjets, weight)
     writer.fill_object(f"{prefix}/METv", METv, weight)
-    for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
-
-    # Signal / Control regions    
+    writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
+    writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
+    
+    prefix = f"3Mu/Baseline/{syst}/Incl/Outputs"
+    for mp in MASSPOINTs:
+        mA = mp.split("_")[1]
+        mA = int(mA.split("-")[1])
+        ACand, xACand = makeACand(muons, mA)
+        score = getScore(classifiers[mp], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+        writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
+        writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+    
+    prefix = f"3Mu/Baseline/{syst}/{measure}/Outputs"
+    for mp in MASSPOINTs:
+        mA = mp.split("_")[1]
+        mA = int(mA.split("-")[1])
+        ACand, xACand = makeACand(muons, mA)
+        score = getScore(classifiers[mp], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+        writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
+        writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+        
+    # Signal / Control Region
     if region is None:
         return None
-    
-    ZCand = Particle(0., 0., 0., 0.)
-    xZCand = Particle(0., 0., 0., 0.)
-    if region == "ZFakeRegion":
-        mZ = 91.2
-        # make os pair
-        if abs(muons[0].Charge() + muons[1].Charge()) == 2:
-            pair1 = muons[0] + muons[2]
-            pair2 = muons[1] + muons[2]
-        elif abs(muons[0].Charge() + muons[2].Charge()) == 2:
-            pair1 = muons[0] + muons[1]
-            pair2 = muons[1] + muons[2]
-        else:   # 1 == 2
-            pair1 = muons[0] + muons[1]
-            pair2 = muons[0] + muons[2]
-
-        if abs(pair1.M() - mZ) < abs(pair2.M() - mZ):
-            ZCand, xZCand = pair1, pair2
-        else:
-            ZCand, xZCand = pair2, pair1
     if region == "ZGammaRegion":
-        ZCand = muons[0] + muons[1] + muons[2]
-        
-    prefix = f"3Mu/{region}/{syst}/Incl"
+        ZCand = muons[0]+muons[1]+muons[2]
+        xZCand = Particle(0., 0., 0., 0.)
+    
+    prefix = f"3Mu/{region}/{syst}/Incl/Inputs"
     writer.fill_muons(f"{prefix}/muons", muons, weight)
     writer.fill_electrons(f"{prefix}/electrons", electrons, weight)
     writer.fill_jets(f"{prefix}/jets", jets, weight)
@@ -143,10 +189,8 @@ def Loop(evt, manager, mcCorr, syst, writer):
     writer.fill_object(f"{prefix}/METv", METv, weight)
     writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
     writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
-    for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
     
-    prefix = f"3Mu/{region}/{syst}/{measure}"
+    prefix = f"3Mu/{region}/{syst}/{measure}/Inputs"
     writer.fill_muons(f"{prefix}/muons", muons, weight)
     writer.fill_electrons(f"{prefix}/electrons", electrons, weight)
     writer.fill_jets(f"{prefix}/jets", jets, weight)
@@ -154,9 +198,29 @@ def Loop(evt, manager, mcCorr, syst, writer):
     writer.fill_object(f"{prefix}/METv", METv, weight)
     writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
     writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
-    for classifier, score in scores.items():
-        writer.fill_hist(f"{prefix}/{classifier}/score", score, weight, 1000, 0., 1.)
     
+    prefix = f"3Mu/{region}/{syst}/Incl/Outputs"
+    for mp in MASSPOINTs:
+        mA = mp.split("_")[1]
+        mA = int(mA.split("-")[1])
+        ACand, xACand = makeACand(muons, mA)
+        score = getScore(classifiers[mp], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+        writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
+        writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+    
+    prefix = f"3Mu/{region}/{syst}/{measure}/Outputs"
+    for mp in MASSPOINTs:
+        mA = mp.split("_")[1]
+        mA = int(mA.split("-")[1])
+        ACand, xACand = makeACand(muons, mA)
+        score = getScore(classifiers[mp], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+        writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
+        writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+
 if __name__ == "__main__":
     file_path = f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__"
     if args.split:
@@ -164,14 +228,36 @@ if __name__ == "__main__":
     file_path += f"/Selector_{args.sample}.root"
     outfile_path = f"{os.environ['WORKDIR']}/triLepRegion/ROOT/Skim3Mu__/{args.era}/{args.sample}.root"
     
-    mvaManager = MVAManager()
     mcCorr = MCCorrection(era=args.era)
     mcCorr.SetBtaggingHandler(tagger="DeepJet", wp="Medium", syst="central")
     histWriter = HistogramWriter(outfile=outfile_path)
     
+    # load classifiers
+    optimizers = {"MHc-70_MA-15": "Adam",
+                  "MHc-100_MA-60": "Adadelta",
+                  "MHc-130_MA-90": "Adam",
+                  "MHc-160_MA-155": "RMSprop"}
+    initLRs =    {"MHc-70_MA-15": 1e-5,
+                  "MHc-100_MA-60": 0.05,
+                  "MHc-130_MA-90": 0.01,
+                  "MHc-160_MA-155": 0.001}
+    schedulers = {"MHc-70_MA-15": "StepLR",
+                  "MHc-100_MA-60": "StepLR",
+                  "MHc-130_MA-90": "StepLR",
+                  "MHc-160_MA-155": "StepLR"}
+    classifiers = {}
+    for mp in MASSPOINTs:
+        optim = optimizers[mp]
+        initLR = initLRs[mp]
+        scheduler = schedulers[mp]
+        model_path = f"{os.environ['WORKDIR']}/models/pilot/{mp}_vs_TTLL_powheg/ParticleNet_{optim}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
+        classifiers[mp] = ParticleNet(num_features=9, num_classes=2, hidden_channels=128)
+        classifiers[mp].load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        
     f = TFile.Open(file_path)
     for evt in f.Events:
         for syst in Systematics:
-            Loop(evt, mvaManager, mcCorr, syst, histWriter)
+            Loop(evt, classifiers, mcCorr, syst, histWriter)
     f.Close()
     histWriter.close()
+    del classifiers
