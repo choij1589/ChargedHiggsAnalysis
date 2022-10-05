@@ -118,7 +118,9 @@ class GeneticModule():
         for idx in range(nbirth):
             self.population[idx] = children[idx]
             # delete bad parents from pool
-            self.pool.remove(parents[idx]['chromosome'])
+            if parents[idx]['chromosome'] in self.pool:
+                self.pool.remove(parents[idx]['chromosome'])
+
         for idx in range(nbirth, nPop):
             self.population[idx] = parents[idx]
 

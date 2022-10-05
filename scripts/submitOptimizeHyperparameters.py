@@ -19,7 +19,7 @@ def makeSubmitJds():
     f.write('+singularityimage = "/data6/Users/choij/Singularity/torch"\n')
     f.write("requirements = HasSingularity\n")
     f.write("request_disk = 40 GB\n")
-    f.write("request_memory = 40 GB\n")
+    f.write("request_memory = 100 GB\n")
     f.write("request_cpus = 20\n")
     f.write("request_gpus = 1\n")
     f.write(f"log = condor/{condorBase}/job.log\n")

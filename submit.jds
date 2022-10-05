@@ -3,10 +3,10 @@ executable = run.sh
 
 requirements = HasSingularity
 
-request_disk = 40 GB
-request_memory = 100 GB
-request_cpus = 20
-request_gpus = 1
+request_disk = 50 GB
+request_memory = 200 GB
+request_cpus = 44
+request_gpus = 2
 
 log = condor/job.log
 output = condor/job.out
