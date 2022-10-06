@@ -121,9 +121,6 @@ if "cuda" in args.device:
     torch.backends.cudnn.benchmark = True
     torch.backends.cudnn.enabled = True
 
-
-
-
 #### helper functions
 def train(model, criterion, optimizer, scheduler):
     model.train()

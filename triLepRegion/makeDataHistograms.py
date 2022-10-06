@@ -366,7 +366,7 @@ def Loop(evt, fakeEstimator, classifiers, writer):
         writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
         writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
         
-        prefix = f"3Mu/{region}/NonpromptUp/Incl/Spectators"
+        prefix = f"3Mu/{region}/NonpromptUp/Incl/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
@@ -377,7 +377,7 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
             writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
         
-        prefix = f"3Mu/{region}/NonpromptUp/{measure}/Spectators"
+        prefix = f"3Mu/{region}/NonpromptUp/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
@@ -408,7 +408,7 @@ def Loop(evt, fakeEstimator, classifiers, writer):
         writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
         writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
         
-        prefix = f"3Mu/{region}/NonpromptDown/Incl/Spectators"
+        prefix = f"3Mu/{region}/NonpromptDown/Incl/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
