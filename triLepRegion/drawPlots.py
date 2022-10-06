@@ -13,8 +13,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--era", required=True, type=str, help="era")
 parser.add_argument("--var", required=True, type=str, help="observable")
 parser.add_argument("--region", required=True, type=str, help="SignalRegion/ZFakeRegion/ZGammaRegion")
-parser.add_argument("--blind", action="store_true", default=False, help="blind mode")
-parser.add_argument("--signalset", type=str, help="charged Higgs mass")
 args = parser.parse_args()
 
 DataStream = "DoubleMuon"
@@ -25,16 +23,11 @@ ttX = ["ttWToLNu", "ttZToLLNuNu", "ttHToNonbb", "tZq", "tHq"]
 Rare = ["WWW", "WWZ", "WZZ", "ZZZ", "WWG", "TTG", "TTTT", "VBF_HToZZTo4L", "GluGluHToZZTo4L"]
 MCSamples = Conv + VV + ttX + Rare
 
-if args.signalset == "mixed":
-    MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
-elif args.signalset == "70":
-    MASSPOINTs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65"]
-elif args.signalset == "100":
-    MASSPOINTs = ["MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95"]
-elif args.signalset == "130":
-    MASSPOINTs = ["MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125"]
-elif args.signalset == "160":
-    MASSPOINTs = ["MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA_155"]
+MASSPOINTs = []
+BLIND = False
+if args.region == "SignalRegion":
+    MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"] 
+    BLIND = True
 
 Systematics = ["Central",
                ["L1PrefireUp", "L1PrefireDown"],
@@ -184,7 +177,7 @@ for i, masspoint in enumerate(MASSPOINTs):
 config = hist_configs[args.var]
 config['ratio'] = [0., 2.]
 
-if args.blind:
+if BLIND:
     from plotter.kinematics import Canvas
     histograms.pop("data")
     c = Canvas(config=config)
@@ -192,7 +185,7 @@ if args.blind:
     c.draw_backgrounds(histograms, colors)
     c.draw_legend()
     c.finalize(args.era)
-    c.savefig(f"./plots/{args.era}/{args.region}/MHc-{args.signalset}/{args.var.replace('/', '_')}.png")
+    c.savefig(f"./plots/{args.era}/{args.region}/{args.var.replace('/', '_')}.png")
 else:
     from plotter.comparison import Canvas
     c = Canvas(config=config)
