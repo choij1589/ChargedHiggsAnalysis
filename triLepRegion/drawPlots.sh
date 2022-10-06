@@ -1,217 +1,57 @@
 #!/bin/sh
-ERAs=( 2017 2018 )
-SIGNALSET=( mixed 70 100 130 160 )
-REGION=$1
+ERA=$1
+REGION=$2
+MASSPOINTs=( "MHc-70_MA-15" "MHc-100_MA-60" "MHc-130_MA-90" "MHc-160_MA-155")
 
+echo drawing plots for $REGION in $ERA...
 
-echo drawing plots for the region $REGION...
-
-if [ $REGION = "ZGammaRegion" ]
-then
-	for ERA in "${ERAs[@]}"
-	do
-		mkdir -p plots/${ERA}/${REGION}
-		python drawPlots.py --era $ERA --var muons/1/pt --region $REGION
-		python drawPlots.py --era $ERA --var muons/1/eta --region $REGION
-		python drawPlots.py --era $ERA --var muons/1/phi --region $REGION
-		python drawPlots.py --era $ERA --var muons/2/pt --region $REGION
-		python drawPlots.py --era $ERA --var muons/2/eta --region $REGION
-		python drawPlots.py --era $ERA --var muons/2/phi --region $REGION
-		python drawPlots.py --era $ERA --var muons/3/pt --region $REGION
-		python drawPlots.py --era $ERA --var muons/3/eta --region $REGION
-		python drawPlots.py --era $ERA --var muons/3/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/size --region $REGION
-		#python drawPlots.py --era $ERA --var jets/HT --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/mass --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/pt --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/eta --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/phi --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-100_MA-15vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-100_MA-60vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-100_MA-95vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-130_MA-15vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-130_MA-55vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-130_MA-90vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-130_MA-125vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-160_MA-15vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-160_MA-85vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-160_MA-120vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-160_MA-155vsTTLL_powheg/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION
-		python drawPlots.py --era $ERA --var MHc-100_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-60vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-95vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-55vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-90vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-125vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-85vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-120vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-155vsVV/score --region $REGION
-	done
-elif [ $REGION = "ZFakeRegion" ]
-then
-	for ERA in "${ERAs[@]}"
-	do
-		mkdir -p plots/${ERA}/${REGION}
-		python drawPlots.py --era $ERA --var muons/1/pt --region $REGION
-		python drawPlots.py --era $ERA --var muons/1/eta --region $REGION
-		python drawPlots.py --era $ERA --var muons/1/phi --region $REGION
-		python drawPlots.py --era $ERA --var muons/2/pt --region $REGION
-		python drawPlots.py --era $ERA --var muons/2/eta --region $REGION
-		python drawPlots.py --era $ERA --var muons/2/phi --region $REGION
-		python drawPlots.py --era $ERA --var muons/3/pt --region $REGION
-		python drawPlots.py --era $ERA --var muons/3/eta --region $REGION
-		python drawPlots.py --era $ERA --var muons/3/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/1/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/2/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/3/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/pt --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/eta --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/phi --region $REGION
-		python drawPlots.py --era $ERA --var jets/4/mass --region $REGION
-		python drawPlots.py --era $ERA --var jets/size --region $REGION
-		#python drawPlots.py --era $ERA --var jets/HT --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/mass --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/pt --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/eta --region $REGION
-		python drawPlots.py --era $ERA --var ZCand/phi --region $REGION
-		python drawPlots.py --era $ERA --var xZCand/mass --region $REGION
-		python drawPlots.py --era $ERA --var xZCand/pt --region $REGION
-		python drawPlots.py --era $ERA --var xZCand/eta --region $REGION
-		python drawPlots.py --era $ERA --var xZCand/phi --region $REGION
-		python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-15vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-60vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-95vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-15vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-55vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-90vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-125vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-15vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-85vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-120vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-155vsTTLL_powheg/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-60vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-100_MA-95vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-55vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-90vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-130_MA-125vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-15vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-85vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-120vsVV/score --region $REGION
-        python drawPlots.py --era $ERA --var MHc-160_MA-155vsVV/score --region $REGION
-	done
-elif [ $REGION = "SignalRegion" ]
-then
-	for ERA in "${ERAs[@]}"
-	do
-		echo $ERA
-		for SET in "${SIGNALSET[@]}"
-		do	
-			echo $SET
-			mkdir -p plots/${ERA}/${REGION}/${SET}
-			python drawPlots.py --era $ERA --var muons/1/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/1/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/1/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/2/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/2/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/2/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/3/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/3/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var muons/3/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/1/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/1/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/1/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/1/mass --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/2/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/2/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/2/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/2/mass --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/3/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/3/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/3/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/3/mass --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/4/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/4/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/4/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/4/mass --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var jets/size --region $REGION --signalset $SET --blind
-			#python drawPlots.py --era $ERA --var jets/HT --region $REGION
-			python drawPlots.py --era $ERA --var ZCand/mass --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var ZCand/pt --region $REGION --signalset $SET --blind 
-			python drawPlots.py --era $ERA --var ZCand/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var ZCand/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var xZCand/mass --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var xZCand/pt --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var xZCand/eta --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var xZCand/phi --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-70_MA-15vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-70_MA-40vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-70_MA-65vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-100_MA-15vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-100_MA-60vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-100_MA-95vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-15vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-55vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-90vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-125vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-15vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-85vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-120vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-155vsTTLL_powheg/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-70_MA-15vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-70_MA-40vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-70_MA-65vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-100_MA-15vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-100_MA-60vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-100_MA-95vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-15vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-55vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-90vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-130_MA-125vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-15vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-85vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-120vsVV/score --region $REGION --signalset $SET --blind
-			python drawPlots.py --era $ERA --var MHc-160_MA-155vsVV/score --region $REGION --signalset $SET --blind
-		done
-	done
-fi
+mkdir -p plots/$ERA/$REGION
+# Inputs
+python drawPlots.py --era $ERA --var Inputs/muons/1/pt --region $REGION  
+python drawPlots.py --era $ERA --var Inputs/muons/1/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/muons/1/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/muons/2/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/muons/2/eta --region $REGION 
+python drawPlots.py --era $ERA --var Inputs/muons/2/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/muons/3/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/muons/3/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/muons/3/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/1/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/1/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/1/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/1/mass --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/2/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/2/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/2/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/2/mass --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/3/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/3/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/3/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/3/mass --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/4/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/4/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/4/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/4/mass --region $REGION
+python drawPlots.py --era $ERA --var Inputs/jets/size --region $REGION
+#python drawPlots.py --era $ERA --var jets/HT --region $REGION
+python drawPlots.py --era $ERA --var Inputs/ZCand/mass --region $REGION
+python drawPlots.py --era $ERA --var Inputs/ZCand/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/ZCand/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/ZCand/phi --region $REGION
+python drawPlots.py --era $ERA --var Inputs/xZCand/mass --region $REGION
+python drawPlots.py --era $ERA --var Inputs/xZCand/pt --region $REGION
+python drawPlots.py --era $ERA --var Inputs/xZCand/eta --region $REGION
+python drawPlots.py --era $ERA --var Inputs/xZCand/phi --region $REGION
+# Outputs
+for MP in "${MASSPOINTs[@]}"
+do
+    python drawPlots.py --era $ERA --var Outputs/$MP/ACand/mass --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/ACand/pt --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/ACand/eta --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/ACand/phi --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/xACand/mass --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/xACand/pt --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/xACand/eta --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/xACand/phi --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/score_vsTTLL_powheg --region $REGION
+done
