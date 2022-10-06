@@ -35,7 +35,7 @@ signalList = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-100_MA-60", "MHc-100_MA-95",
               "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
               "MHc-160_MA-85", "MHc-160_MA-155"]
-backgroundList = ["TTLL_powheg"]
+backgroundList = ["TTLL_powheg", "ttX"]
 
 if not args.signal in signalList:
     print(f"[trainModels] Wrong signal model {args.signal}")
@@ -91,7 +91,7 @@ if args.pilot:
     maxSize = 50000
     epochs = 30
 else:
-    maxSize = 200000
+    maxSize = 100000
     epochs = 300
 
 #### Load dataset
