@@ -490,24 +490,30 @@ if __name__ == "__main__":
     histWriter = HistogramWriter(outfile=outfile_path)
     
     # load classifiers
-    optimizers = {"MHc-70_MA-15_vs_TTLL_powheg": "AdamW",
-                  "MHc-70_MA-15_vs_ttX": "Adam",
-                  "MHc-100_MA-60_vs_TTLL_powheg": "Adam",
-                  "MHc-130_MA-90_vs_TTLL_powheg": "AdamW",
-                  "MHc-130_MA-90_vs_ttX": "RMSprop",
-                  "MHc-160_MA-155_vs_TTLL_powheg": "AdamW"}
-    initLRs =    {"MHc-70_MA-15_vs_TTLL_powheg": 0.002,
-                  "MHc-70_MA-15_vs_ttX": 0.02,
-                  "MHc-100_MA-60_vs_TTLL_powheg": 0.01,
-                  "MHc-130_MA-90_vs_TTLL_powheg": 0.01,
-                  "MHc-130_MA-90_vs_ttX": 0.001,
-                  "MHc-160_MA-155_vs_TTLL_powheg": 2e-05}
-    schedulers = {"MHc-70_MA-15_vs_TTLL_powheg": "StepLR",
-                  "MHc-70_MA-15_vs_ttX": "ExponentialLR",
-                  "MHc-100_MA-60_vs_TTLL_powheg": "ExponentialLR",
-                  "MHc-130_MA-90_vs_TTLL_powheg": "ExponentialLR",
-                  "MHc-130_MA-90_vs_TTLL_powheg": "ExponentialLR",
-                  "MHc-160_MA-155_vs_TTLL_powheg": "ExponentialLR"}
+    optimizers = {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
+    initLRs =    {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
+    schedulers = {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
     classifiers = {}
     for classifier in CLASSIFIERs:
         optim = optimizers[classifier]
