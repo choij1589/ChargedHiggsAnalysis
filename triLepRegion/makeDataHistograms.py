@@ -26,6 +26,10 @@ periodList = PeriodDict[args.era]
 idx = int(args.sample[-1])
 args.sample = args.sample.replace(str(idx), periodList[idx])
 MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+CLASSIFIERs = ["MHc-70_MA-15_vs_TTLL_powheg", "MHc-70_MA-15_vs_ttX",
+               "MHc-100_MA-60_vs_TTLL_powheg",
+               "MHc-130_MA_90_vs_TTLL_powheg", "MHc-130_MA-90_vs_ttX",
+               "MHc-160_MA-155_vs_TTLL_powheg"]
 
 def getScore(model, objects):
     model.eval()
@@ -112,22 +116,28 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, 1., 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, 1., 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), 1., 100, 0., 1.,1000, 0., 1000.)
             
         prefix = f"3Mu/Baseline/Central/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, 1., 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, 1., 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), 1., 100, 0., 1.,1000, 0., 1000.)
     else:
         # Nonprompt
         weight = fakeEstimator.get_fake_weight(muons) 
@@ -155,22 +165,28 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
         
         prefix = f"3Mu/Baseline/Nonprompt/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
             
         # NonpromptUp
         weight = fakeEstimator.get_fake_weight(muons, 1) 
@@ -197,22 +213,28 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
         
         prefix = f"3Mu/Baseline/NonpromptUp/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
             
         # NonpromptDown
         weight = fakeEstimator.get_fake_weight(muons, -1) 
@@ -239,22 +261,28 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
         
         prefix = f"3Mu/Baseline/NonpromptDown/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
             
     if region is None:
         return None
@@ -287,22 +315,28 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, 1., 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, 1., 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.) 
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), 1., 100, 0., 1.,1000, 0., 1000.)
             
         prefix = f"3Mu/{region}/Central/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, 1., 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, 1., 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, 1., 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, 1.)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, 1.)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), 1., 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), 1., 100, 0., 1.,1000, 0., 1000.)
     else:
         # Nonprompt
         weight = fakeEstimator.get_fake_weight(muons) 
@@ -329,22 +363,28 @@ def Loop(evt, fakeEstimator, classifiers, writer):
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
         
         prefix = f"3Mu/{region}/Nonprompt/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
             
         # NonpromptUp
         weight = fakeEstimator.get_fake_weight(muons, 1) 
@@ -366,27 +406,33 @@ def Loop(evt, fakeEstimator, classifiers, writer):
         writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
         writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
         
-        prefix = f"3Mu/{region}/NonpromptUp/Incl/Spectators"
+        prefix = f"3Mu/{region}/NonpromptUp/Incl/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
         
-        prefix = f"3Mu/{region}/NonpromptUp/{measure}/Spectators"
+        prefix = f"3Mu/{region}/NonpromptUp/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
                 
         # NonpromptDown
         weight = fakeEstimator.get_fake_weight(muons, -1) 
@@ -408,27 +454,33 @@ def Loop(evt, fakeEstimator, classifiers, writer):
         writer.fill_object(f"{prefix}/ZCand", ZCand, weight)
         writer.fill_object(f"{prefix}/xZCand", xZCand, weight)
         
-        prefix = f"3Mu/{region}/NonpromptDown/Incl/Spectators"
+        prefix = f"3Mu/{region}/NonpromptDown/Incl/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
             
         prefix = f"3Mu/{region}/NonpromptDown/{measure}/Outputs"
         for mp in MASSPOINTs:
             mA = mp.split("_")[1]
             mA = int(mA.split("-")[1])
             ACand, xACand = makeACand(muons, mA)
-            score = getScore(classifiers[mp], objects)
-            writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+            score_vs_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+            score_vs_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_vs_TTLL_powheg, weight, 100, 0., 1.)
+            writer.fill_hist(f"{prefix}/{mp}/score_vs_ttX", score_vs_ttX, weight, 100, 0., 1.)
             writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
             writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-            writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_vs_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+            writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_vs_ttX, ACand.M(), weight, 100, 0., 1.,1000, 0., 1000.)
             
 if __name__ == "__main__":
     file_path = f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__/DATA/Selector_{args.sample}.root"
@@ -438,26 +490,38 @@ if __name__ == "__main__":
     histWriter = HistogramWriter(outfile=outfile_path)
     
     # load classifiers
-    optimizers = {"MHc-70_MA-15": "Adam",
-                  "MHc-100_MA-60": "Adadelta",
-                  "MHc-130_MA-90": "Adam",
-                  "MHc-160_MA-155": "RMSprop"}
-    initLRs =    {"MHc-70_MA-15": 1e-5,
-                  "MHc-100_MA-60": 0.05,
-                  "MHc-130_MA-90": 0.01,
-                  "MHc-160_MA-155": 0.001}
-    schedulers = {"MHc-70_MA-15": "StepLR",
-                  "MHc-100_MA-60": "StepLR",
-                  "MHc-130_MA-90": "StepLR",
-                  "MHc-160_MA-155": "StepLR"}
+    optimizers = {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
+    initLRs =    {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
+    schedulers = {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
     classifiers = {}
-    for mp in MASSPOINTs:
-        optim = optimizers[mp]
-        initLR = initLRs[mp]
-        scheduler = schedulers[mp]
-        model_path = f"{os.environ['WORKDIR']}/models/pilot/{mp}_vs_TTLL_powheg/ParticleNet_{optim}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-        classifiers[mp] = ParticleNet(num_features=9, num_classes=2, hidden_channels=128)
-        classifiers[mp].load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    for classifier in CLASSIFIERs:
+        optim = optimizers[classifier]
+        initLR = initLRs[classifier]
+        scheduler = schedulers[classifier]
+        model_path = f"{os.environ['WORKDIR']}/models/full/{classifier}/ParticleNet_{optim}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
+        classifiers[classifier] = ParticleNet(num_features=9, num_classes=2, hidden_channels=128)
+        classifiers[classifier].load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     
     f = TFile.Open(file_path)
     for evt in f.Events:

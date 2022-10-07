@@ -20,6 +20,10 @@ parser.add_argument("--split", action="store_true", default=False, help="Using s
 args = parser.parse_args()
 
 MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+CLASSIFIERs = ["MHc-70_MA-15_vs_TTLL_powheg", "MHc-70_MA-15_vs_ttX",
+               "MHc-100_MA-60_vs_TTLL_powheg",
+               "MHc-130_MA_90_vs_TTLL_powheg", "MHc-130_MA-90_vs_ttX",
+               "MHc-160_MA-155_vs_TTLL_powheg"]
 Systematics = ["Central",
                "L1PrefireUp", "L1PrefireDown",
                "PileUpCorrUp", "PileUpCorrDown",
@@ -157,22 +161,28 @@ def Loop(evt, classifiers, mcCorr, syst, writer):
         mA = mp.split("_")[1]
         mA = int(mA.split("-")[1])
         ACand, xACand = makeACand(muons, mA)
-        score = getScore(classifiers[mp], objects)
-        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+        score_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+        score_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_TTLL_powheg, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{mp}/score_ttX", score_ttX, weight, 100, 0., 1.)
         writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
         writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_ttX, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
     
     prefix = f"3Mu/Baseline/{syst}/{measure}/Outputs"
     for mp in MASSPOINTs:
         mA = mp.split("_")[1]
         mA = int(mA.split("-")[1])
         ACand, xACand = makeACand(muons, mA)
-        score = getScore(classifiers[mp], objects)
-        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+        score_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+        score_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_TTLL_powheg, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{mp}/score_ttX", score_ttX, weight, 100, 0., 1.)
         writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
         writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_ttX, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
         
     # Signal / Control Region
     if region is None:
@@ -204,22 +214,28 @@ def Loop(evt, classifiers, mcCorr, syst, writer):
         mA = mp.split("_")[1]
         mA = int(mA.split("-")[1])
         ACand, xACand = makeACand(muons, mA)
-        score = getScore(classifiers[mp], objects)
-        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+        score_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+        score_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_TTLL_powheg, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{mp}/score_ttX", score_ttX, weight, 100, 0., 1.)
         writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
         writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_ttX, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
     
     prefix = f"3Mu/{region}/{syst}/{measure}/Outputs"
     for mp in MASSPOINTs:
         mA = mp.split("_")[1]
         mA = int(mA.split("-")[1])
         ACand, xACand = makeACand(muons, mA)
-        score = getScore(classifiers[mp], objects)
-        writer.fill_hist(f"{prefix}/{mp}/score_vsTTLL_powheg", score, weight, 100, 0., 1.)
+        score_TTLL_powheg = getScore(classifiers[f"{mp}_vs_TTLL_powheg"], objects)
+        score_ttX = getScore(classifiers[f"{mp}_vs_ttX"], objects)
+        writer.fill_hist(f"{prefix}/{mp}/score_vs_TTLL_powheg", score_TTLL_powheg, weight, 100, 0., 1.)
+        writer.fill_hist(f"{prefix}/{mp}/score_ttX", score_ttX, weight, 100, 0., 1.)
         writer.fill_object(f"{prefix}/{mp}/ACand", ACand, weight)
         writer.fill_object(f"{prefix}/{mp}/xACand", xACand, weight)
-        writer.fill_hist2d(f"{prefix}/{mp}/score_vsTTLL_powheg_mACand", score, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_TTLL_powheg_mACand", score_TTLL_powheg, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
+        writer.fill_hist2d(f"{prefix}/{mp}/score_vs_ttX_mACand", score_ttX, ACand.M(), weight, 100, 0., 1., 1000, 0., 1000.)
 
 if __name__ == "__main__":
     file_path = f"{os.environ['WORKDIR']}/SelectorOutput/{args.era}/Skim3Mu__"
@@ -233,26 +249,38 @@ if __name__ == "__main__":
     histWriter = HistogramWriter(outfile=outfile_path)
     
     # load classifiers
-    optimizers = {"MHc-70_MA-15": "Adam",
-                  "MHc-100_MA-60": "Adadelta",
-                  "MHc-130_MA-90": "Adam",
-                  "MHc-160_MA-155": "RMSprop"}
-    initLRs =    {"MHc-70_MA-15": 1e-5,
-                  "MHc-100_MA-60": 0.05,
-                  "MHc-130_MA-90": 0.01,
-                  "MHc-160_MA-155": 0.001}
-    schedulers = {"MHc-70_MA-15": "StepLR",
-                  "MHc-100_MA-60": "StepLR",
-                  "MHc-130_MA-90": "StepLR",
-                  "MHc-160_MA-155": "StepLR"}
+    optimizers = {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
+    initLRs =    {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
+    schedulers = {"MHc-70_MA-15_vs_TTLL_powheg":   "",
+                  "MHc-70_MA-15_vs_ttX":           "",
+                  "MHc-100_MA-60_vs_TTLL_powheg":  "",
+                  "MHc-100_MA_60_vs_ttX":          "",
+                  "MHc-130_MA-90_vs_TTLL_powheg":  "",
+                  "MHc-130_MA-90_vs_ttX":          "",
+                  "MHc-160_MA-155_vs_TTLL_powheg": "",
+                  "MHc-160_MA-155_vs_ttX":         ""}
     classifiers = {}
-    for mp in MASSPOINTs:
-        optim = optimizers[mp]
-        initLR = initLRs[mp]
-        scheduler = schedulers[mp]
-        model_path = f"{os.environ['WORKDIR']}/models/pilot/{mp}_vs_TTLL_powheg/ParticleNet_{optim}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-        classifiers[mp] = ParticleNet(num_features=9, num_classes=2, hidden_channels=128)
-        classifiers[mp].load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    for classifier in CLASSIFIERs:
+        optim = optimizers[classifier]
+        initLR = initLRs[classifier]
+        scheduler = schedulers[classifier]
+        model_path = f"{os.environ['WORKDIR']}/models/full/{classifier}/ParticleNet_{optim}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
+        classifiers[classifier] = ParticleNet(num_features=9, num_classes=2, hidden_channels=128)
+        classifiers[classifier].load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         
     f = TFile.Open(file_path)
     for evt in f.Events:
