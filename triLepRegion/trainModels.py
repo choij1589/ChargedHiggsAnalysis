@@ -162,7 +162,7 @@ if __name__ == "__main__":
         rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.signal}_vs_{args.background}/roc-{modelName}.png"
 
     criterion = torch.nn.CrossEntropyLoss()
-    earlyStopper = EarlyStopping(patience=8, path=checkpointPath)
+    earlyStopper = EarlyStopping(patience=6, path=checkpointPath)
     summaryWriter = SummaryWriter(name=modelName)
     print(f"@@@@ Start training {modelName}...")
     for epoch in range(epochs):

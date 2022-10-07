@@ -34,7 +34,10 @@ class GeneticModule():
             model, optimizer, initLR, scheduler = self.population[idx]['chromosome']
             path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{masspoint}_vs_{background}/training-{model}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
             csv = pd.read_csv(path)
-            self.population[idx]['fitness'] = float(csv.iloc[-1].loc['loss/valid'])
+            train_loss = float(csv.iloc[-1].loc['loss/train'])
+            valid_loss = float(csv.iloc[-1].loc['loss/valid'])
+            fitness = valid_loss + abs(train_loss - valid_loss) # valid_loss + overtraining panelty
+            self.population[idx]['fitness'] = fitness
     
     def __getIdxFromRoulette(self, nPop):
         probs = np.array(range(nPop+1))
