@@ -11,10 +11,8 @@ from torch import cuda
 #           "MHc-100_MA-60", "MHc-100_MA-95",
 #           "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
 #           "MHc-160_MA-85", "MHc-160_MA-155"]
-#SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90"]
-SIGNALs = ["MHc-160_MA-155"]
-#BACKGROUNDs = ["TTLL_powheg"]
-BACKGROUNDs = ["ttX"]
+SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+BACKGROUNDs = ["TTLL_powheg", "ttX"]
 
 def makePopulation(sig, bkg):
     path = f"{os.environ['WORKDIR']}/models/pilot/{sig}_vs_{bkg}/GAOptimization.csv"

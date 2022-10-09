@@ -3,6 +3,7 @@ import sys; sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
 import subprocess
 
+from time import sleep
 from libPython.GATools import GeneticModule
 
 parser = argparse.ArgumentParser()
@@ -40,6 +41,7 @@ def evalFitness(population):
         print(f"sumbit {command}...")
         proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         procs.append(proc)
+        sleep(1)
         
     for proc in procs:
         proc.communicate()
