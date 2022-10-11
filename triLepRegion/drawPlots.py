@@ -17,7 +17,7 @@ args = parser.parse_args()
 
 DataStream = "DoubleMuon"
 Conv = ["DYJets", "ZGToLLG"]
-VV = ["WZTo3LNu_mllmin4p0_powheg", "ZZTo4L_powheg"]
+VV = ["WZTo3LNu_amcatnlo", "ZZTo4L_powheg"]
 ttX = ["ttWToLNu", "ttZToLLNuNu", "ttHToNonbb", "tZq", "tHq"]
 Rare = ["WWW", "WWZ", "WZZ", "ZZZ", "WWG", "TTG", "TTTT", "VBF_HToZZTo4L", "GluGluHToZZTo4L"]
 MCSamples = Conv + VV + ttX + Rare

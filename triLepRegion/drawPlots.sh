@@ -53,5 +53,6 @@ do
     python drawPlots.py --era $ERA --var Outputs/$MP/xACand/pt --region $REGION
     python drawPlots.py --era $ERA --var Outputs/$MP/xACand/eta --region $REGION
     python drawPlots.py --era $ERA --var Outputs/$MP/xACand/phi --region $REGION
-    python drawPlots.py --era $ERA --var Outputs/$MP/score_vsTTLL_powheg --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/score_vs_TTLL_powheg --region $REGION
+    python drawPlots.py --era $ERA --var Outputs/$MP/score_vs_ttX --region $REGION
 done

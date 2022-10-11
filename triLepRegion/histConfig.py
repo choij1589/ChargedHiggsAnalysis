@@ -204,11 +204,16 @@ hist_configs = {
                                         "x_range": [0., 200.],
                                         "rebin": 5
                                         },
-    "Outputs/MHc-70_MA-15/score_vsTTLL_powheg": {"x_title": "score",
+    "Outputs/MHc-70_MA-15/score_vs_TTLL_powheg": {"x_title": "score",
                                                  "y_title": "Events",
                                                  "x_range": [0., 1.],
                                                  "rebin": 5
                                                  },
+    "Outputs/MHc-70_MA-15/score_vs_ttX": {"x_title": "score",
+                                          "y_title": "Events",
+                                          "x_range": [0., 1.],
+                                          "rebin": 5
+                                         },
     "Outputs/MHc-100_MA-60/ACand/pt": {"x_title": "p_{T}(A)",
                                       "y_title": "Events / 5 GeV",
                                       "x_range": [0., 200.],
@@ -249,11 +254,16 @@ hist_configs = {
                                         "x_range": [0., 200.],
                                         "rebin": 5
                                         },
-    "Outputs/MHc-100_MA-60/score_vsTTLL_powheg": {"x_title": "score",
+    "Outputs/MHc-100_MA-60/score_vs_TTLL_powheg": {"x_title": "score",
                                                  "y_title": "Events",
                                                  "x_range": [0., 1.],
                                                  "rebin": 5
                                                  },
+    "Outputs/MHc-100_MA-60/score_vs_ttX": {"x_title": "score",
+                                          "y_title": "Events",
+                                          "x_range": [0., 1.],
+                                          "rebin": 5
+                                         },
     "Outputs/MHc-130_MA-90/ACand/pt": {"x_title": "p_{T}(A)",
                                       "y_title": "Events / 5 GeV",
                                       "x_range": [0., 200.],
@@ -294,11 +304,16 @@ hist_configs = {
                                         "x_range": [0., 200.],
                                         "rebin": 5
                                         },
-    "Outputs/MHc-130_MA-90/score_vsTTLL_powheg": {"x_title": "score",
+    "Outputs/MHc-130_MA-90/score_vs_TTLL_powheg": {"x_title": "score",
                                                  "y_title": "Events",
                                                  "x_range": [0., 1.],
                                                  "rebin": 5
                                                  },
+    "Outputs/MHc-130_MA-90/score_vs_ttX": {"x_title": "score",
+                                          "y_title": "Events",
+                                          "x_range": [0., 1.],
+                                          "rebin": 5
+                                         },
     "Outputs/MHc-160_MA-155/ACand/pt": {"x_title": "p_{T}(A)",
                                       "y_title": "Events / 5 GeV",
                                       "x_range": [0., 200.],
@@ -339,9 +354,14 @@ hist_configs = {
                                         "x_range": [0., 200.],
                                         "rebin": 5
                                         },
-    "Outputs/MHc-160_MA-155/score_vsTTLL_powheg": {"x_title": "score",
+    "Outputs/MHc-160_MA-155/score_vs_TTLL_powheg": {"x_title": "score",
                                                  "y_title": "Events",
                                                  "x_range": [0., 1.],
                                                  "rebin": 5
-                                                 }
+                                                 },
+    "Outputs/MHc-160_MA-155/score_vs_ttX": {"x_title": "score",
+                                          "y_title": "Events",
+                                          "x_range": [0., 1.],
+                                          "rebin": 5
+                                         },
 }
