@@ -1,5 +1,5 @@
 #!/bin/bash
-era=$1
+era=$1ToMuMu_MHc-100_MA-60WZTo3LNu_amcatnlo
 python scripts/submitMakeDataHistograms.py --era $1 --sample DoubleMuon &
 python scripts/submitMakeMCHistograms.py --era $1 --sample TTToHcToWAToMuMu_MHc-70_MA-15 --split &
 #python scripts/submitMakeMCHistograms.py --era $1 --sample TTToHcToWAToMuMu_MHc-70_MA-40 --split &
