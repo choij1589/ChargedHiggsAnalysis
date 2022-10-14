@@ -6,3 +6,5 @@ condor/*
 libCpp/splitFile
 libCpp/copyFile
 libPython/secrets.py
+*/.DS_Store
+*/tmp
