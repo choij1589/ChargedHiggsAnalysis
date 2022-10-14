@@ -17,8 +17,7 @@ args = parser.parse_args()
 
 DataStream = "DoubleMuon"
 Conv = ["DYJets", "ZGToLLG"]
-VV = ["WZTo3LNu_mllmin4p0_powheg", "ZZTo4L_powheg"]
-#VV = ["WZTo3LNu_mllmin4p0_powheg"] 
+VV = ["WZTo3LNu_amcatnlo", "ZZTo4L_powheg"]
 ttX = ["ttWToLNu", "ttZToLLNuNu", "ttHToNonbb", "tZq", "tHq"]
 Rare = ["WWW", "WWZ", "WZZ", "ZZZ", "WWG", "TTG", "TTTT", "VBF_HToZZTo4L", "GluGluHToZZTo4L"]
 MCSamples = Conv + VV + ttX + Rare
@@ -121,6 +120,8 @@ for sample in MCSamples:
             this_syst_down = h_down.GetBinContent(bin) - this_value
             this_syst = max(abs(this_syst_up), abs(this_syst_down))
             h_cent.SetBinError(bin, this_syst)
+    if sample == "ZZTo4L_powheg":
+        h_cent.Scale(186./19.)
     MCcoll[sample] = h_cent
 
 

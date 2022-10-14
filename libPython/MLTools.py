@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 import torch
 import torch.nn.functional as F
-from torch.nn import Sequential, Linear, ReLU
+from torch.nn import Sequential, Linear, ReLU, BatchNorm1d
 from torch_geometric.nn import global_mean_pool, knn_graph
 from torch_geometric.nn import GCNConv, GraphConv
 from torch_geometric.nn import GraphNorm
@@ -81,9 +81,10 @@ class GNN(torch.nn.Module):
 class EdgeConv(MessagePassing):
     def __init__(self, in_channels, out_channels):
         super().__init__(aggr='mean')
-        self.mlp = Sequential(Linear(2 * in_channels, out_channels), ReLU(),
-                              Linear(out_channels, out_channels), ReLU(),
-                              Linear(out_channels, out_channels))
+        self.mlp = Sequential(
+                Linear(2 * in_channels, out_channels), BatchNorm1d(out_channels), ReLU(),
+                Linear(out_channels, out_channels), BatchNorm1d(out_channels), ReLU(),
+                Linear(out_channels, out_channels), BatchNorm1d(out_channels), ReLU())
 
     def forward(self, x, edge_index, batch=None):
         return self.propagate(edge_index, x=x, batch=batch)
@@ -96,42 +97,44 @@ class EdgeConv(MessagePassing):
 class DynamicEdgeConv(EdgeConv):
     def __init__(self, in_channels, out_channels, k=4):
         super().__init__(in_channels, out_channels)
+        self.shortcut = Sequential(Linear(in_channels, out_channels), BatchNorm1d(out_channels))
         self.k = k
 
     def forward(self, x, edge_index=None, batch=None):
         if edge_index is None:
             edge_index = knn_graph(
                 x, self.k, batch, loop=False, flow=self.flow)
-        return super().forward(x, edge_index, batch=batch)
+        out = super().forward(x, edge_index, batch=batch)
+        out += self.shortcut(x)
+        return F.relu(out)
 
 
 class ParticleNet(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels, dynamic=True):
+    def __init__(self, num_features, num_classes, hidden_channels):
         super(ParticleNet, self).__init__()
-        self.dynamic = dynamic
         self.gn0 = GraphNorm(num_features)
         self.conv1 = DynamicEdgeConv(num_features, hidden_channels)
         self.gn1 = GraphNorm(hidden_channels)
         self.conv2 = DynamicEdgeConv(hidden_channels, hidden_channels)
         self.gn2 = GraphNorm(hidden_channels)
         self.conv3 = DynamicEdgeConv(hidden_channels, hidden_channels)
-        self.dense = Linear(hidden_channels, hidden_channels)
-        self.output = Linear(hidden_channels, num_classes)
+        self.dense = Linear(hidden_channels, 64)
+        self.output = Linear(64, num_classes)
 
     def forward(self, x, edge_index, batch=None):
         # Convolution layers
         x = self.gn0(x, batch=batch)
         x = self.conv1(x, edge_index, batch=batch)
         x = self.gn1(x, batch=batch)
-        x = self.conv2(x, batch=batch) if self.dynamic else self.conv2(x, edge_index, batch=batch)
+        x = self.conv2(x, batch=batch)
         x = self.gn2(x, batch=batch)
-        x = self.conv3(x, batch=batch) if self.dynamic else self.conv3(x, edge_index, batch=batch)
+        x = self.conv3(x, batch=batch)
         # readout layers
         x = global_mean_pool(x, batch=batch)
 
         # dense layers
-        x = F.dropout(x, p=0.5, training=self.training)
-        x = F.relu(self.dense(x))
+        x = F.selu(self.dense(x))
+        x = F.alpha_dropout(x, p=0.5)
         x = self.output(x)
 
         return F.softmax(x, dim=1)

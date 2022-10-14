@@ -25,16 +25,15 @@ parser.add_argument("--optimizer", "-z", required=True, type=str, help="optimize
 parser.add_argument("--initLR", "-i", required=True, type=float, help="initial learning rate")
 parser.add_argument("--nbatch", "-n", default=1024, type=int, help="batch size")
 parser.add_argument("--scheduler", "-c", required=True, type=str, help="learning rate scheducler")
-#parser.add_argument("--era", "-e", default="All", type=str, help="Era")
 parser.add_argument("--pilot", "-p", action="store_true", default=False, help="pilot run")
 parser.add_argument("--device", "-d", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
 
 # check arguments
 signalList = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
-              "MHc-100_MA-60", "MHc-100_MA-95",
+              "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
               "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
-              "MHc-160_MA-85", "MHc-160_MA-155"]
+              "MHc-160_MA_15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 backgroundList = ["TTLL_powheg", "ttX"]
 
 if not args.signal in signalList:
@@ -67,20 +66,28 @@ elif args.optimizer == "Adam":
     optimizer = torch.optim.Adam(model.parameters(), lr=args.initLR)
 elif args.optimizer == "Adadelta":
     optimizer = torch.optim.Adadelta(model.parameters(), lr=args.initLR)
+elif args.optimizer == "NAdam":
+    optimizer = torch.optim.NAdam(model.parameters(), lr=args.initLR)
+elif args.optimizer == "RAdam":
+    optimizer = torch.optim.RAdam(model.parameters(), lr=args.initLR)
 else:
     print(f"[trainModels] Wrong optimizer name {args.optimizer}")
     exit(1)
 
 print(f"@@@@ Using lr scheduler {args.scheduler}...")
+stopperPatience = 6
 if args.scheduler == "StepLR":
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.9)
 elif args.scheduler == "ExponentialLR":
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
 elif args.scheduler == "CyclicLR":
     cycle_momentum = True if args.optimizer == "RMSprop" else False
+    stopperPatience = 10
     scheduler = torch.optim.lr_scheduler.CyclicLR(
-            optimizer, base_lr=0.001, max_lr=0.2, step_size_up=3, step_size_down=5,
-            gamma=0.95, mode='exp_range', cycle_momentum=cycle_momentum)
+            optimizer, 
+            base_lr=args.initLR/5., max_lr=args.initLR*2, 
+            step_size_up=3, step_size_down=5,
+            cycle_momentum=cycle_momentum)
 else:
     print(f"[trainModels] Wrong scheduler name {args.scheduler}")
     exit(1)
@@ -162,7 +169,7 @@ if __name__ == "__main__":
         rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.signal}_vs_{args.background}/roc-{modelName}.png"
 
     criterion = torch.nn.CrossEntropyLoss()
-    earlyStopper = EarlyStopping(patience=6, path=checkpointPath)
+    earlyStopper = EarlyStopping(patience=stopperPatience, path=checkpointPath)
     summaryWriter = SummaryWriter(name=modelName)
     print(f"@@@@ Start training {modelName}...")
     for epoch in range(epochs):
@@ -180,8 +187,8 @@ if __name__ == "__main__":
             print(f"Early stopping in epoch {epoch}")
             break
     
-    print(f"@@@@ Saving final model...")
-    torch.save(model.state_dict(), checkpointPath)
+    #print(f"@@@@ Saving final model...")
+    #torch.save(model.state_dict(), checkpointPath)
 
     print(f"@@@@ Visualising results...")
     # train / validation loss, accuraccy
@@ -189,6 +196,7 @@ if __name__ == "__main__":
     summaryWriter.visualize_training(summaryPath)
     # ROC curve
     model.to("cpu")
+    model.load_state_dict(torch.load(checkpointPath, map_location=torch.device('cpu')))
     tpr = {}
     fpr = {}
     auc = {}
