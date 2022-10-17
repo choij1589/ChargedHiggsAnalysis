@@ -98,5 +98,6 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
 
         if len(data_list) == max_size:
             break
+    print(f"@@@@ the no. of data_list ends with {len(data_list)}")
 
     return data_list

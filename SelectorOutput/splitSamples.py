@@ -1,19 +1,25 @@
 import os, shutil
+import argparse
 from ROOT import TFile
 
-prefix = "Skim3Mu__"
+parser = argparse.ArgumentParser()
+parser.add_argument("--era", "-e", type=str, required=True, help="Era")
+parser.add_argument("--flag", "-f", type=str, required=True, help="SKFlatAnalyzer flag")
+args = parser.parse_args()
+
+prefix = f"{args.era}/{args.flag}"
 
 # read sample list
 sampleList = []
-with open("SampleList.txt", "r") as f:
+with open(f"sampleList.txt", "r") as f:
     for line in f.readlines():
-        if line[0] == "#" or "DoubleMuon" in line:
+        if line[0] == "#" in line:
             continue
         sampleList.append(line[:-1])
 
 # make split directory
 if not os.path.exists(f"{prefix}/Split"):
-    os.makedirs("{prefix}/Split")
+    os.makedirs(f"{prefix}/Split")
 
 def splitSample(samplename):
     # open file
@@ -34,4 +40,3 @@ def splitSample(samplename):
 
 for sample in sampleList:
     splitSample(sample)
-

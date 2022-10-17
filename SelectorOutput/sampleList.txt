@@ -1,9 +1,3 @@
-# data
-DoubleMuon_B_ver2
-DoubleMuon_C
-DoubleMuon_D
-DoubleMuon_E
-DoubleMuon_F
 # signal samples
 TTToHcToWAToMuMu_MHc-70_MA-15
 TTToHcToWAToMuMu_MHc-70_MA-40
