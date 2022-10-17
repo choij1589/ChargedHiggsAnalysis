@@ -7,6 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--signal", "-s", required=True, type=str, help="Signal mass point")
 parser.add_argument("--background", "-b", required=True, type=str, help="background")
+parser.add_argument("--channel", "-c", required=True, type=str, help="channel")
 args = parser.parse_args()
 
 # make random string
@@ -35,7 +36,7 @@ def makeRunSh():
     f.write("cd $WORKDIR\n")
     f.write("source /opt/conda/bin/activate\n")
     f.write("conda activate torch\n")
-    f.write(f"python triLepRegion/optimizeHyperParams.py --signal {args.signal} --background {args.background}")
+    f.write(f"python triLepRegion/optimizeHyperParams.py --signal {args.signal} --background {args.background} --channel {args.channel}")
     f.close()
 
 if __name__ == "__main__":

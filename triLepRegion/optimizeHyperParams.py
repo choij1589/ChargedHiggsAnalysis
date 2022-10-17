@@ -7,8 +7,9 @@ from time import sleep
 from libPython.GATools import GeneticModule
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--signal", "-s", required=True, type=str, help="signal mass point")
-parser.add_argument("--background", "-b", required=True, type=str, help="background")
+parser.add_argument("--signal", required=True, type=str, help="signal mass point")
+parser.add_argument("--background", required=True, type=str, help="background")
+parser.add_argument("--channel", required=True, type=str, help="channel")
 args = parser.parse_args()
 
 # Let's run the model linearly first
@@ -19,11 +20,11 @@ schedulers = ["StepLR", "ExponentialLR", "CyclicLR"]
 initLRs = [0.00001, 0.00002, 0.00005, 0.0001, 0.0002, 0.0005, 
            0.001, 0.002, 0.005, 0.01, 0.02, 0.05]
 nBatch = 1024
-nHidden = 128
+nHidden = 64
 criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
-nPop = 13
+nPop = 16
 thresholds = [0.7, 0.8, 0.95, 0.8]
-maxIter = 5
+maxIter = 4
 
 def evalFitness(population):
     procs = []
@@ -33,6 +34,7 @@ def evalFitness(population):
             continue
         model, optimizer, initLR, scheduler = population[idx]['chromosome']
         command = f"python {os.environ['WORKDIR']}/triLepRegion/trainModels.py --signal {args.signal} --background {args.background}"
+        command += f" --channel {args.channel}"
         command += f" --model {model}"
         command += f" --optimizer {optimizer}"
         command += f" --initLR {initLR}"
@@ -58,15 +60,15 @@ gaModule.generatePool(criteria)
 
 gaModule.randomGeneration(nPop=nPop)
 evalFitness(gaModule.population)
-gaModule.updatePopulation(args.signal, args.background)
+gaModule.updatePopulation(args.signal, args.background, args.channel)
 print("@@@@ generation 0")
 print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
     gaModule.evolution(thresholds=thresholds, ratio=0.5)
     evalFitness(gaModule.population)
-    gaModule.updatePopulation(args.signal, args.background)
+    gaModule.updatePopulation(args.signal, args.background, args.channel)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
     
-path = f"{os.environ['WORKDIR']}/models/pilot/{args.signal}_vs_{args.background}/GAOptimization.csv"
+path = f"{os.environ['WORKDIR']}/models/pilot/{args.channel}__/{args.signal}_vs_{args.background}/GAOptimization.csv"
 gaModule.savePopulation(path=path)
