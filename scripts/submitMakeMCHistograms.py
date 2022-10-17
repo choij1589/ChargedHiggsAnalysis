@@ -69,8 +69,7 @@ if __name__ == "__main__":
             sleep(1)
 
     # now hadd the outputs
-    basedir = f"triLepRegion/ROOT/Skim3Mu__/{args.era}"
-    os.system(f"hadd -f {basedir}/{args.sample}.root {basedir}/{args.sample}_*.root")
-    for idx in range(len(samples)):
-        os.remove(f"{basedir}/{args.sample}_{idx}.root")
-
+    # basedir = f"triLepRegion/ROOT/Skim3Mu__/{args.era}"
+    # os.system(f"hadd -f {basedir}/{args.sample}.root {basedir}/{args.sample}_*.root")
+    # for idx in range(len(samples)):
+    #     os.remove(f"{basedir}/{args.sample}_{idx}.root")
