@@ -7,15 +7,15 @@ from itertools import product
 from time import sleep
 from torch import cuda
 
-#SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
-#           "MHc-100_MA-60", "MHc-100_MA-95",
-#           "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
-#           "MHc-160_MA-85", "MHc-160_MA-155"]
-SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
+           "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
+           "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
+           "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 BACKGROUNDs = ["TTLL_powheg", "ttX"]
+CHANNEL = "Skim3Mu"
 
-def makePopulation(sig, bkg):
-    path = f"{os.environ['WORKDIR']}/models/pilot/{sig}_vs_{bkg}/GAOptimization.csv"
+def makePopulation(sig, bkg, channel):
+    path = f"{os.environ['WORKDIR']}/pilot/models/{channel}__/{sig}_vs_{bkg}/GAOptimization.csv"
     csv = pd.read_csv(path).T
     
     population = []
@@ -29,12 +29,13 @@ def makePopulation(sig, bkg):
     population = list(set(population))
     return population
 
-def addJobCommands(queue, sig, bkg):
-    job_list = makePopulation(sig, bkg)
+def addJobCommands(queue, sig, bkg, channel):
+    job_list = makePopulation(sig, bkg, channel)
     for model, optim, initLR, scheduler in job_list:
         command = f"python triLepRegion/trainModels.py"
         command += f" --signal {sig}"
         command += f" --background {bkg}"
+        command += f" --channel {channel}"
         command += f" --model {model}"
         command += f" --optimizer {optim}"
         command += f" --initLR {initLR}"
@@ -54,7 +55,7 @@ if __name__ == "__main__":
 
     queue = deque()
     for sig, bkg in product(SIGNALs, BACKGROUNDs):    
-        addJobCommands(queue, sig, bkg)
+        addJobCommands(queue, sig, bkg, CHANNEL)
     
     # submit all jobs till the queue empty
     while queue:
