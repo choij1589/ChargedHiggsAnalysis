@@ -17,16 +17,17 @@ from libPython.MLTools      import SummaryWriter
 
 #### Parse arguments
 parser = argparse.ArgumentParser()
-parser.add_argument("--signal", "-s", required=True, type=str, help="signal sample")
-parser.add_argument("--background", "-b", required=True, type=str, help="background sample")
-parser.add_argument("--model", "-m", required=True, type=str, help="model type")
-parser.add_argument("--nhidden", "-l", default=128, type=int, help="the number of hidden layers")
-parser.add_argument("--optimizer", "-z", required=True, type=str, help="optimizer")
-parser.add_argument("--initLR", "-i", required=True, type=float, help="initial learning rate")
-parser.add_argument("--nbatch", "-n", default=1024, type=int, help="batch size")
-parser.add_argument("--scheduler", "-c", required=True, type=str, help="learning rate scheducler")
-parser.add_argument("--pilot", "-p", action="store_true", default=False, help="pilot run")
-parser.add_argument("--device", "-d", default="cpu", type=str, help="device to use")
+parser.add_argument("--signal", required=True, type=str, help="signal sample")
+parser.add_argument("--background", required=True, type=str, help="background sample")
+parser.add_argument("--channel",required=True, type=str, help="channel")
+parser.add_argument("--model", required=True, type=str, help="model type")
+parser.add_argument("--nhidden", default=64, type=int, help="the number of hidden layers")
+parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
+parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
+parser.add_argument("--nbatch", default=1024, type=int, help="batch size")
+parser.add_argument("--scheduler", required=True, type=str, help="lr scheducler")
+parser.add_argument("--pilot", action="store_true", default=False, help="pilot run")
+parser.add_argument("--device", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
 
 # check arguments
@@ -102,8 +103,8 @@ else:
     epochs = 300
 
 #### Load dataset
-rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Selector_TTToHcToWAToMuMu_{args.signal}.root")
-rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Selector_{args.background}.root")
+rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
+rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_{args.background}.root")
 
 isPrompt = False if args.background == "TTLL_powheg" else True
 sigDatalist = rtfile_to_datalist(rtSig, channel="3Mu", is_signal=True, is_prompt=True, max_size=maxSize)
@@ -158,15 +159,15 @@ def test(model, criterion, loader):
 if __name__ == "__main__":
     modelName = f"{args.model}_{args.optimizer}_initLR-{str(args.initLR).replace('.', 'p')}_{args.scheduler}"
     if args.pilot:
-        checkpointPath = f"{os.environ['WORKDIR']}/models/pilot/{args.signal}_vs_{args.background}/{modelName}.pt"
-        logPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/logs/{args.signal}_vs_{args.background}/{modelName}.log"
-        summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.signal}_vs_{args.background}/training-{modelName}.png"
-        rocPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.signal}_vs_{args.background}/roc-{modelName}.png"
+        checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/models/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.pt"
+        logPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.log"
+        summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/training-{modelName}.png"
+        rocPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/roc-{modelName}.png"
     else:
-        checkpointPath = f"{os.environ['WORKDIR']}/models/full/{args.signal}_vs_{args.background}/{modelName}.pt"
-        logPath = f"{os.environ['WORKDIR']}/triLepRegion/full/logs/{args.signal}_vs_{args.background}/{modelName}.log"
-        summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.signal}_vs_{args.background}/training-{modelName}.png"
-        rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.signal}_vs_{args.background}/roc-{modelName}.png"
+        checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/full/models/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.pt"
+        logPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.log"
+        summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/training-{modelName}.png"
+        rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/roc-{modelName}.png"
 
     criterion = torch.nn.CrossEntropyLoss()
     earlyStopper = EarlyStopping(patience=stopperPatience, path=checkpointPath)
