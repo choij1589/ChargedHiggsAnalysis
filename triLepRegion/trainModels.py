@@ -19,7 +19,6 @@ from libPython.MLTools      import SummaryWriter
 parser = argparse.ArgumentParser()
 parser.add_argument("--signal", required=True, type=str, help="signal sample")
 parser.add_argument("--background", required=True, type=str, help="background sample")
-<<<<<<< HEAD
 parser.add_argument("--channel", required=True, type=str, help="channel")
 parser.add_argument("--model", required=True, type=str, help="model type")
 parser.add_argument("--nhidden", default=64, type=int, help="the number of hidden layers")
@@ -108,8 +107,9 @@ rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.chann
 rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_{args.background}.root")
 
 isPrompt = False if args.background == "TTLL_powheg" else True
-sigDatalist = rtfile_to_datalist(rtSig, channel="3Mu", is_signal=True, is_prompt=True, max_size=maxSize)
-bkgDatalist = rtfile_to_datalist(rtBkg, channel="3Mu", is_signal=False, is_prompt=isPrompt, max_size=maxSize)
+channel = args.channel[4:]
+sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True, max_size=maxSize)
+bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt, max_size=maxSize)
 rtSig.Close()
 rtBkg.Close()
 
@@ -160,20 +160,12 @@ def test(model, criterion, loader):
 if __name__ == "__main__":
     modelName = f"{args.model}_{args.optimizer}_initLR-{str(args.initLR).replace('.', 'p')}_{args.scheduler}"
     if args.pilot:
-<<<<<<< HEAD
-        checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/models/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.pt"
-=======
         checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/{modelName}.pt"
->>>>>>> 1b5edc00f3421c18e95994bbd75566e17c5437b1
         logPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.log"
         summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/training-{modelName}.png"
         rocPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/roc-{modelName}.png"
     else:
-<<<<<<< HEAD
-        checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/full/models/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.pt"
-=======
         checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/models/{args.signal}_vs_{args.background}/{modelName}.pt"
->>>>>>> 1b5edc00f3421c18e95994bbd75566e17c5437b1
         logPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.log"
         summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/training-{modelName}.png"
         rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/roc-{modelName}.png"
