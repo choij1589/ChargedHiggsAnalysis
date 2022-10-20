@@ -34,7 +34,7 @@ args = parser.parse_args()
 signalList = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
               "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
-              "MHc-160_MA_15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
+              "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 backgroundList = ["TTLL_powheg", "ttX"]
 
 if not args.signal in signalList:
@@ -159,12 +159,12 @@ def test(model, criterion, loader):
 if __name__ == "__main__":
     modelName = f"{args.model}_{args.optimizer}_initLR-{str(args.initLR).replace('.', 'p')}_{args.scheduler}"
     if args.pilot:
-        checkpointPath = f"{os.environ['WORKDIR']}/models/pilot/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.pt"
+        checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/{modelName}.pt"
         logPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.log"
         summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/training-{modelName}.png"
         rocPath = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/roc-{modelName}.png"
     else:
-        checkpointPath = f"{os.environ['WORKDIR']}/models/full/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.pt"
+        checkpointPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/models/{args.signal}_vs_{args.background}/{modelName}.pt"
         logPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/{modelName}.log"
         summaryPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/training-{modelName}.png"
         rocPath = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/roc-{modelName}.png"

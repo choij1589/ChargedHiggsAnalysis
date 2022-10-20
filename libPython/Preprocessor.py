@@ -54,7 +54,7 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
         jets, bjets = get_jets(evt)
         METv = Particle(evt.METvPt, 0., evt.METvPhi, 0.)
 
-        if not pass_baseline(channel, evt, muons, electrons, jets, bjets, "loose"):
+        if not pass_baseline(channel, evt, muons, electrons, idstring="loose", isTraining=True):
             continue
         #if not select(channel, evt, muons, electrons, jets, bjets, "loose") == "SignalRegion":
         #    continue

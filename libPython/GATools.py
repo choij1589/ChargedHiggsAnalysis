@@ -17,9 +17,10 @@ class GeneticModule():
     def getGeneValues(self, genes):
         self.hyperSet.append(genes)
         
-    def generatePool(self, criteria):
+    def generatePool(self, criteria=None):
         self.pool = list(product(*self.hyperSet))
-        self.pool = list(filter(criteria, self.pool))
+        if not criteria is None:
+            self.pool = list(filter(criteria, self.pool))
         
     def randomGeneration(self, nPop=10):
         population = {}
