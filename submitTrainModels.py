@@ -15,7 +15,7 @@ BACKGROUNDs = ["TTLL_powheg", "ttX"]
 CHANNEL = "Skim1E2Mu"
 
 def makePopulation(sig, bkg, channel):
-    path = f"{os.environ['WORKDIR']}/models/pilot/{channel}__/{sig}_vs_{bkg}/GAOptimization.csv"
+    path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{channel}__/models/{sig}_vs_{bkg}/GAOptimization.csv"
     csv = pd.read_csv(path).T
     
     population = []

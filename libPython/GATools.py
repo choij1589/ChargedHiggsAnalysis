@@ -37,7 +37,10 @@ class GeneticModule():
             csv = pd.read_csv(path)
             train_loss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/train'])
             valid_loss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/valid'])
-            fitness = valid_loss + abs(train_loss - valid_loss) # valid_loss + overtraining panelty
+            panelty = abs(train_loss - valid_loss)
+            # fitness as the harmonic mean of valid loss and panelty
+            fitness = 2*valid_loss*panelty/(valid_loss+panelty)
+            # fitness = valid_loss + abs(train_loss - valid_loss) # valid_loss + overtraining panelty
             self.population[idx]['fitness'] = fitness
     
     def __getIdxFromRoulette(self, nPop):

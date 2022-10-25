@@ -117,9 +117,9 @@ sigDatalist = shuffle(sigDatalist, random_state=42)[:maxSize]
 bkgDatalist = shuffle(bkgDatalist, random_state=42)[:maxSize]
 datalist = shuffle(sigDatalist+bkgDatalist, random_state=42)
 
-trainDataset = MyDataset(datalist[:int(maxSize*2*0.4)])
-validDataset = MyDataset(datalist[int(maxSize*2*0.4):int(maxSize*2*0.5)])
-testDataset = MyDataset(datalist[int(maxSize*2*0.5):])
+trainDataset = MyDataset(datalist[:int(maxSize*2*0.6)])
+validDataset = MyDataset(datalist[int(maxSize*2*0.6):int(maxSize*2*0.7)])
+testDataset = MyDataset(datalist[int(maxSize*2*0.7):])
 
 trainLoader = DataLoader(trainDataset, batch_size=args.nbatch, shuffle=True, pin_memory=True)
 validLoader = DataLoader(validDataset, batch_size=args.nbatch, shuffle=False, pin_memory=True)
