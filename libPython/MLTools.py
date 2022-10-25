@@ -110,16 +110,16 @@ class DynamicEdgeConv(EdgeConv):
 
 
 class ParticleNet(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels):
+    def __init__(self, num_features, num_classes):
         super(ParticleNet, self).__init__()
         self.gn0 = GraphNorm(num_features)
-        self.conv1 = DynamicEdgeConv(num_features, hidden_channels)
-        self.gn1 = GraphNorm(hidden_channels)
-        self.conv2 = DynamicEdgeConv(hidden_channels, hidden_channels)
-        self.gn2 = GraphNorm(hidden_channels)
-        self.conv3 = DynamicEdgeConv(hidden_channels, hidden_channels)
-        self.dense1 = Linear(hidden_channels, 64)
-        self.dense2 = Linear(64, 64)
+        self.conv1 = DynamicEdgeConv(num_features, 64)
+        self.gn1 = GraphNorm(64)
+        self.conv2 = DynamicEdgeConv(64, 128)
+        self.gn2 = GraphNorm(128)
+        self.conv3 = DynamicEdgeConv(128, 128)
+        self.gn3 = GraphNorm(128)
+        self.dense = Linear(128, 64)
         self.output = Linear(64, num_classes)
 
     def forward(self, x, edge_index, batch=None):
@@ -130,14 +130,13 @@ class ParticleNet(torch.nn.Module):
         x = self.conv2(x, batch=batch)
         x = self.gn2(x, batch=batch)
         x = self.conv3(x, batch=batch)
+        x = self.gn3(x, batch=batch)
         # readout layers
         x = global_mean_pool(x, batch=batch)
 
         # dense layers
-        x = F.selu(self.dense1(x))
-        x = F.alpha_dropout(x, p=0.2)
-        x = F.selu(self.dense2(x))
-        x = F.alpha_dropout(x, p=0.2)
+        x = F.relu(self.dense(x))
+        x = F.dropout(x, p=0.5)
         x = self.output(x)
 
         return F.softmax(x, dim=1)
