@@ -39,8 +39,8 @@ class GeneticModule():
             valid_loss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/valid'])
             panelty = abs(train_loss - valid_loss)
             # fitness as the harmonic mean of valid loss and panelty
-            fitness = 2*valid_loss*panelty/(valid_loss+panelty)
-            # fitness = valid_loss + abs(train_loss - valid_loss) # valid_loss + overtraining panelty
+            #fitness = 2*valid_loss*panelty/(valid_loss+panelty)
+            fitness = valid_loss + 3*panelty # valid_loss + overtraining panelty
             self.population[idx]['fitness'] = fitness
     
     def __getIdxFromRoulette(self, nPop):
