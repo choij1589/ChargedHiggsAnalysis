@@ -10,7 +10,7 @@ from torch_geometric.loader import DataLoader
 
 from libPython.Preprocessor import MyDataset
 from libPython.Preprocessor import rtfile_to_datalist
-from libPython.MLTools      import GCN, GNN, ParticleNet
+from libPython.MLTools      import GCN, GNN, ParticleNet, ParticleNetLite
 from libPython.MLTools      import EarlyStopping
 from libPython.MLTools      import predict, prepare_roc, plot_roc
 from libPython.MLTools      import SummaryWriter
@@ -21,10 +21,8 @@ parser.add_argument("--signal", required=True, type=str, help="signal sample")
 parser.add_argument("--background", required=True, type=str, help="background sample")
 parser.add_argument("--channel", required=True, type=str, help="channel")
 parser.add_argument("--model", required=True, type=str, help="model type")
-parser.add_argument("--nhidden", default=64, type=int, help="the number of hidden layers")
 parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
 parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
-parser.add_argument("--nbatch", default=1024, type=int, help="batch size")
 parser.add_argument("--scheduler", required=True, type=str, help="lr scheducler")
 parser.add_argument("--pilot", action="store_true", default=False, help="pilot run")
 parser.add_argument("--device", default="cpu", type=str, help="device to use")
@@ -49,11 +47,13 @@ nFeatures = 9
 nClasses = 2
 print(f"@@@@ Using model {args.model}...")
 if args.model == "GCN":
-    model = GCN(nFeatures, nClasses, args.nhidden).to(args.device)
+    model = GCN(nFeatures, nClasses).to(args.device)
 elif args.model == "GNN":
-    model = GNN(nFeatures, nClasses, args.nhidden).to(args.device)
+    model = GNN(nFeatures, nClasses).to(args.device)
 elif args.model == "ParticleNet":
-    model = ParticleNet(nFeatures, nClasses, args.nhidden).to(args.device)
+    model = ParticleNet(nFeatures, nClasses).to(args.device)
+elif args.model == "ParticleNetLite":
+    model = ParticleNetLite(nFeatures, nClasses).to(args.device)
 else:
     print(f"[trainModels] Wrong model name {args.model}")
     exit(1)
@@ -121,9 +121,9 @@ trainDataset = MyDataset(datalist[:int(maxSize*2*0.6)])
 validDataset = MyDataset(datalist[int(maxSize*2*0.6):int(maxSize*2*0.7)])
 testDataset = MyDataset(datalist[int(maxSize*2*0.7):])
 
-trainLoader = DataLoader(trainDataset, batch_size=args.nbatch, shuffle=True, pin_memory=True)
-validLoader = DataLoader(validDataset, batch_size=args.nbatch, shuffle=False, pin_memory=True)
-testLoader = DataLoader(testDataset, batch_size=args.nbatch, shuffle=False, pin_memory=True)
+trainLoader = DataLoader(trainDataset, batch_size=1024, shuffle=True, pin_memory=True)
+validLoader = DataLoader(validDataset, batch_size=1024, shuffle=False, pin_memory=True)
+testLoader = DataLoader(testDataset, batch_size=1024, shuffle=False, pin_memory=True)
 
 #### GPU settings
 if "cuda" in args.device:

@@ -56,8 +56,6 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
 
         if not pass_baseline(channel, evt, muons, electrons, idstring="loose", isTraining=True):
             continue
-        #if not select(channel, evt, muons, electrons, jets, bjets, "loose") == "SignalRegion":
-        #    continue
 
         muons_prompt = list(filter(lambda x: x.LepType() > 0, muons))
         electrons_prompt = list(filter(lambda x: x.LepType() > 0, electrons))
@@ -75,10 +73,10 @@ def rtfile_to_datalist(rtfile, channel, is_signal, is_prompt, max_size=-1):
         objects = muons+electrons+jets
         objects.append(METv)
         for particle in objects:
-            node_list.append([particle.Pt(),
-                              particle.Eta(),
-                              particle.Phi(),
-                              particle.M(),
+            node_list.append([particle.E(),
+                              particle.Px(),
+                              particle.Py(),
+                              particle.Pz(),
                               particle.Charge(),
                               particle.IsMuon(),
                               particle.IsElectron(),

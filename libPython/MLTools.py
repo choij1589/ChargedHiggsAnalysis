@@ -15,16 +15,16 @@ from torch_geometric.nn import MessagePassing
 from sklearn import metrics
 
 class GCN(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels):
+    def __init__(self, num_features, num_classes):
         super(GCN, self).__init__()
         self.gn0 = GraphNorm(num_features)
-        self.conv1 = GCNConv(num_features, hidden_channels)
-        self.gn1 = GraphNorm(hidden_channels)
-        self.conv2 = GCNConv(hidden_channels, hidden_channels)
-        self.gn2 = GraphNorm(hidden_channels)
-        self.conv3 = GCNConv(hidden_channels, hidden_channels)
-        self.dense = Linear(hidden_channels, hidden_channels)
-        self.output = Linear(hidden_channels, num_classes)
+        self.conv1 = GCNConv(num_features, 64)
+        self.gn1 = GraphNorm(64)
+        self.conv2 = GCNConv(64, 64)
+        self.gn2 = GraphNorm(64)
+        self.conv3 = GCNConv(64, 64)
+        self.dense = Linear(64, 64)
+        self.output = Linear(64, num_classes)
 
     def forward(self, x, edge_index, batch=None):
         # Convolution layers
@@ -47,16 +47,16 @@ class GCN(torch.nn.Module):
 
 
 class GNN(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels):
+    def __init__(self, num_features, num_classes):
         super(GNN, self).__init__()
         self.gn0 = GraphNorm(num_features)
-        self.conv1 = GraphConv(num_features, hidden_channels)
-        self.gn1 = GraphNorm(hidden_channels)
-        self.conv2 = GraphConv(hidden_channels, hidden_channels)
-        self.gn2 = GraphNorm(hidden_channels)
-        self.conv3 = GraphConv(hidden_channels, hidden_channels)
-        self.dense = Linear(hidden_channels, hidden_channels)
-        self.output = Linear(hidden_channels, num_classes)
+        self.conv1 = GraphConv(num_features, 64)
+        self.gn1 = GraphNorm(64)
+        self.conv2 = GraphConv(64, 64)
+        self.gn2 = GraphNorm(64)
+        self.conv3 = GraphConv(64, 64)
+        self.dense = Linear(64, 64)
+        self.output = Linear(64, num_classes)
 
     def forward(self, x, edge_index, batch=None):
         # Convolution layers
@@ -121,6 +121,39 @@ class ParticleNet(torch.nn.Module):
         self.gn3 = GraphNorm(128)
         self.dense = Linear(128, 64)
         self.output = Linear(64, num_classes)
+
+    def forward(self, x, edge_index, batch=None):
+        # Convolution layers
+        x = self.gn0(x, batch=batch)
+        x = self.conv1(x, edge_index, batch=batch)
+        x = self.gn1(x, batch=batch)
+        x = self.conv2(x, batch=batch)
+        x = self.gn2(x, batch=batch)
+        x = self.conv3(x, batch=batch)
+        x = self.gn3(x, batch=batch)
+        # readout layers
+        x = global_mean_pool(x, batch=batch)
+
+        # dense layers
+        x = F.relu(self.dense(x))
+        x = F.dropout(x, p=0.5)
+        x = self.output(x)
+
+        return F.softmax(x, dim=1)
+
+
+class ParticleNetLite(torch.nn.Module):
+    def __init__(self, num_features, num_classes):
+        super(ParticleNetLite, self).__init__()
+        self.gn0 = GraphNorm(num_features)
+        self.conv1 = DynamicEdgeConv(num_features, 32)
+        self.gn1 = GraphNorm(32)
+        self.conv2 = DynamicEdgeConv(32, 64)
+        self.gn2 = GraphNorm(64)
+        self.conv3 = DynamicEdgeConv(64, 64)
+        self.gn3 = GraphNorm(64)
+        self.dense = Linear(64, 32)
+        self.output = Linear(32, num_classes)
 
     def forward(self, x, edge_index, batch=None):
         # Convolution layers
