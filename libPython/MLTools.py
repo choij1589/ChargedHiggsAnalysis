@@ -118,7 +118,8 @@ class ParticleNet(torch.nn.Module):
         self.conv2 = DynamicEdgeConv(hidden_channels, hidden_channels)
         self.gn2 = GraphNorm(hidden_channels)
         self.conv3 = DynamicEdgeConv(hidden_channels, hidden_channels)
-        self.dense = Linear(hidden_channels, 64)
+        self.dense1 = Linear(hidden_channels, 64)
+        self.dense2 = Linear(64, 64)
         self.output = Linear(64, num_classes)
 
     def forward(self, x, edge_index, batch=None):
@@ -133,8 +134,10 @@ class ParticleNet(torch.nn.Module):
         x = global_mean_pool(x, batch=batch)
 
         # dense layers
-        x = F.selu(self.dense(x))
-        x = F.alpha_dropout(x, p=0.5)
+        x = F.selu(self.dense1(x))
+        x = F.alpha_dropout(x, p=0.2)
+        x = F.selu(self.dense2(x))
+        x = F.alpha_dropout(x, p=0.2)
         x = self.output(x)
 
         return F.softmax(x, dim=1)

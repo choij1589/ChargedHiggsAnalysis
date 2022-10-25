@@ -25,7 +25,7 @@ parser.add_argument("--nhidden", default=64, type=int, help="the number of hidde
 parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
 parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
 parser.add_argument("--nbatch", default=1024, type=int, help="batch size")
-parser.add_argument("--scheduler", required=True, type=str, help="learning rate scheducler")
+parser.add_argument("--scheduler", required=True, type=str, help="lr scheducler")
 parser.add_argument("--pilot", action="store_true", default=False, help="pilot run")
 parser.add_argument("--device", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
