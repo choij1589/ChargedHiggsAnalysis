@@ -107,8 +107,9 @@ rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.chann
 rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_{args.background}.root")
 
 isPrompt = False if args.background == "TTLL_powheg" else True
-sigDatalist = rtfile_to_datalist(rtSig, channel="3Mu", is_signal=True, is_prompt=True, max_size=maxSize)
-bkgDatalist = rtfile_to_datalist(rtBkg, channel="3Mu", is_signal=False, is_prompt=isPrompt, max_size=maxSize)
+channel = args.channel[4:]
+sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True, max_size=maxSize)
+bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt, max_size=maxSize)
 rtSig.Close()
 rtBkg.Close()
 

@@ -12,10 +12,10 @@ SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
            "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
            "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 BACKGROUNDs = ["TTLL_powheg", "ttX"]
-CHANNEL = "Skim3Mu"
+CHANNEL = "Skim1E2Mu"
 
 def makePopulation(sig, bkg, channel):
-    path = f"{os.environ['WORKDIR']}/pilot/models/{channel}__/{sig}_vs_{bkg}/GAOptimization.csv"
+    path = f"{os.environ['WORKDIR']}/models/pilot/{channel}__/{sig}_vs_{bkg}/GAOptimization.csv"
     csv = pd.read_csv(path).T
     
     population = []
@@ -42,7 +42,7 @@ def addJobCommands(queue, sig, bkg, channel):
         command += f" --scheduler {scheduler}"
         queue.append(command)
 
-def checkDeviceStatus(device, procs, freeMemory=2e9, maxRunningJobs=14):
+def checkDeviceStatus(device, procs, freeMemory=2e9, maxRunningJobs=12):
     runningJobs = list(filter(lambda proc: proc.poll() is None, procs))
     free, max = cuda.mem_get_info(device)
     return (free > freeMemory) and (len(runningJobs) < maxRunningJobs)
