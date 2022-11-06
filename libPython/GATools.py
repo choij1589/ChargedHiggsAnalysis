@@ -40,7 +40,7 @@ class GeneticModule():
             panelty = abs(train_loss - valid_loss)
             # fitness as the harmonic mean of valid loss and panelty
             #fitness = 2*valid_loss*panelty/(valid_loss+panelty)
-            fitness = valid_loss + 3*panelty # valid_loss + overtraining panelty
+            fitness = valid_loss + panelty # valid_loss + overtraining panelty
             self.population[idx]['fitness'] = fitness
     
     def __getIdxFromRoulette(self, nPop):

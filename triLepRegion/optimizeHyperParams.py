@@ -17,7 +17,7 @@ os.makedirs(model_path)
 
 # Let's run the model linearly first
 #### Hyper parameters
-models = ["ParticleNet"]
+models = ["ParticleNet", "ParticleNetLite"]
 optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
 schedulers = ["StepLR", "ExponentialLR", "CyclicLR"]
 initLRs = [0.00001, 0.00002, 0.00005, 0.0001, 0.0002, 0.0005, 
@@ -26,7 +26,7 @@ nBatch = 1024
 nHidden = 64
 # criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
 nPop = 12
-thresholds = [0.7, 0.8, 0.95, 0.8]
+thresholds = [0.9, 0.7, 0.7, 0.7]
 maxIter = 4
 
 def evalFitness(population):
@@ -66,12 +66,13 @@ evalFitness(gaModule.population)
 gaModule.updatePopulation(args.signal, args.background, args.channel)
 print("@@@@ generation 0")
 print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
+path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/GAOptimization_gen0.csv"
+gaModule.savePopulation(path=path)
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
     gaModule.evolution(thresholds=thresholds, ratio=0.5)
     evalFitness(gaModule.population)
     gaModule.updatePopulation(args.signal, args.background, args.channel)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-    
-path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/GAOptimization.csv"
-gaModule.savePopulation(path=path)
+    path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/GAOptimization_gen{iter}.csv"
+    gaModule.savePopulation(path=path)
