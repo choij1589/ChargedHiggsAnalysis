@@ -3,9 +3,11 @@
 *.pyc
 .local/*
 condor/*
+libCpp/libtorch
 libCpp/splitFile
 libCpp/copyFile
 libPython/secrets.py
+TorchScript/example-app/build
 .DS_Store
 */.DS_Store
 */tmp
