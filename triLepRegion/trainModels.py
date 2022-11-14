@@ -29,7 +29,8 @@ parser.add_argument("--device", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
 
 # check arguments
-signalList = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
+signalList = ["MHc-70", "MHc-100", "MHc-130", "MHc-160",
+              "MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
               "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
               "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
@@ -99,7 +100,7 @@ if args.pilot:
     maxSize = 50000
     epochs = 30
 else:
-    maxSize = 100000
+    maxSize = 90000
     epochs = 300
 
 #### Load dataset
@@ -108,8 +109,8 @@ rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.chann
 
 isPrompt = False if args.background == "TTLL_powheg" else True
 channel = args.channel[4:]
-sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True, max_size=maxSize)
-bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt, max_size=maxSize)
+sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True, max_size=1)
+bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt)
 rtSig.Close()
 rtBkg.Close()
 
