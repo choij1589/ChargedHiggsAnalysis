@@ -33,11 +33,11 @@ class GeneticModule():
         # get hyperparams
         for idx in range(len(self.population)):
             model, optimizer, initLR, scheduler = self.population[idx]['chromosome']
-            path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{channel}__/{masspoint}_vs_{background}/training-{model}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
+            path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{channel}__/{masspoint}_vs_{background}/plots/training-{model}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
             csv = pd.read_csv(path)
             train_loss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/train'])
             valid_loss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/valid'])
-            panelty = 1.5*abs(train_loss - valid_loss)
+            panelty = 1.4*abs(train_loss - valid_loss)
             # fitness as the harmonic mean of valid loss and panelty
             #fitness = 2*valid_loss*panelty/(valid_loss+panelty)
             fitness = valid_loss + panelty # valid_loss + overtraining panelty

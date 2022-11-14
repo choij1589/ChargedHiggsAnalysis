@@ -99,8 +99,10 @@ if args.pilot:
     maxSize = 50000
     epochs = 30
 else:
-    maxSize = 100000
-    epochs = 300
+    maxSize = 10000
+    epochs = 200
+    if args.channel == "Skim1E2Mu" and args.background == "TTLL_powheg":
+        maxSize = 90000
 
 #### Load dataset
 rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
@@ -108,8 +110,8 @@ rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.chann
 
 isPrompt = False if args.background == "TTLL_powheg" else True
 channel = args.channel[4:]
-sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True, max_size=maxSize)
-bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt, max_size=maxSize)
+sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True)
+bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt)
 rtSig.Close()
 rtBkg.Close()
 

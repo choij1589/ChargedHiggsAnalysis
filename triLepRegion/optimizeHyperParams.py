@@ -12,21 +12,21 @@ parser.add_argument("--background", required=True, type=str, help="background")
 parser.add_argument("--channel", required=True, type=str, help="channel")
 args = parser.parse_args()
 
-model_path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}"
+model_path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/models"
 os.makedirs(model_path)
 
 # Let's run the model linearly first
 #### Hyper parameters
 models = ["ParticleNet", "ParticleNetLite"]
 optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
-schedulers = ["StepLR", "ExponentialLR", "CyclicLR"]
-initLRs = [0.00001, 0.00002, 0.00005, 0.0001, 0.0002, 0.0005, 
-           0.001, 0.002, 0.005, 0.01, 0.02, 0.05]
+schedulers = ["StepLR", "CyclicLR"]
+initLRs = [0.0001, 0.0002, 0.0005, 
+           0.001, 0.002, 0.005, 
+           0.01, 0.02, 0.05]
 nBatch = 1024
-nHidden = 64
 # criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
 nPop = 12
-thresholds = [0.9, 0.7, 0.7, 0.7]
+thresholds = [0.7, 0.7, 0.7, 0.7]
 maxIter = 4
 
 def evalFitness(population):
@@ -66,7 +66,7 @@ evalFitness(gaModule.population)
 gaModule.updatePopulation(args.signal, args.background, args.channel)
 print("@@@@ generation 0")
 print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/GAOptimization_gen0.csv"
+path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/models/GAOptimization_gen0.csv"
 gaModule.savePopulation(path=path)
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
@@ -74,5 +74,5 @@ for iter in range(1, maxIter):
     evalFitness(gaModule.population)
     gaModule.updatePopulation(args.signal, args.background, args.channel)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-    path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/models/{args.signal}_vs_{args.background}/GAOptimization_gen{iter}.csv"
+    path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/models/GAOptimization_gen{iter}.csv"
     gaModule.savePopulation(path=path)
