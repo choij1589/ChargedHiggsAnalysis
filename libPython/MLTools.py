@@ -119,7 +119,8 @@ class ParticleNet(torch.nn.Module):
         self.gn2 = GraphNorm(128)
         self.conv3 = DynamicEdgeConv(128, 128)
         self.gn3 = GraphNorm(128)
-        self.dense = Linear(128, 64)
+        self.dense1 = Linear(128, 64)
+        self.dense2 = Linear(64, 64)
         self.output = Linear(64, num_classes)
 
     def forward(self, x, edge_index, batch=None):
@@ -135,8 +136,10 @@ class ParticleNet(torch.nn.Module):
         x = global_mean_pool(x, batch=batch)
 
         # dense layers
-        x = F.relu(self.dense(x))
-        x = F.dropout(x, p=0.5)
+        x = F.relu(self.dense1(x))
+        x = F.dropout(x, p=0.2)
+        x = F.relu(self.dense2(x))
+        x = F.dropout(x, p=0.2)
         x = self.output(x)
 
         return F.softmax(x, dim=1)
@@ -152,7 +155,8 @@ class ParticleNetLite(torch.nn.Module):
         self.gn2 = GraphNorm(64)
         self.conv3 = DynamicEdgeConv(64, 64)
         self.gn3 = GraphNorm(64)
-        self.dense = Linear(64, 32)
+        self.dense1 = Linear(64, 32)
+        self.dense2 = Linear(32, 32)
         self.output = Linear(32, num_classes)
 
     def forward(self, x, edge_index, batch=None):
@@ -168,8 +172,10 @@ class ParticleNetLite(torch.nn.Module):
         x = global_mean_pool(x, batch=batch)
 
         # dense layers
-        x = F.relu(self.dense(x))
-        x = F.dropout(x, p=0.5)
+        x = F.relu(self.dense1(x))
+        x = F.dropout(x, p=0.2)
+        x = F.relu(self.dense2(x))
+        x = F.dropout(x, p=0.2)
         x = self.output(x)
 
         return F.softmax(x, dim=1)
@@ -187,8 +193,8 @@ class EarlyStopping():
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
 
-    def update(self, val_loss, model):
-        score = -val_loss
+    def update(self, val_loss, panelty,  model):
+        score = -(val_loss+panelty)
         if self.best_score is None:
             self.best_score = score
             self.save_checkpoint(val_loss, model)

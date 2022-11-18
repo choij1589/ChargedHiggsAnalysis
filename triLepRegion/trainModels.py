@@ -186,7 +186,10 @@ if __name__ == "__main__":
         summaryWriter.add_scalar("acc/valid", validAcc)
         print(f"[EPOCH {epoch}]\tTrain Acc: {trainAcc:.4f}\tTrain Loss: {trainLoss:.4f}")
         print(f"[EPOCH {epoch}]\tVlaid Acc: {validAcc:.4f}\tValid Loss: {validLoss:.4f}\n")
-        earlyStopper.update(validLoss, model)
+
+        # early stopping
+        panelty = 1.5*abs(trainLoss - validLoss)
+        earlyStopper.update(validLoss, panelty, model)
         if earlyStopper.early_stop:
             print(f"Early stopping in epoch {epoch}")
             break
