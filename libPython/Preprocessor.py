@@ -1,13 +1,10 @@
+import os, sys; sys.path.insert(0, os.environ['WORKDIR'])
+import numpy as np
+import torch
+from torch_geometric.data import Data, InMemoryDataset
+from ROOT import TLorentzVector
 from libPython.Selection import pass_baseline, select
 from libPython.DataFormat import Particle, get_muons, get_electrons, get_jets
-from torch_geometric.data import InMemoryDataset
-from torch_geometric.data import Data
-import torch
-import numpy as np
-import os
-import sys
-sys.path.insert(0, os.environ['WORKDIR'])
-
 
 class MyDataset(InMemoryDataset):
     def __init__(self, data_list):
@@ -25,9 +22,11 @@ def get_edge_indices(node_list, k):
             # avoid same node
             if node is neighbor:
                 continue
-            dEta = node[1] - neighbor[1]
-            dPhi = np.remainder(node[2] - neighbor[2], np.pi)
-            distances[j] = np.sqrt(np.power(dEta, 2)+np.power(dPhi, 2))
+            thisPart = TLorentzVector()
+            neighborPart = TLorentzVector()
+            thisPart.SetPxPyPzE(node[1], node[2], node[3], node[0])
+            neighborPart.SetPxPyPzE(neighbor[1], neighbor[2], neighbor[3], neighbor[0])
+            distances[j] = thisPart.DeltaR(neighborPart)
         distances = dict(sorted(distances.items(), key=lambda item: item[1]))
         for n in list(distances.keys())[:k]:
             edge_index.append([i, n])
