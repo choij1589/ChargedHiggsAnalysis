@@ -15,34 +15,31 @@ SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
 BACKGROUNDs = ["TTLL_powheg", "ttX"]
 MODELs = ["ParticleNet", "ParticleNetLite"]
 OPTIMIZERs = ["RMSprop", "Adadelta", "Adam", "AdamW"]
-INITLRs = [0.00001, 0.00002, 0.00005, 0.0001, 0.0002, 0.0005,
-           0.001, 0.002, 0.005, 0.01, 0.02, 0.05]
-SCHEDULERs = ["StepLR", "ExponentialLR", "CyclicLR"]
+INITLRs = [0.0001, 0.0002, 0.0005,
+           0.001, 0.002, 0.005, 
+           0.01, 0.02, 0.05]
+SCHEDULERs = ["StepLR", "CyclicLR"]
 
 def assertParameters(channel, signal, background, model, optim, initLR, scheduler):
-    try:
-        assert channel in CHANNELs
-        assert signal in SIGNALs
-        assert background in BACKGROUNDs
-        assert model in MODELs
-        assert optim in OPTIMIZERs
-        assert initLR in INITLRs
-        assert scheduler in SCHEDULERs
-    except Exception as e:
-        print(e)
-        exit(1)
+    assert channel in CHANNELs
+    assert signal in SIGNALs
+    assert background in BACKGROUNDs
+    assert model in MODELs
+    assert optim in OPTIMIZERs
+    assert initLR in INITLRs
+    assert scheduler in SCHEDULERs
 
 def addJobCommands(queue):
-    csv = pd.read_csv("MetaInfo/modelInfo.csv", sep=",\s", comment="#", engine="python")
+    csv = pd.read_csv("MetaInfo/modelInfo.csv", sep=",\s", engine="python", comment="#")
     for idx in csv.index:
+        print(idx)
         channel = csv.loc[idx, 'channel']
         sig, bkg = csv.loc[idx, 'signal'], csv.loc[idx, 'background']
         model = csv.loc[idx, 'model']
         optim = csv.loc[idx, 'optimizer']
-        initLR = csv.loc[idx, 'initLR']
+        initLR = float(csv.loc[idx, 'initLR'])
         scheduler = csv.loc[idx, 'scheduler']
         assertParameters(channel, sig, bkg, model, optim, initLR, scheduler)
-
         command = "python triLepRegion/trainModels.py"
         command += f" --signal {sig}"
         command += f" --background {bkg}"
@@ -63,10 +60,9 @@ if __name__ == "__main__":
     for i in range(cuda.device_count()):
         device = f"cuda:{i}"
         multiProcs[device] = []
-
     queue = deque()
     addJobCommands(queue)
-
+    
     # submit all jobs till the queue empty
     while queue:
         for device, procs in multiProcs.items():
