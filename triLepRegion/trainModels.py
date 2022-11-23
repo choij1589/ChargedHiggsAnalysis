@@ -99,7 +99,7 @@ if args.pilot:
     maxSize = 50000
     epochs = 30
 else:
-    maxSize = 10000
+    maxSize = 100000
     epochs = 200
     if args.channel == "Skim1E2Mu" and args.background == "TTLL_powheg":
         maxSize = 90000
