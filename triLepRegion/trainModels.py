@@ -101,35 +101,58 @@ else:
 #### pilot mode
 #### It is used in both debugging and finding optimal hyperparameter
 if args.pilot:
-    maxSize = 100000
-    epochs = 50
+    maxSize = 50000
+    epochs = 30
 else:
-    maxSize = 200000
+    maxSize = 100000
     epochs = 200
     if args.channel == "Skim1E2Mu" and args.background == "TTLL_powheg":
         maxSize = 180000
 
 #### Load dataset
-rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
-rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_{args.background}.root")
-
 isPrompt = False if args.background == "TTLL_powheg" else True
-if "Skim" in args.channel:
+if args.channel in ["Skim1E2Mu", "Skim3Mu"]:
+    rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
+    rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_{args.background}.root")
     channel = args.channel[4:]
+    sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True)
+    bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt)
+    # shuffle b/w years
+    sigDatalist = shuffle(sigDatalist, random_state=42)[:maxSize]
+    bkgDatalist = shuffle(bkgDatalist, random_state=42)[:maxSize]
+    rtSig.Close()
+    rtBkg.Close()
 else:   # Combine
-    channel = args.channel
-sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True)
-bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt)
-rtSig.Close()
-rtBkg.Close()
+    # load 1E2Mu
+    rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/Skim1E2Mu__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
+    rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/Skim1E2Mu__/Selector_{args.background}.root")
+    sigDatalist1E2Mu = rtfile_to_datalist(rtSig, channel="1E2Mu", is_signal=True, is_prompt=True)
+    bkgDatalist1E2Mu = rtfile_to_datalist(rtBkg, channel="1E2Mu", is_signal=False, is_prompt=isPrompt)
+    # shuffle b/w years
+    sigDatalist1E2Mu = shuffle(sigDatalist1E2Mu, random_state=42)[:maxSize]
+    bkgDatalist1E2Mu = shuffle(bkgDatalist1E2Mu, random_state=42)[:maxSize]
+    rtSig.Close()
+    rtBkg.Close()
+    # load 3Mu
+    rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/Skim3Mu__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
+    rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/Skim3Mu__/Selector_{args.background}.root")
+    sigDatalist3Mu = rtfile_to_datalist(rtSig, channel="3Mu", is_signal=True, is_prompt=True)
+    bkgDatalist3Mu = rtfile_to_datalist(rtBkg, channel="3Mu", is_signal=False, is_prompt=isPrompt)
+    # shuffle b/w years
+    sigDatalist3Mu = shuffle(sigDatalist3Mu, random_state=42)[:maxSize]
+    bkgDatalist3Mu = shuffle(bkgDatalist3Mu, random_state=42)[:maxSize]
+    rtSig.Close()
+    rtBkg.Close()
+    # shuffle b/w channels
+    sigDatalist = shuffle(sigDatalist1E2Mu+sigDatalist3Mu, random_state=42)
+    bkgDatalist = shuffle(bkgDatalist1E2Mu+bkgDatalist3Mu, random_state=42)
 
-sigDatalist = shuffle(sigDatalist, random_state=42)[:maxSize]
-bkgDatalist = shuffle(bkgDatalist, random_state=42)[:maxSize]
+# add datalist and shuffle
 datalist = shuffle(sigDatalist+bkgDatalist, random_state=42)
 
-trainDataset = MyDataset(datalist[:int(maxSize*2*0.6)])
-validDataset = MyDataset(datalist[int(maxSize*2*0.6):int(maxSize*2*0.7)])
-testDataset = MyDataset(datalist[int(maxSize*2*0.7):])
+trainDataset = MyDataset(datalist[:int(len(datalist)*0.6)])
+validDataset = MyDataset(datalist[int(len(datalist)*0.6):int(len(datalist)*0.7)])
+testDataset = MyDataset(datalist[int(len(datalist)*0.7):])
 
 trainLoader = DataLoader(trainDataset, batch_size=1024, shuffle=True, pin_memory=True)
 validLoader = DataLoader(validDataset, batch_size=1024, shuffle=False, pin_memory=True)
