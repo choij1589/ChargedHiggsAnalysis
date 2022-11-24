@@ -29,6 +29,7 @@ parser.add_argument("--device", default="cpu", type=str, help="device to use")
 args = parser.parse_args()
 
 # check arguments
+channelList = ["Skim1E2Mu", "Skim3Mu", "Combine"]
 signalList = ["MHc-70", "MHc-100", "MHc-130", "MHc-160",
               "MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
@@ -36,6 +37,9 @@ signalList = ["MHc-70", "MHc-100", "MHc-130", "MHc-160",
               "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 backgroundList = ["TTLL_powheg", "ttX"]
 
+if not args.channel in channelList:
+    print(f"[trainModels] Wrong channel {channel}")
+    exit(1)
 if not args.signal in signalList:
     print(f"[trainModels] Wrong signal model {args.signal}")
     exit(1)
@@ -97,20 +101,23 @@ else:
 #### pilot mode
 #### It is used in both debugging and finding optimal hyperparameter
 if args.pilot:
-    maxSize = 50000
-    epochs = 30
-else:
     maxSize = 100000
+    epochs = 50
+else:
+    maxSize = 200000
     epochs = 200
     if args.channel == "Skim1E2Mu" and args.background == "TTLL_powheg":
-        maxSize = 90000
+        maxSize = 180000
 
 #### Load dataset
 rtSig = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_TTToHcToWAToMuMu_{args.signal}.root")
 rtBkg = TFile.Open(f"{os.environ['WORKDIR']}/SelectorOutput/Training/{args.channel}__/Selector_{args.background}.root")
 
 isPrompt = False if args.background == "TTLL_powheg" else True
-channel = args.channel[4:]
+if "Skim" in args.channel:
+    channel = args.channel[4:]
+else:   # Combine
+    channel = args.channel
 sigDatalist = rtfile_to_datalist(rtSig, channel=channel, is_signal=True, is_prompt=True)
 bkgDatalist = rtfile_to_datalist(rtBkg, channel=channel, is_signal=False, is_prompt=isPrompt)
 rtSig.Close()

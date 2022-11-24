@@ -16,7 +16,7 @@
 
 def pass_baseline(channel, evt, muons, electrons, idstring, isTraining=False):
     # check arguments
-    if not channel in ["1E2Mu", "3Mu"]:
+    if not channel in ["1E2Mu", "3Mu", "Combine"]:
         print(f"[Selection::pass_baseline] Wrong channel {channel}")
         exit(1)
     
@@ -34,7 +34,7 @@ def pass_baseline(channel, evt, muons, electrons, idstring, isTraining=False):
             if not pass_safecut: return False
 
             if not (muons[0]+muons[1]).M() > 12.: return False
-    else:   # 3Mu
+    elif channel == "3Mu":
         if not (len(muons) == 3 and len(electrons) == 0): return False
         if not abs(muons[0].Charge()+muons[1].Charge()+muons[2].Charge()) == 1: return False
         
@@ -46,6 +46,16 @@ def pass_baseline(channel, evt, muons, electrons, idstring, isTraining=False):
             if (muons[0].Charge() + muons[1].Charge() == 0) and (not (muons[0]+muons[1]).M() > 12.): return False
             if (muons[0].Charge() + muons[2].Charge() == 0) and (not (muons[0]+muons[2]).M() > 12.): return False
             if (muons[1].Charge() + muons[2].Charge() == 0) and (not (muons[1]+muons[2]).M() > 12.): return False
+    else:   # combine
+        if not isTraining:
+            print("[Selection::pass_baseline] Combine channel only support training mode")
+            raise(ValueError)
+        is1E2Mu = len(muons) == 2 and len(electrons) == 1
+        is3Mu = len(muons) == 3 and len(electrons) == 0
+        if is1E2Mu and (not abs(muons[0].Charge()+muons[1].Charge() == 0)):
+            return False
+        if is3Mu and (not abs(muons[0].Charge()+muons[1].Charge()+muons[2].Charge()) == 1):
+            return False
         
     return True
 
