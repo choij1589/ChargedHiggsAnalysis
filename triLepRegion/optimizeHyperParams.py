@@ -12,7 +12,7 @@ parser.add_argument("--background", required=True, type=str, help="background")
 parser.add_argument("--channel", required=True, type=str, help="channel")
 args = parser.parse_args()
 
-model_path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/models"
+model_path = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/models"
 os.makedirs(model_path)
 
 # Let's run the model linearly first
@@ -42,7 +42,8 @@ def evalFitness(population):
         command += f" --optimizer {optimizer}"
         command += f" --initLR {initLR}"
         command += f" --scheduler {scheduler}"
-        command += f" --device cuda --pilot"
+        command += f" --device cuda"
+        #command += f" --device cuda --pilot"
         print(f"sumbit {command}...")
         proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         procs.append(proc)
@@ -66,7 +67,7 @@ evalFitness(gaModule.population)
 gaModule.updatePopulation(args.signal, args.background, args.channel)
 print("@@@@ generation 0")
 print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/models/GAOptimization_gen0.csv"
+path = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/models/GAOptimization_gen0.csv"
 gaModule.savePopulation(path=path)
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
@@ -74,5 +75,5 @@ for iter in range(1, maxIter):
     evalFitness(gaModule.population)
     gaModule.updatePopulation(args.signal, args.background, args.channel)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-    path = f"{os.environ['WORKDIR']}/triLepRegion/pilot/{args.channel}__/{args.signal}_vs_{args.background}/models/GAOptimization_gen{iter}.csv"
+    path = f"{os.environ['WORKDIR']}/triLepRegion/full/{args.channel}__/{args.signal}_vs_{args.background}/models/GAOptimization_gen{iter}.csv"
     gaModule.savePopulation(path=path)
