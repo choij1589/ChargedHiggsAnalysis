@@ -1,14 +1,10 @@
 import os
 from ROOT import TCanvas, TLegend, TLatex
 from ROOT import THStack
+from MetaInfo.AllEras import LumiInfo
+
 
 class Canvas():
-    lumi_info = {
-            "2016preVFP": "L^{int} = 19.5 fb^{-1} (13TeV)",
-            "2016postVFP": "L^{int} = 16.8 fb^{-1} (13TeV)",
-            "2017": "L^{int} = 41.5 fb^{-1} (13TeV) ",
-            "2018": "L^{int} = 59.8 fb^{-1} (13TeV)"
-        }
     def __init__(self, config=None):
         self.config = config
         
@@ -32,6 +28,11 @@ class Canvas():
         self.stack = THStack("stack", "")
         self.systematics = None
         self.legend = None
+        
+        self.lumiString = ""
+        if "era" in config.keys():
+            era = config['era']
+            self.lumiString = f"L_{int} = {LumiInfo[era]}"+" fb^{-1} (13TeV)"
         
     def draw_signals(self, hists, colors):
         self.signals = hists
@@ -144,7 +145,7 @@ class Canvas():
         for hist in self.signals.values():
             hist.Draw("hist&same")
         self.legend.Draw()
-        self.lumi.DrawLatexNDC(0.62, 0.91, self.lumi_info[era])
+        self.lumi.DrawLatexNDC(0.62, 0.91, self.lumiString)
         self.cms.DrawLatexNDC(0.15, 0.83, "CMS")
         self.preliminary.DrawLatexNDC(0.15, 0.78, "Work in progress") 
         self.cvs.RedrawAxis()

@@ -19,5 +19,7 @@ else
     conda activate torch
 fi
 
+export PYTHONPATH="${PYTHONPATH}:${WORKDIR}"
+export PYTHONPATH="${PYTHONPATH}:${WORKDIR}/libPython"
 alias splitFile="${WORKDIR}/libCpp/splitFile"
 alias copyFile="${WORKDIR}/libCpp/copyFile"

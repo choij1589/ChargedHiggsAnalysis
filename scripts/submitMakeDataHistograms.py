@@ -5,7 +5,7 @@ import subprocess
 import uuid
 import argparse
 from time import sleep
-from MetaInfo.periodInfo import PeriodDict
+from MetaInfo.AllEras import PeriodDict
 
 # Sync arguments with triLepRegion/makeMCHistograms.py
 parser = argparse.ArgumentParser()

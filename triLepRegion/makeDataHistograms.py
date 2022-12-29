@@ -1,6 +1,6 @@
 import os, sys; sys.path.insert(0, os.environ['WORKDIR'])
 import argparse
-from MetaInfo.periodInfo import PeriodDict
+from MetaInfo.AllEras import PeriodDict
 
 from ROOT import TFile
 import torch

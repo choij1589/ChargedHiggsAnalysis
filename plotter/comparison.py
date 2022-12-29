@@ -1,15 +1,10 @@
 import os
 from ROOT import TCanvas, TPad, TLegend, TLatex
 from ROOT import THStack
+from MetaInfo.AllEras import LumiInfo
 
 
 class Canvas():
-    lumi_info = {
-            "2016preVFP": "L^{int} = 19.5 fb^{-1} (13TeV)",
-            "2016postVFP": "L^{int} = 16.8 fb^{-1} (13TeV)",
-            "2017": "L^{int} = 41.5 fb^{-1} (13TeV) ",
-            "2018": "L^{int} = 59.8 fb^{-1} (13TeV)"
-        }
     def __init__(self, config=None):
         #super(Canvas, self).__init__()
         self.config = config
@@ -40,6 +35,10 @@ class Canvas():
         self.ratio = None
         self.ratio_syst = None
         self.legend = None
+        
+        if "era" in config.keys():
+            era = config['era']
+            self.lumiString = f"L_{int} = {LumiInfo[era]}"+" fb^{-1} (13TeV)"
 
     def draw_distributions(self, hists, colors):
         self.histograms = hists
@@ -149,7 +148,7 @@ class Canvas():
             self.legend.AddEntry(hist, hist.GetName(), "f")
         self.legend.AddEntry(self.systematics, "stat+syst", "f")
 
-    def finalize(self, era):
+    def finalize(self):
         # log
         setLogY = "logY" in self.config.keys()
         if setLogY: self.pad_up.SetLogy()
@@ -160,7 +159,7 @@ class Canvas():
         self.data.Draw("p&hist&same")
         self.data.Draw("e1&same")
         self.legend.Draw()
-        self.lumi.DrawLatexNDC(0.62, 0.91, self.lumi_info[era])
+        self.lumi.DrawLatexNDC(0.62, 0.91, self.lumiString)
         self.cms.DrawLatexNDC(0.15, 0.83, "CMS")
         self.preliminary.DrawLatexNDC(0.15, 0.78, "Work in progress")
         self.pad_up.RedrawAxis()
