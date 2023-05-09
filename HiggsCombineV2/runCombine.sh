@@ -1,0 +1,10 @@
+#!/bin/sh
+ERA=$1
+CHANNEL=$2
+NETWORK=$3
+
+./runHybridNew.sh $ERA $CHANNEL $NETWORK MHc-70_MA-65
+./runHybridNew.sh $ERA $CHANNEL $NETWORK MHc-100_MA-95
+./runHybridNew.sh $ERA $CHANNEL $NETWORK MHc-130_MA-90
+./runHybridNew.sh $ERA $CHANNEL $NETWORK MHc-160_MA-85
+./runHybridNew.sh $ERA $CHANNEL $NETWORK MHc-160_MA-120

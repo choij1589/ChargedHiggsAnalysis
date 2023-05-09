@@ -1,0 +1,173 @@
+#include <map>
+using namespace std;
+using namespace ROOT;
+
+
+// Argument explanation
+// 1. SIGNAL: datacard is signal hypothesis dependent in 3Mu channel
+// 2. sampleList: set of samples that has similar phase space configuration / share systematics
+//                signal / nonprompt / conversion / ttX / diboson / others
+// 3. cardType: CNC or shape
+
+map<TString, vector<TString>> map_sample = {
+              {"nonprompt", {"nonprompt"}},
+              {"diboson", {"WZTo3LNu_amcatnlo","ZZTo4L_powheg"}},
+              {"conversion", {"DYJets", "DYJets10to50_MG", "ZGToLLG"}},
+              {"ttX", {"ttWToLNu", "ttZToLLNuNu", "ttHToNonbb"}},
+              {"others", {"WWW", "WWZ", "WZZ", "ZZZ", "TTG", "tZq", "tHq", "TTTT", "VBF_HToZZTo4L", "GluGluHToZZTo4L"}}
+            };
+
+map<TString, vector<TString>> map_systematics = {
+        {"prompt", {"Central", "MuonIDSFUp", "MuonIDSFDown", "DblMuTrigSFUp", "DblMuTrigSFDown", 
+                    "JetEnUp", "JetEnDown", "JetResUp", "JetResDown"}},
+        {"nonprompt", {"Central", "NonpromptUp", "NonpromptDown"}},
+        {"conversion", {"Central", "ConversionUp", "ConversionDown"}}
+};
+
+map<TString, pair<double, double>> map_convsf_2016 = { {"LowPT3Mu", {0.902, 0.890}},
+                                                       {"HighPT3Mu", {2.003, 0.738}}
+                                                     };
+map<TString, pair<double, double>> map_convsf_2017 = { {"LowPT3Mu", {0.901, 1.303}},
+                                                       {"HighPT3Mu", {1.239, 0.464}},
+                                                     };
+map<TString, pair<double, double>> map_convsf_2018 = { {"LowPT3Mu", {0.628, 0.522}},
+                                                       {"HighPT3Mu", {0.981, 0.412}}
+                                                     };
+
+
+void prepareDatacard(const TString ERA,
+                     const TString CHANNEL,
+                     const TString NETWORK,
+                     const TString SIGNAL, 
+                     const TString sampleKey, 
+                     const bool doShape, 
+                     const bool doCut) {
+    
+    // make outfile path
+    const TString WORKDIR = static_cast<TString>(std::getenv("WORKDIR"));
+    TString outfile_path = WORKDIR + "/SignalRegionStudy/" + SIGNAL + "/datacard_input." + sampleKey;
+    // check card type and append to outfile_path
+    if (doShape) outfile_path += ".shape";
+    else         outfile_path += ".CNC";
+
+    // check score cut option and append to outfile_path
+    if (doCut) outfile_path += ".withcut.root";
+    else       outfile_path += ".nocut.root";
+
+    std::cout << "[prepareDatacard] outfile_path = " << outfile_path << endl;
+    TFile *f = new TFile(outfile_path, "recreate");
+    vector<TString> systematics;
+    if (sampleKey == "nonprompt")       systematics = map_systematics["nonprompt"];
+    else if (sampleKey == "conversion") systematics = map_systematics["conversion"];
+    else                                systematics = map_systematics["prompt"];
+
+
+    for (const auto &syst: systematics) {
+        TH1D *h = nullptr;
+        if (SIGNAL==sampleKey) h = makeHisto1DSingle(SIGNAL, SIGNAL, syst, doCut);
+        else                   h = makeHisto1D(SIGNAL, sampleKey, syst, doCut);
+        f->cd();
+        h->Write();
+    }
+    f->Close();
+}
+
+// for shape analysis
+TH1D* makeHisto1D(const TString SIGNAL, const TString sampleKey, const TString syst, const bool doCut) {
+    const vector<TString> sampleList = map_sample[sampleKey];
+    TH1D *out = nullptr;
+    for (const auto &sampleName: sampleList) {
+        std::cout << "[makeHisto1D] processing sample " << sampleName << " with syst " << syst << std::endl;
+        TH1D *h = makeHisto1DSingle(SIGNAL, sampleName, syst, doCut);
+
+        if (!out) out = (TH1D*)h->Clone(sampleKey+"_"+syst);
+        else      out->Add(h);
+    }
+    return out;
+}
+
+TH1D* makeHisto1DSingle(const TString SIGNAL, const TString sampleName, const TString syst, const bool doCut) {
+    const double mA = map_mA[SIGNAL];
+    const pair<double, double> score = map_score[SIGNAL];
+
+    
+    // get root file and tree
+    TString filepath = static_cast<TString>(std::getenv("WORKDIR")) + "/data/";
+    if (sampleName.Contains(SIGNAL))
+        filepath += "PromptUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/PromptUnbinned_TTToHcToWAToMuMu_" + sampleName + ".root";
+    else if (sampleName.Contains("nonprompt"))
+        filepath += "MatrixUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/DATA/MatrixUnbinned_SkimTree_SS2lOR3l_DoubleMuon.root";
+    else if (sampleName.Contains("TTTT") || sampleName.Contains("WWG"))
+        filepath += "PromptUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/PromptUnbinned_" + sampleName + ".root";
+    else
+        filepath += "PromptUbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK++"__/PromptUnbinned_SkimTree_SS2lOR3l_" + sampleName + ".root";
+    TFile *f = new TFile(filepath, "read");
+    TTree *tree = static_cast<TTree*>(f->Get("Events"));
+    
+    TString prefix;
+    if (syst.Contains("JetEn")) prefix = syst;
+    else                        prefix = "Central";
+
+    float pair1_mass; tree->SetBranchAddress(prefix+"_mass1", &pair1_mass);
+    float pair2_mass; tree->SetBranchAddress(prefix+"_mass2", &pair2_mass);
+    float score_ttFake; tree->SetBranchAddress(prefix+"_score_"+SIGNAL+"_vs_TTLL_powheg", &score_ttFake);
+    float score_ttX;    tree->SetBranchAddress(prefix+"_score_"+SIGNAL+"_vs_ttX", &score_ttX);
+
+    float w_norm, w_l1prefire, w_pileup, w_nonprompt;
+    float sf_muonID, sf_dblmutrig, sf_btag;
+    if (sampleName == "nonprompt") {
+        if (syst == "NonpromptUp")        tree->SetBranchAddress("w_nonprompt_up", &w_nonprompt);
+        else if (syst == "NonpromptDown") tree->SetBranchAddress("w_nonprompt_down", &w_nonprompt);
+        else                              tree->SetBranchAddress("w_nonprompt", &w_nonprompt);
+    }
+    else {
+        tree->SetBranchAddress("w_norm", &w_norm);
+        tree->SetBranchAddress("w_l1prefire", &w_l1prefire);
+        tree->SetBranchAddress("w_pileup", &w_pileup);
+        
+        if (syst == "MuonIDSFUp") tree->SetBranchAddress(prefix+"_sf_muonID_up", &sf_muonID);
+        else if (syst == "MuonIDSFDown") tree->SetBranchAddress(prefix+"_sf_muonID_down", &sf_muonID);
+        else                             tree->SetBranchAddress(prefix+"_sf_muonID", &sf_muonID);
+
+        if (syst == "DblMuTrigSFUp") tree->SetBranchAddress(prefix+"_sf_dblmutrig_up", &sf_dblmutrig);
+        else if (syst == "DblMuTrigSFDown") tree->SetBranchAddress(prefix+"_sf_dblmutrig_down", &sf_dblmutrig);
+        else                                tree->SetBranchAddress(prefix+"_sf_dblmutrig", &sf_dblmutrig);
+
+        tree->SetBranchAddress(prefix+"_sf_btag_central", &sf_btag);
+    }
+
+    // event loop
+    TH1D *out = new TH1D(sampleName+"_"+syst, "", 200, mA-10., mA+10.);
+    for (unsigned int i = 0; i < tree->GetEntries(); i++) {
+        tree->GetEntry(i);
+        if (pair1_mass < 0. && pair2_mass < 0.) continue;
+        if (doCut && !(score_ttFake > score.first && score_ttX > score.second)) continue;
+
+        double Amass = fabs(pair1_mass - mA) < fabs(pair2_mass - mA) ? pair1_mass : pair2_mass;
+        
+        double weight = 1.;
+        if (sampleName == "nonprompt") weight = w_nonprompt;
+        else                           weight = w_norm * w_l1prefire * w_pileup * sf_muonID * sf_dblmutrig * sf_btag;
+        
+        // Conversion SF
+        if (sampleName == "DYJets") {
+            auto sf_conv = map_convsf_2018["LowPT3Mu"];
+            if (syst == "ConversionUp")        weight *= (sf_conv.first + sf_conv.second);
+            else if (syst == "ConversionDown") weight *= max(0., (sf_conv.first - sf_conv.second));
+            else                               weight *= sf_conv.first;
+        }
+        if (sampleName == "ZGToLLG") {
+            auto sf_conv = map_convsf_2018["HighPT3Mu"];
+            if (syst == "ConversionUp")        weight *= (sf_conv.first + sf_conv.second);
+            else if (syst == "ConversionDown") weight *= max(0., (sf_conv.first - sf_conv.second));
+            else                               weight *= sf_conv.first;
+        }
+        
+        out->Fill(Amass, weight);
+    }
+    out->SetDirectory(0);
+    f->Close();
+
+    return out;
+}
+

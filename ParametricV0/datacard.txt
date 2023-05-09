@@ -1,0 +1,18 @@
+# datacard
+--------------------------------------------
+imax 1
+jmax 1
+kmax *
+--------------------------------------------
+shapes      signal      Tag0        workspace_sig.root      workspace_sig:model_sig
+shapes      bkg_mass    Tag0        workspace_bkg.root      workspace_bkg:model_bkg
+shapes      data_obs    Tag0        workspace_bkg.root      workspace_bkg:mc_bkg
+--------------------------------------------
+bin         Tag0
+observation -1
+--------------------------------------------
+bin         Tag0        Tag0
+process     signal      bkg_mass
+process     0           1
+rate        122.33      1.0
+--------------------------------------------

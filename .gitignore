@@ -1,0 +1,9 @@
+data/*
+*.pyc
+*.root
+.vscode/*
+condor/*
+libCpp/*.d
+libCpp/*.pcm
+libCpp/*.so
+
