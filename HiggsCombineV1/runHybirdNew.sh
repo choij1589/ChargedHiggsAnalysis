@@ -12,11 +12,11 @@ python3 createCard.py --era $ERA --channel $CHANNEL --masspoint $MASSPOINT >> ${
 cd ${BASEDIR}
 
 # run combine
-combine -M AsymptoticLimits datacard.txt
-combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult --fork 12
-combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult --fork 12 --expectedFromGrid 0.500     # median expected
-combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult --fork 12 --expectedFromGrid 0.840     # 68% up
-combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult --fork 12 --expectedFromGrid 0.160     # 68% down
-combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult --fork 12 --expectedFromGrid 0.975     # 95% up
-combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult --fork 12 --expectedFromGrid 0.025     # 95% down
+combine -M AsymptoticLimits datacard.txt -t -1
+combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult -t -1 --fork 12
+combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.500     # median expected
+combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.840     # 68% up
+combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.160     # 68% down
+combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.975     # 95% up
+combine -M HybridNew --LHCmode LHC-limits datacard.txt --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.025     # 95% down
 cd $HOMEDIR
