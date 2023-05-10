@@ -12,11 +12,14 @@ using namespace std;
 // data field
 const TString ERA = "2018";
 const TString CHANNEL = "Skim3Mu";
-const TString NETWORK = "DenseNet";
-const TString METHOD = "method2";
+const TString NETWORK = "";     // None, DenseNet, GraphNet
 const TString DATASTREAM = "DoubleMuon";
 
-const vector<TString> SIGNALs = {"MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"};
+const vector<TString> SIGNALs = {
+    "MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
+    "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
+    "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
+    "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"};
 
 const vector<TString> bkg_VV = {"WZTo3LNu_amcatnlo", "ZZTo4L_powheg"};
 const vector<TString> bkg_ttX = {"ttWToLNu", "ttZToLLNuNu", "ttHToNonbb"};
@@ -38,7 +41,7 @@ const vector<TString> promptSysts = {"Central",
                                      "ElectronResUp", "ElectronResDown"};
 
 // global variables
-double mass, mass1, mass2, scoreX, scoreY, weight;
+double mass1, mass2, scoreX, scoreY, weight;
 
 // function declarations
 TFile *getFile(const TString &sampleName, const bool isPrompt=true, const bool isSignal=false);
@@ -50,7 +53,9 @@ double getConvSF(const TString &region, int sys=0);
 void preprocess() {
     for (const auto &SIGNAL: SIGNALs) {
         cout << "@@@@ processing for " << SIGNAL << "..." << endl;
-        const TString baseOutPath = "samples/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/"+SIGNAL+"/"+METHOD+"/";
+        TString baseOutPath;
+        if (NETWORK.Contains("Net")) baseOutPath = "samples/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/"+SIGNAL+"/";
+        else                         baseOutPath = "samples/"+ERA+"/"+CHANNEL+"__/"+SIGNAL+"/";
         gSystem->mkdir(baseOutPath, true);
         gROOT->SetBatch(true);
 
@@ -65,7 +70,6 @@ void preprocess() {
         out = new TFile(baseOutPath+SIGNAL+".root", "recreate");
         for (const auto &syst: promptSysts) {
             outTree = new TTree(SIGNAL+"_"+syst, "");
-            outTree->Branch("mass", &mass);
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
@@ -87,7 +91,6 @@ void preprocess() {
         out = new TFile(baseOutPath+"nonprompt.root", "recreate");
         for (const auto &syst: matrixSysts) {
             outTree = new TTree("nonprompt_"+syst, "");
-            outTree->Branch("mass", &mass);
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
@@ -107,7 +110,6 @@ void preprocess() {
         out = new TFile(baseOutPath+"conversion.root", "recreate");
         for (const auto &syst: convSysts) {
             outTree = new TTree("conversion_"+syst, "");
-            outTree->Branch("mass", &mass);
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
@@ -130,7 +132,6 @@ void preprocess() {
         out = new TFile(baseOutPath+"diboson.root", "recreate");
         for (const auto &syst: promptSysts) {
             outTree = new TTree("diboson_"+syst, "");
-            outTree->Branch("mass", &mass);
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
@@ -153,7 +154,6 @@ void preprocess() {
         out = new TFile(baseOutPath+"ttX.root", "recreate");
         for (const auto &syst: promptSysts) {
             outTree = new TTree("ttX_"+syst, "");
-            outTree->Branch("mass", &mass);
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
@@ -176,7 +176,6 @@ void preprocess() {
         out = new TFile(baseOutPath+"others.root", "recreate");
         for (const auto &syst: promptSysts) {
             outTree = new TTree("others_"+syst, "");
-            outTree->Branch("mass", &mass);
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
@@ -199,8 +198,15 @@ void preprocess() {
 // function definitions
 TFile *getFile(const TString &sampleName, const bool isPrompt, const bool isSignal) {
     const TString dataPath = "/home/choij/workspace/ChargedHiggsAnalysis/data";
-    const TString promptPath = dataPath+"/PromptUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__";
-    const TString matrixPath = dataPath+"/MatrixUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/DATA";
+    TString promptPath, matrixPath;
+    if (NETWORK.Contains("Net")) {
+        promptPath = dataPath+"/PromptUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__";
+        matrixPath = dataPath+"/MatrixUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/DATA";
+    }
+    else {
+        promptPath = dataPath+"/PromptUnbinned/"+ERA+"/"+CHANNEL+"__DenseNet__";
+        matrixPath = dataPath+"/MatrixUnbinned/"+ERA+"/"+CHANNEL+"__DenseNet__/DATA";
+    }
     TString filePath;
     // data
     if (sampleName == DATASTREAM && isPrompt)
@@ -225,8 +231,10 @@ TFile *getFile(const TString &sampleName, const bool isPrompt, const bool isSign
 void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const TString &signal, const TString &syst) {
     tree->SetBranchAddress("mass1", &mass1);
     tree->SetBranchAddress("mass2", &mass2);
-    tree->SetBranchAddress("score_"+signal+"_vs_ttFake", &scoreX);
-    tree->SetBranchAddress("score_"+signal+"_vs_ttX", &scoreY);
+    if (NETWORK.Contains("Net")) {
+        tree->SetBranchAddress("score_"+signal+"_vs_ttFake", &scoreX);
+        tree->SetBranchAddress("score_"+signal+"_vs_ttX", &scoreY);
+    }
     tree->SetBranchAddress("weight", &weight);
     const double mA = getAmass(signal);
 
@@ -244,19 +252,7 @@ void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const T
             else if (syst == "ConversionDown") weight *= getConvSF("HighPT3Mu", -1);
             else                               weight *= getConvSF("HighPT3Mu");
         }
-
-        if (METHOD == "method1") {
-            mass = mass1; outTree->Fill();
-            mass = mass2; outTree->Fill();
-        }
-        else if (METHOD == "method2") {
-            mass = 0.;
-            outTree->Fill();
-        }
-        else {
-            cerr << "Wrong method " << METHOD << endl;
-            exit(EXIT_FAILURE);
-        }
+        outTree->Fill();
     }
 }
 

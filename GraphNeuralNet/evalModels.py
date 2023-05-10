@@ -275,18 +275,20 @@ testMask = array("B", [False]); tree.SetBranchAddress(f"testMask", testMask)
 signalMask = array("B", [False]); tree.SetBranchAddress(f"signalMask", signalMask)
 
 bestModelIdx = -1
-bestAUC = 0.
+fitness = 0.
 for idx in range(10):
     ksProbSig, ksProbBkg = getKSprob(tree, idx)
     print(idx, ksProbSig, ksProbBkg)
-    if not (ksProbSig > 0.05 and ksProbBkg > 0.05): continue
+    if not (ksProbSig > 0.1 and ksProbBkg > 0.1): continue
 
+    trainAUC = getAUC(tree, idx, "train")
     testAUC = getAUC(tree, idx, "test")
     print(f"model-{idx} with testAUC = {testAUC:.3f}")
-    if bestAUC < testAUC:
+    thisFitness = testAUC - (trainAUC - testAUC)
+    if fitness < thisFitness:
         bestModelIdx = idx
-        bestAUC = testAUC
-print(f"best model: model-{bestModelIdx} with test AUC {bestAUC:.3f}")
+        fitness = thisFitness
+print(f"best model: model-{bestModelIdx} with test AUC {fitness:.3f}")
 nNodes, optimizer, initLR, scheduler = list(chromosomes.keys())[bestModelIdx]
 trainAUC = getAUC(tree, bestModelIdx, "train")
 validAUC = getAUC(tree, bestModelIdx, "valid")

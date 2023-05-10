@@ -5,7 +5,7 @@ import pandas as pd
 parser = argparse.ArgumentParser()
 parser.add_argument("--era", required=True, type=str, help="era")
 parser.add_argument("--channel", required=True, type=str, help="channel")
-parser.add_argument("--network", required=True, type=str, help="network")
+parser.add_argument("--network", default="", type=str, help="network")
 parser.add_argument("--masspoint", required=True, type=str, help="masspoint")
 args = parser.parse_args()
 
@@ -19,7 +19,10 @@ promptSysts = ["L1Prefire", "PileupReweight", "MuonIDSF", "DblMuTrigSF",
 class DatacardManager():
     def __init__(self, era, channel, network, masspoint):
         self.signal = masspoint
-        self.rtfile = R.TFile.Open(f"results/{era}/{channel}__{network}__/{masspoint}/shapes_input.root")
+        if ("Net" in args.network): 
+            self.rtfile = R.TFile.Open(f"results/{era}/{channel}__{network}__/{masspoint}/shapes_input.root")
+        else:
+            self.rtfile = R.TFile.Open(f"results/{era}/{channel}__/{masspoint}/shapes_input.root")
         self.backgrounds = []
         for bkg in ["nonprompt", "conversion", "diboson", "ttX", "others"]:
             # check if central event rates are positive
@@ -112,6 +115,7 @@ class DatacardManager():
                 mean_down, stddev_down = self.get_event_stat(process, f"{syst}Down")
                 
                 # if mean & stddev within 0.5%, only vary normalization
+                if stddev < 10e-6:                          continue
                 if abs(mean - mean_up)/mean > 0.005:        type="shape"; break
                 if abs(mean - mean_down)/mean > 0.005:      type="shape"; break
                 if abs(stddev-stddev_up)/stddev > 0.005:    type="shape"; break
