@@ -1,9 +1,8 @@
 void printLimit() {
     const TString ERA = "2018";
     const TString CHANNEL = "Skim3Mu";
-    const TString NETWORK = "DenseNet";
-    const TString MASSPOINT = "MHc-160_MA-120";
-    const TString BASEDIR = "results/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/"+MASSPOINT+"/";
+    const TString MASSPOINT = "MHc-130_MA-90";
+    const TString BASEDIR = "results/"+ERA+"/"+CHANNEL+"__/"+MASSPOINT+"/";
 
     TFile *f = nullptr;
     TTree *limit = nullptr;
@@ -30,35 +29,35 @@ void printLimit() {
     limit = static_cast<TTree*>(f->Get("limit"));
     limit->SetBranchAddress("limit", &value);
     limit->GetEntry(0);
-    cout << value*15 << "\t";  
+    cout << value*5 << "\t";  
 
     f = new TFile(BASEDIR+"higgsCombineTest.HybridNew.mH120.quant0.160.root");
     limit = static_cast<TTree*>(f->Get("limit"));
     limit->SetBranchAddress("limit", &value);
     limit->GetEntry(0);
-    cout << value*15 << "\t";
+    cout << value*5 << "\t";
 
     f = new TFile(BASEDIR+"higgsCombineTest.HybridNew.mH120.quant0.500.root");
     limit = static_cast<TTree*>(f->Get("limit"));
     limit->SetBranchAddress("limit", &value);
     limit->GetEntry(0);
-    cout << value*15 << "\t";
+    cout << value*5 << "\t";
 
     f = new TFile(BASEDIR+"higgsCombineTest.HybridNew.mH120.quant0.840.root");
     limit = static_cast<TTree*>(f->Get("limit"));
     limit->SetBranchAddress("limit", &value);
     limit->GetEntry(0);
-    cout << value*15 << "\t";
+    cout << value*5 << "\t";
 
     f = new TFile(BASEDIR+"higgsCombineTest.HybridNew.mH120.quant0.975.root");
     limit = static_cast<TTree*>(f->Get("limit"));
     limit->SetBranchAddress("limit", &value);
     limit->GetEntry(0);
-    cout << value*15 << "\t";
+    cout << value*5 << "\t";
 
     f = new TFile(BASEDIR+"higgsCombineTest.HybridNew.mH120.root");
     limit = static_cast<TTree*>(f->Get("limit"));
     limit->SetBranchAddress("limit", &value);
     limit->GetEntry(0);
-    cout << value*15 << endl;
+    cout << value*5 << endl;
 }

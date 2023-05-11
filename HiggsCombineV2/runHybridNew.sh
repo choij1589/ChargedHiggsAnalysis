@@ -6,6 +6,7 @@ MASSPOINT=$3
 
 HOMEDIR=$PWD
 BASEDIR=${HOMEDIR}/results/${ERA}/${CHANNEL}__/${MASSPOINT}
+echo $BASEDIR
 
 # prepare datacard
 mkdir -p $BASEDIR
@@ -22,4 +23,8 @@ combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -
 combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.160     # 68% down
 combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.975     # 95% up
 combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 12 --expectedFromGrid 0.025     # 95% down
+combineTool.py -M Impacts -d workspace.root -m 125 --doInitialFit -t -1
+combineTool.py -M Impacts -d workspace.root -m 125 --doFits -t -1
+combineTool.py -M Impacts -d workspace.root -m 125 -o impacts.json
+plotImpacts.py -i impacts.json -o impacts
 cd $HOMEDIR

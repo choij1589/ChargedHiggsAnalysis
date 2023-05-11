@@ -9,7 +9,7 @@ SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-15", "MHc-130_MA-15", "MHc-160_MA-15",
            "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120",
            "MHc-130_MA-125", "MHc-160_MA-155"]
 #SIGNALs = ["MHc-70_MA-15", "MHc-130_MA-90", "MHc-160_MA-155"]
-ERA = "2017"
+ERA = "2018"
 CHANNEL = "Skim3Mu"
 WORKDIR = os.getenv("WORKDIR")
 

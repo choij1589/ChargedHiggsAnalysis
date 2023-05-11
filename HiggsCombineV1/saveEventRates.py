@@ -5,7 +5,7 @@ from math import sqrt
 R.gROOT.SetBatch(True)
 
 
-ERA = "2017"
+ERA = "2018"
 CHANNEL = "Skim3Mu"
 
 SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-15", "MHc-130_MA-15", "MHc-160_MA-15",
@@ -44,10 +44,10 @@ def getSumEntries(processName, syst="Central"):
     sumW = 0.;
     sumW2 = 0.;
     for evt in tree:
-        if abs(evt.mass1-MA) < 5*width and abs(evt.mass2-MA) < 5*width:
+        if abs(evt.mass1-MA) < 3*width and abs(evt.mass2-MA) < 3*width:
             sumW += evt.weight*2
             sumW2 += pow(evt.weight*2, 2)
-        elif abs(evt.mass1-MA) < 5*width or abs(evt.mass2-MA) < 5*width:
+        elif abs(evt.mass1-MA) < 3*width or abs(evt.mass2-MA) < 3*width:
             sumW += evt.weight
             sumW2 += pow(evt.weight, 2)
         else:

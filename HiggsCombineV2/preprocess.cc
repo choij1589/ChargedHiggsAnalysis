@@ -241,6 +241,9 @@ void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const T
     // loop
     for (unsigned int entry=0; entry < tree->GetEntries(); entry++) {
         tree->GetEntry(entry);
+        // signal xsec scaled to be 5 fb
+        if (sampleName.Contains("MA"))         weight /= 3.;
+
         // conversion SF for DYJets / ZGToLLG samples
         if (sampleName.Contains("DYJets")) {
             if (syst == "ConversionUp")        weight *= getConvSF("LowPT3Mu", 1);
