@@ -73,8 +73,6 @@ elif args.model == "GNN":
     model = GNN(nFeatures, nClasses).to(args.device)
 elif args.model == "ParticleNet":
     model = ParticleNet(nFeatures, nClasses, args.nNodes, args.dropout_p).to(args.device)
-elif args.model == "ParticleNetLite":
-    model = ParticleNetLite(nFeatures, nClasses, args.nNodes, args.dropout_p).to(args.device)
 else:
     print(f"[trainModel] Wrong model name {args.model}")
     exit(1)
