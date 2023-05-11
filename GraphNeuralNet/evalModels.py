@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import torch
+import ROOT
 
 from array import array
 from sklearn.utils import shuffle
@@ -21,6 +22,7 @@ parser.add_argument("--signal", type=str, required=True, help="signal")
 parser.add_argument("--background", type=str, required=True, help="background")
 args = parser.parse_args()
 
+ROOT.gROOT.SetBatch(True)
 WORKDIR = os.environ['WORKDIR']
 CHANNEL = args.channel
 SIG = args.signal
