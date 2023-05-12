@@ -12,8 +12,8 @@ echo $BASEDIR
 cd $BASEDIR
 
 # run combine
-combineTool.py -M Impacts -d workspace.root -m 125 --doInitialFit --expectSignal 1 -t -1
-combineTool.py -M Impacts -d workspace.root -m 125 --doFits --expectSignal 1 -t -1
-combineTool.py -M Impacts -d workspace.root -m 125 --expectSignal 1 -o impacts.json
+combineTool.py -M Impacts -d workspace.root -m 125 --doInitialFit --setParameterRanges r=-2,2 -t -1
+combineTool.py -M Impacts -d workspace.root -m 125 --doFits --setParameterRanges r=-2,2 -t -1
+combineTool.py -M Impacts -d workspace.root -m 125 --setParameterRanges r=-2,2 -o impacts.json
 plotImpacts.py -i impacts.json -o impacts --summary
 cd $HOMEDIR
