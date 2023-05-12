@@ -11,7 +11,7 @@ from sklearn import metrics
 from torch.utils.data import DataLoader
 from ROOT import TFile, TTree, TH1D
 from Preprocess import ArrayDataset
-from Models import SNN, SNNLite
+from Models import SNN
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--channel", type=str, required=True, help="channel")
@@ -117,8 +117,8 @@ def plotROC(model, trainLoader, validLoader, testLoader, path):
     plt.close()
 
 def plotTrainingStage(idx, path):
-    modelName, optimizer, initLR, scheduler = list(chromosomes.keys())[idx]
-    csvPath = f"{WORKDIR}/DenseNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/CSV/{modelName}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
+    nNodes, optimizer, initLR, scheduler = list(chromosomes.keys())[idx]
+    csvPath = f"{WORKDIR}/DenseNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/CSV/SNN-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
     record = pd.read_csv(csvPath, index_col=0).transpose()
 
     trainLoss = list(record.loc['loss/train'])
@@ -146,8 +146,8 @@ def plotTrainingStage(idx, path):
     plt.close()
 
 #### load datasets
-signal = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/Combined/{args.channel}__/CSV/{args.signal}.csv", index_col=0), random_state=42)
-bkg = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/Combined/{args.channel}__/CSV/{args.background}.csv", index_col=0), random_state=42)
+signal = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/DataPreprocess/Combined/{args.channel}__/CSV/{args.signal}.csv", index_col=0), random_state=42)
+bkg = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/DataPreprocess/Combined/{args.channel}__/CSV/{args.background}.csv", index_col=0), random_state=42)
 signal['label'] = 1
 bkg['label'] = 0
 
@@ -164,10 +164,9 @@ testLoader  = DataLoader(testset, batch_size=1024, pin_memory=True, shuffle=Fals
 chromosomes = getChromosomes(SIG, BKG)
 models =  {}
 for idx in range(10):
-    modelName, optimizer, initLR, scheduler = list(chromosomes.keys())[idx]
-    modelPath = f"{WORKDIR}/DenseNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/{modelName}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    if modelName == "SNN": model = SNN(len(signal.columns)-1, 2)
-    else:                  model = SNNLite(len(signal.columns)-1, 2)
+    nNodes, optimizer, initLR, scheduler = list(chromosomes.keys())[idx]
+    modelPath = f"{WORKDIR}/DenseNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/SNN-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
+    model = SNN(len(signal.columns)-1, 2, nNodes, 0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
     
     models[idx] = model
@@ -288,7 +287,7 @@ for idx in range(10):
         bestModelIdx = idx
         bestAUC = testAUC
 print(f"best model: model-{bestModelIdx} with test AUC {bestAUC:.3f}")
-modelName, optimizer, initLR, scheduler = list(chromosomes.keys())[bestModelIdx]
+nNodes, optimizer, initLR, scheduler = list(chromosomes.keys())[bestModelIdx]
 trainAUC = getAUC(tree, bestModelIdx, "train")
 validAUC = getAUC(tree, bestModelIdx, "valid")
 testAUC  = getAUC(tree, bestModelIdx, "test")
@@ -296,7 +295,7 @@ ksProbSig, ksProbBkg = getKSprob(tree, bestModelIdx)
 f.Close()
 
 #### write selection
-selectionInfo = f"{SIG}, {BKG}, {bestModelIdx}, {modelName}, {optimizer}, {initLR}, {scheduler}, {trainAUC}, {validAUC}, {testAUC}, {ksProbSig}, {ksProbBkg}"
+selectionInfo = f"{SIG}, {BKG}, {bestModelIdx}, {nNodes}, {optimizer}, {initLR}, {scheduler}, {trainAUC}, {validAUC}, {testAUC}, {ksProbSig}, {ksProbBkg}"
 print(f"[evalModels] {SIG}_vs_{BKG} summary: {selectionInfo}")
 with open(f"{WORKDIR}/DenseNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/results/summary.txt", "w") as f:
     f.write(f"{selectionInfo}\n")

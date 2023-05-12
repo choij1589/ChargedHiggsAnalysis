@@ -9,51 +9,31 @@ from torch_geometric.nn import MessagePassing
 
 
 class SNN(nn.Module):
-    def __init__(self, nFeatures, nClasses):
+    def __init__(self, nFeatures, nClasses, nNodes, dropout_p):
         super(SNN, self).__init__()
         # Lecun init is default for pytorch
+        self.dropout_p = dropout_p
         self.bn = nn.BatchNorm1d(nFeatures)
-        self.dense1 = nn.Linear(nFeatures, 64, bias=True)
-        self.dense2 = nn.Linear(64, 128, bias=True)
-        self.dense3 = nn.Linear(128, 256, bias=True)
-        self.dense4 = nn.Linear(256, 128, bias=True)
-        self.dense5 = nn.Linear(128, 64, bias=True)
-        self.dense6 = nn.Linear(64, nClasses, bias=True)
+        self.dense1 = nn.Linear(nFeatures, nNodes, bias=True)
+        self.dense2 = nn.Linear(nNodes, nNodes, bias=True)
+        self.dense3 = nn.Linear(nNodes, nNodes, bias=True)
+        self.dense4 = nn.Linear(nNodes, nNodes, bias=True)
+        self.dense5 = nn.Linear(nNodes, nNodes, bias=True)
+        self.dense6 = nn.Linear(nNodes, nClasses, bias=True)
     
     def forward(self, x):
         x = F.selu(self.dense1(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = F.selu(self.dense2(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = F.selu(self.dense3(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = F.selu(self.dense4(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = F.selu(self.dense5(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         out = F.softmax(self.dense6(x), dim=1)
         
-        return out
-
-class SNNLite(nn.Module):
-    def __init__(self, nFeatures, nClasses):
-        super(SNNLite, self).__init__()
-        # Lecun init is default for pytorch
-        self.bn = nn.BatchNorm1d(nFeatures)
-        self.dense1 = nn.Linear(nFeatures, 64, bias=True)
-        self.dense2 = nn.Linear(64, 128, bias=True)
-        self.dense3 = nn.Linear(128, 64, bias=True)
-        self.dense4 = nn.Linear(64, nClasses, bias=True)
-
-    def forward(self, x):
-        x = F.selu(self.dense1(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
-        x = F.selu(self.dense2(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
-        x = F.selu(self.dense3(x))
-        x = F.alpha_dropout(x, p=0.5, training=self.training)
-        out = F.softmax(self.dense4(x), dim=1)
-
         return out
 
 

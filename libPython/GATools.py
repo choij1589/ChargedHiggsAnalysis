@@ -32,8 +32,8 @@ class GeneticModule():
         # get hyperparams
         for idx in range(len(self.population)):
             if nnType == "DenseNeuralNet":
-                model, optimizer, initLR, scheduler = self.population[idx]['chromosome']
-                modelName = f"{model}_{optimizer}_initLR-{str(initLR).replace('.','p')}_{scheduler}"
+                nNodes, optimizer, initLR, scheduler = self.population[idx]['chromosome']
+                modelName = f"SNN-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.','p')}_{scheduler}"
             elif nnType == "GraphNeuralNet":
                 nNodes, optimizer, initLR, scheduler = self.population[idx]['chromosome']
                 modelName = f"ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.','p')}_{scheduler}"

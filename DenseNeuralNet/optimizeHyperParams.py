@@ -18,16 +18,14 @@ os.makedirs(modelPath.replace("models", "CSV"))
 
 # Let's run the model linearly first
 #### Hyper parameters
-models = ["SNN", "SNNLite"]
+nNodes = [64, 128]
 optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
 schedulers = ["StepLR", "ExponentialLR", "CyclicLR"]
-initLRs = [0.0001, 0.0002, 0.0005, 
-           0.001, 0.002, 0.005, 
-           0.01, 0.02, 0.05]
+initLRs = [0.001, 0.002, 0.005, 0.01]
 nBatch = 1024
 # criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
-nPop = 18
-thresholds = [0.7, 0.7, 0.7, 0.7]
+nPop = 6
+thresholds = [0.5, 0.5, 0.5, 0.5]
 maxIter = 5
 
 def evalFitness(population):
@@ -36,10 +34,11 @@ def evalFitness(population):
         # already estimated
         if population[idx]['fitness'] is not None:
             continue
-        model, optimizer, initLR, scheduler = population[idx]['chromosome']
+        nNodes, optimizer, initLR, scheduler = population[idx]['chromosome']
         command = f"python {WORKDIR}/DenseNeuralNet/trainModel.py --signal {args.signal} --background {args.background}"
         command += f" --channel {args.channel}"
-        command += f" --model {model}"
+        command += f" --model SNN"
+        command += f" --nNodes {nNodes}"
         command += f" --optimizer {optimizer}"
         command += f" --initLR {initLR}"
         command += f" --scheduler {scheduler}"
@@ -56,7 +55,7 @@ def evalFitness(population):
 
 # generate pool
 gaModule = GeneticModule()
-gaModule.getGeneValues(models)
+gaModule.getGeneValues(nNodes)
 gaModule.getGeneValues(optimizers)
 gaModule.getGeneValues(initLRs)
 gaModule.getGeneValues(schedulers)

@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
-from Models import SNN, SNNLite
+from Models import SNN
 from Preprocess import ArrayDataset
 from MLTools import EarlyStopper, SummaryWriter
 
@@ -18,6 +18,8 @@ parser.add_argument("--signal", required=True, type=str, help="signal")
 parser.add_argument("--background", required=True, type=str, help="background")
 parser.add_argument("--channel", required=True, type=str, help="channel")
 parser.add_argument("--model", required=True, type=str, help="model type")
+parser.add_argument("--nNodes", required=True, type=int, help="no. of hidden nodes")
+parser.add_argument("--dropout_p", default=0.4, type=float, help="dropout")
 parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
 parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
 parser.add_argument("--scheduler", required=True, type=str, help="lr scheduler")
@@ -45,8 +47,8 @@ if not args.background in backgroundList:
 WORKDIR = os.environ['WORKDIR']
 
 #### load dataset
-signal = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/Combined/{args.channel}__/CSV/{args.signal}.csv", index_col=0), random_state=42)
-bkg = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/Combined/{args.channel}__/CSV/{args.background}.csv", index_col=0), random_state=42)
+signal = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/DataPreprocess/Combined/{args.channel}__/CSV/{args.signal}.csv", index_col=0), random_state=42)
+bkg = shuffle(pd.read_csv(f"{os.environ['WORKDIR']}/data/DataPreprocess/Combined/{args.channel}__/CSV/{args.background}.csv", index_col=0), random_state=42)
 signal['label'] = 1
 bkg['label'] = 0
 
@@ -61,13 +63,8 @@ testLoader  = DataLoader(ArrayDataset(testset), batch_size=1024, pin_memory=True
 
 #### setup
 print(f"@@@@ Using model {args.model}...")
-if args.model == "SNN":
-    model = SNN(len(signal.columns)-1,  2).to(args.device)
-elif args.model == "SNNLite":
-    model = SNNLite(len(signal.columns)-1, 2).to(args.device)
-else:
-    print(f"[trainModel] Wrong model name {args.model}")
-    exit(1)
+model = SNN(len(signal.columns)-1,  2, args.nNodes, args.dropout_p).to(args.device)
+
 #model = torch.compile(model)
 print(f"@@@@ Using optimizer {args.optimizer}")
 if args.optimizer == "RMSprop":
@@ -137,7 +134,7 @@ def test(model, loader):
     return (loss, correct)
 
 if __name__ == "__main__":
-    modelName = f"{args.model}_{args.optimizer}_initLR-{str(args.initLR).replace('.','p')}_{args.scheduler}"
+    modelName = f"SNN-nNodes{args.nNodes}_{args.optimizer}_initLR-{str(args.initLR).replace('.','p')}_{args.scheduler}"
     print(f"@@@@ Start training...")
     checkptpath = f"{WORKDIR}/DenseNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/models/{modelName}.pt"
     summarypath = f"{WORKDIR}/DenseNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/CSV/{modelName}.csv"
