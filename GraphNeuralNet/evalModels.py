@@ -279,7 +279,7 @@ fitness = 0.
 for idx in range(10):
     ksProbSig, ksProbBkg = getKSprob(tree, idx)
     print(idx, ksProbSig, ksProbBkg)
-    if not (ksProbSig > 0.1 and ksProbBkg > 0.1): continue
+    #if not (ksProbSig > 0.1 and ksProbBkg > 0.1): continue
 
     trainAUC = getAUC(tree, idx, "train")
     testAUC = getAUC(tree, idx, "test")

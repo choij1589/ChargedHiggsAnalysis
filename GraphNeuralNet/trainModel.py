@@ -20,7 +20,7 @@ parser.add_argument("--background", required=True, type=str, help="background")
 parser.add_argument("--channel", required=True, type=str, help="channel")
 parser.add_argument("--model", required=True, type=str, help="model type")
 parser.add_argument("--nNodes", required=True, type=int, help="number of nodes for each layer")
-parser.add_argument("--dropout_p", default=0.3, type=float, help="dropout_p")
+parser.add_argument("--dropout_p", default=0.4, type=float, help="dropout_p")
 parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
 parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
 parser.add_argument("--scheduler", required=True, type=str, help="lr scheduler")
@@ -52,8 +52,8 @@ WORKDIR = os.environ['WORKDIR']
 #### load dataset
 rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=42); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=42); rtBkg.Close()
+sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=10000), random_state=42); rtSig.Close()
+bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=10000), random_state=42); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
@@ -152,17 +152,6 @@ if __name__ == "__main__":
     summaryWriter = SummaryWriter(name=modelName)
 
     for epoch in range(150):
-
-        # only train convolution layers for first 10 epochs
-        if epoch == 20:
-            for name, param in model.named_parameters():
-                if "gn" in name or "conv" in name:
-                    param.requires_grad = False
-            optimizer = torch.optim.AdamW(model.parameters(), lr=args.initLR*5)
-            scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer,
-                                                          base_lr=args.initLR/5., max_lr=args.initLR*2,
-                                                          step_size_up=3, step_size_down=5, cycle_momentum=False)
-
         train(model, optimizer, scheduler)
         trainLoss, trainAcc = test(model, trainLoader)
         validLoss, validAcc = test(model, validLoader)
