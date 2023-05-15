@@ -1,0 +1,3 @@
+0,1,2,3,4,5
+chromosome,"(128, 'Adadelta', 0.01, 'ExponentialLR')","(128, 'RMSprop', 0.001, 'CyclicLR')","(64, 'Adam', 0.001, 'ExponentialLR')","(64, 'Adam', 0.001, 'ExponentialLR')","(64, 'Adam', 0.005, 'StepLR')","(128, 'Adadelta', 0.002, 'CyclicLR')"
+fitness,0.5934214804513114,0.4544570770263672,0.384798601422991,0.384798601422991,0.3842030274300347,0.6768372726440429
