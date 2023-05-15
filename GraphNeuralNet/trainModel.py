@@ -52,8 +52,8 @@ WORKDIR = os.environ['WORKDIR']
 #### load dataset
 rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=42); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=42); rtBkg.Close()
+sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=10000), random_state=42); rtSig.Close()
+bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=10000), random_state=42); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
