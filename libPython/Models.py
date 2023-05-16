@@ -6,7 +6,7 @@ from torch_geometric.nn import global_mean_pool, global_max_pool, knn_graph
 from torch_geometric.nn import GCNConv, GraphConv
 from torch_geometric.nn import GraphNorm
 from torch_geometric.nn import MessagePassing
-
+from torch_geometric.utils import dropout_edge
 
 class SNN(nn.Module):
     def __init__(self, nFeatures, nClasses, nNodes, dropout_p):
@@ -118,14 +118,16 @@ class EdgeConv(MessagePassing):
         return self.mlp(tmp)
 
 class DynamicEdgeConv(EdgeConv):
-    def __init__(self, in_channels, out_channels, dropout_p, k=4):
+    def __init__(self, in_channels, out_channels, dropout_p, training, k=4):
         super().__init__(in_channels, out_channels, dropout_p)
         self.shortcut = Sequential(Linear(in_channels, out_channels), BatchNorm1d(out_channels))
+        self.training = training
         self.k = k
 
     def forward(self, x, edge_index=None, batch=None):
         if edge_index is None:
             edge_index = knn_graph(x, self.k, batch, loop=False, flow=self.flow)
+            edge_index, _ = dropout_edge(edge_index, p=0.2, training=self.training)
         out = super().forward(x, edge_index, batch=batch)
         out += self.shortcut(x)
         return out
@@ -134,9 +136,9 @@ class ParticleNet(torch.nn.Module):
     def __init__(self, num_features, num_classes, num_nodes, dropout_p):
         super(ParticleNet, self).__init__()
         self.gn0 = GraphNorm(num_features)
-        self.conv1 = DynamicEdgeConv(num_features, num_nodes, dropout_p, k=4)
-        self.conv2 = DynamicEdgeConv(num_nodes, num_nodes, dropout_p, k=3)
-        self.conv3 = DynamicEdgeConv(num_nodes, num_nodes, dropout_p, k=2) 
+        self.conv1 = DynamicEdgeConv(num_features, num_nodes, dropout_p, training=self.training, k=4)
+        self.conv2 = DynamicEdgeConv(num_nodes, num_nodes, dropout_p, training=self.training, k=4)
+        self.conv3 = DynamicEdgeConv(num_nodes, num_nodes, dropout_p, training=self.training, k=4) 
         self.dense1 = Linear(num_nodes, num_nodes)
         self.bn1 = BatchNorm1d(num_nodes)
         self.dense2 = Linear(num_nodes, num_nodes)
@@ -145,6 +147,9 @@ class ParticleNet(torch.nn.Module):
         self.dropout_p = dropout_p
 
     def forward(self, x, edge_index, batch=None):
+        # dropout edge while training
+        # edge_index, _ = dropout_edge(edge_index, p=0.2, training=self.training)
+
         # Convolution layers
         x = self.gn0(x, batch=batch)
         conv1 = self.conv1(x, edge_index, batch=batch)

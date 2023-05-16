@@ -1,7 +1,7 @@
 void printLimit() {
     const TString ERA = "2018";
     const TString CHANNEL = "Skim3Mu";
-    const TString MASSPOINT = "MHc-130_MA-90";
+    const TString MASSPOINT = "MHc-160_MA-120";
     const TString BASEDIR = "results/"+ERA+"/"+CHANNEL+"__/"+MASSPOINT+"/";
 
     TFile *f = nullptr;

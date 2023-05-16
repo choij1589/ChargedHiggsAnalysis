@@ -29,7 +29,7 @@ def getChromosomes(SIG, BKG, top=10):
     chromosomes = {}
     for i in range(5):
         csv = pd.read_csv(f"{BASEDIR}/CSV/GAOptimGen{i}.csv").transpose()
-        for idx in range(6):
+        for idx in range(18):
             key = eval(csv.loc[str(idx), 'chromosome'])
             if key in chromosomes.keys(): continue
             chromosomes[key] = float(csv.loc[str(idx), 'fitness'])
@@ -279,7 +279,7 @@ bestModelIdx = -1
 bestAUC = 0.
 for idx in range(10):
     ksProbSig, ksProbBkg = getKSprob(tree, idx)
-    if not (ksProbSig > 0.05 and ksProbBkg > 0.05): continue
+    if not (ksProbSig > 0.1 and ksProbBkg > 0.1): continue
 
     testAUC = getAUC(tree, idx, "test")
     print(f"model-{idx} with testAUC = {testAUC:.3f}")
