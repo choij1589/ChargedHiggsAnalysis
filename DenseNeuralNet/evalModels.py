@@ -29,7 +29,7 @@ def getChromosomes(SIG, BKG, top=10):
     chromosomes = {}
     for i in range(5):
         csv = pd.read_csv(f"{BASEDIR}/CSV/GAOptimGen{i}.csv").transpose()
-        for idx in range(18):
+        for idx in range(6):
             key = eval(csv.loc[str(idx), 'chromosome'])
             if key in chromosomes.keys(): continue
             chromosomes[key] = float(csv.loc[str(idx), 'fitness'])
