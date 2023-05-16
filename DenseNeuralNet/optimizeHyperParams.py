@@ -24,7 +24,7 @@ schedulers = ["StepLR", "ExponentialLR", "CyclicLR"]
 initLRs = [0.001, 0.002, 0.005, 0.01]
 nBatch = 1024
 # criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
-nPop = 6
+nPop = 18
 thresholds = [0.5, 0.5, 0.5, 0.5]
 maxIter = 5
 
