@@ -18,6 +18,7 @@ condorBase = f"optim_{args.signal}_vs_{args.background}_{process}"
 def makeSubmitJds():
     f = open(f"condor/{condorBase}/submit.jds", "w")
     f.write(f"executable = condor/{condorBase}/run.sh\n")
+    f.write(f"jobbatchname = train_{args.train}_{args.signal}_vs_{args.background}_{args.channel}\n")
     f.write('+singularityimage = "/data6/Users/choij/Singularity/torch200"\n')
     f.write("requirements = HasSingularity\n")
     f.write("request_disk = 40 GB\n")

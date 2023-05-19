@@ -19,8 +19,8 @@ os.makedirs(modelPath.replace("models", "CSV"))
 # Let's run the model linearly first
 #### Hyper parameters
 nNodes = [32, 64, 128]
-#optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
-optimizers = ["RMSprop", "Adam", "NAdam", "RAdam"]
+optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
+#optimizers = ["RMSprop", "Adam", "NAdam", "RAdam"]
 schedulers = ["StepLR", "CyclicLR"]
 #initLRs = [0.001, 0.002, 0.005, 0.008, 0.01]
 initLRs = [0.0001, 0.0005, 0.001, 0.002, 0.01]
