@@ -42,10 +42,10 @@ def getChromosomes(SIG, BKG, top=10):
     return sortedChromosomes
 
 def getKSprob(tree, idx):
-    hSigTrain = TH1D("hSigTrain", "", 10000, 0., 1.)
-    hBkgTrain = TH1D("hBkgTrain", "", 10000, 0., 1.)
-    hSigTest = TH1D("hSigTest", "", 10000, 0., 1.)
-    hBkgTest = TH1D("hBkgTest", "", 10000, 0., 1.)
+    hSigTrain = TH1D("hSigTrain", "", 100, 0., 1.)
+    hBkgTrain = TH1D("hBkgTrain", "", 100, 0., 1.)
+    hSigTest = TH1D("hSigTest", "", 100, 0., 1.)
+    hBkgTest = TH1D("hBkgTest", "", 100, 0., 1.)
 
     for i in range(tree.GetEntries()):
         tree.GetEntry(i)
@@ -149,9 +149,9 @@ def plotTrainingStage(idx, path):
 #### load datasets
 rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{SIG}.root")
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{BKG}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=42); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=42); rtBkg.Close()
-dataList = shuffle(sigDataList+bkgDataList, random_state=42)
+sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=953); rtSig.Close()
+bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
+dataList = shuffle(sigDataList+bkgDataList, random_state=953)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
 validset = GraphDataset(dataList[int(len(dataList)*0.6):int(len(dataList)*0.7)])
@@ -162,7 +162,7 @@ validLoader = DataLoader(validset, batch_size=1024, shuffle=False, pin_memory=Tr
 testLoader  = DataLoader(testset, batch_size=1024, shuffle=False, pin_memory=True)
 
 #### load models
-chromosomes = getChromosomes(SIG, BKG)
+chromosomes = getChromosomes(SIG, BKG, top=10)
 models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome

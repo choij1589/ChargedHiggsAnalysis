@@ -25,6 +25,7 @@ parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
 parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
 parser.add_argument("--scheduler", required=True, type=str, help="lr scheduler")
 parser.add_argument("--device", default="cpu", type=str, help="cpu or cuda")
+parser.add_argument("--pilot", action="store_true", default=False, help="pilot mode")
 args = parser.parse_args()
 
 # check arguments
@@ -50,10 +51,11 @@ if not args.background in backgroundList:
 WORKDIR = os.environ['WORKDIR']
 
 #### load dataset
+maxSize = 10000 if args.pilot else -1
 rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=42); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=42); rtBkg.Close()
+sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])

@@ -120,14 +120,14 @@ class EdgeConv(MessagePassing):
 class DynamicEdgeConv(EdgeConv):
     def __init__(self, in_channels, out_channels, dropout_p, training, k=4):
         super().__init__(in_channels, out_channels, dropout_p)
-        self.shortcut = Sequential(Linear(in_channels, out_channels), BatchNorm1d(out_channels))
+        self.shortcut = Sequential(Linear(in_channels, out_channels), BatchNorm1d(out_channels), Dropout(dropout_p))
         self.training = training
         self.k = k
 
     def forward(self, x, edge_index=None, batch=None):
         if edge_index is None:
             edge_index = knn_graph(x, self.k, batch, loop=False, flow=self.flow)
-            edge_index, _ = dropout_edge(edge_index, p=0.2, training=self.training)
+        edge_index, _ = dropout_edge(edge_index, p=0.2, training=self.training)
         out = super().forward(x, edge_index, batch=batch)
         out += self.shortcut(x)
         return out
@@ -147,9 +147,6 @@ class ParticleNet(torch.nn.Module):
         self.dropout_p = dropout_p
 
     def forward(self, x, edge_index, batch=None):
-        # dropout edge while training
-        # edge_index, _ = dropout_edge(edge_index, p=0.2, training=self.training)
-
         # Convolution layers
         x = self.gn0(x, batch=batch)
         conv1 = self.conv1(x, edge_index, batch=batch)
