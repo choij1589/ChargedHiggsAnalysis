@@ -125,18 +125,18 @@ def rtfileToDataListV2(rtfile, isSignal, poleMass, maxSize=-1):
             raise(ValueError)
 
         # infer neutrino momentum
-        eta_list = np.arange(-5, 5, 0.01)
-        best_eta = 0.
-        best_diff = 999.
-        for eta in eta_list:
-            this_neutrino = Particle(evt.METvPt, eta, evt.METvPhi, 0.)
-            Wcand = closest_lep + this_neutrino
-            diff = min(abs(poleMass - Wcand.M()), abs(80.377 - Wcand.M()))
-            if diff < best_diff:
-                best_eta = eta
-                best_diff = diff
+        #eta_list = np.arange(-5, 5, 0.01)
+        #best_eta = 0.
+        #best_diff = 999.
+        #for eta in eta_list:
+        #    this_neutrino = Particle(evt.METvPt, eta, evt.METvPhi, 0.)
+        #    Wcand = closest_lep + this_neutrino
+        #    diff = min(abs(poleMass - Wcand.M()), abs(80.377 - Wcand.M()))
+        #    if diff < best_diff:
+        #        best_eta = eta
+        #        best_diff = diff
         #print(best_eta, best_diff)
-        NETv = Particle(evt.METvPt, best_eta, evt.METvPhi, 0.)
+        METv = Particle(evt.METvPt, closest_lep.Eta(), evt.METvPhi, 0.)
             
         # convert event to a graph
         nodeList = []
