@@ -42,10 +42,10 @@ def getChromosomes(SIG, BKG, top=10):
     return sortedChromosomes
 
 def getKSprob(tree, idx):
-    hSigTrain = TH1D("hSigTrain", "", 100, 0., 1.)
-    hBkgTrain = TH1D("hBkgTrain", "", 100, 0., 1.)
-    hSigTest = TH1D("hSigTest", "", 100, 0., 1.)
-    hBkgTest = TH1D("hBkgTest", "", 100, 0., 1.)
+    hSigTrain = TH1D("hSigTrain", "", 1000, 0., 1.)
+    hBkgTrain = TH1D("hBkgTrain", "", 1000, 0., 1.)
+    hSigTest = TH1D("hSigTest", "", 1000, 0., 1.)
+    hBkgTest = TH1D("hBkgTest", "", 1000, 0., 1.)
 
     for i in range(tree.GetEntries()):
         tree.GetEntry(i)
