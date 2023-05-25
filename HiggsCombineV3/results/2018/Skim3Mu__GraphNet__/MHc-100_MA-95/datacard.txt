@@ -1,0 +1,29 @@
+# skip conversion for central event rate -1.367
+# signal xsec scaled to be 15 fb
+imax		1 number of bins
+jmax		4 number of bins
+kmax		* number of nuisance parameters
+--------------------------------------------------
+shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
+shapes	signal	*	shapes_input.root	MHc-100_MA-95	MHc-100_MA-95_$SYSTEMATIC
+--------------------------------------------------
+observation	14.01
+--------------------------------------------------
+bin			bin1		bin1		bin1		bin1		bin1		
+process			signal		nonprompt	diboson		ttX		others		
+process			0		1		2		3		4		
+rate			-1		-1		-1		-1		-1		
+--------------------------------------------------
+bin1		autoMCStats	5
+lumi_13TeV	lnN	1.025		-		1.025		1.025		1.025		
+L1Prefire	lnN	1.002		-		1.003		1.002		1.002		
+PileupReweight	shape	1		-		1		1		1		
+MuonIDSF	shape	1		-		1		1		1		
+DblMuTrigSF	lnN	1.000		-		1.000		1.000		1.000		
+JetRes		shape	1		-		1		1		1		
+JetEn		shape	1		-		1		1		1		
+MuonEn		shape	1		-		1		1		1		
+ElectronEn	lnN	1.000		-		1.000		1.000		1.000		
+ElectronRes	lnN	1.000		-		1.000		1.000		1.000		
+Nonprompt	shape	-		1		-		-		-		
+

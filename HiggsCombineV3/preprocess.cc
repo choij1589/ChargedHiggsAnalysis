@@ -12,14 +12,10 @@ using namespace std;
 // data field
 const TString ERA = "2018";
 const TString CHANNEL = "Skim3Mu";
-const TString NETWORK = "";     // None, DenseNet, GraphNet
+const TString NETWORK = "GraphNet";     // None, DenseNet, GraphNet
 const TString DATASTREAM = "DoubleMuon";
 
-const vector<TString> SIGNALs = {
-    "MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
-    "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
-    "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
-    "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"};
+const vector<TString> SIGNALs = {"MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"};
 
 const vector<TString> bkg_VV = {"WZTo3LNu_amcatnlo", "ZZTo4L_powheg"};
 const vector<TString> bkg_ttX = {"ttWToLNu", "ttZToLLNuNu", "ttHToNonbb"};
@@ -40,8 +36,15 @@ const vector<TString> promptSysts = {"Central",
                                      "ElectronEnUp", "ElectronEnDown",
                                      "ElectronResUp", "ElectronResDown"};
 
+const map<TString, vector<double>> scoreCuts = {{"MHc-70_MA-65", {0.43, 0.97, 0.4}},
+                                                {"MHc-160_MA-85", {0.21, 0.93, 0.5}},
+                                                {"MHc-130_MA-90", {0.6, 0.4, 0.57}},
+                                                {"MHc-100_MA-95", {0.7, 0.44, 0.91}},
+                                                {"MHc-160_MA-120", {0.4, 0.25, 0.35}}
+                                                };
+
 // global variables
-double mass1, mass2, scoreX, scoreY, weight;
+double mass1, mass2, scoreX, scoreY, scoreZ, weight;
 
 // function declarations
 TFile *getFile(const TString &sampleName, const bool isPrompt=true, const bool isSignal=false);
@@ -74,6 +77,7 @@ void preprocess() {
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
             outTree->Branch("scoreY", &scoreY);
+            outTree->Branch("scoreZ", &scoreZ);
             outTree->Branch("weight", &weight);
 
             f = getFile(SIGNAL, true, true);
@@ -95,6 +99,7 @@ void preprocess() {
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
             outTree->Branch("scoreY", &scoreY);
+            outTree->Branch("scoreZ", &scoreZ);
             outTree->Branch("weight", &weight);
 
             f = getFile("nonprompt", false);
@@ -114,6 +119,7 @@ void preprocess() {
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
             outTree->Branch("scoreY", &scoreY);
+            outTree->Branch("scoreZ", &scoreZ);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_conv) {
@@ -136,6 +142,7 @@ void preprocess() {
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
             outTree->Branch("scoreY", &scoreY);
+            outTree->Branch("scoreZ", &scoreZ);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_VV) {
@@ -158,6 +165,7 @@ void preprocess() {
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
             outTree->Branch("scoreY", &scoreY);
+            outTree->Branch("scoreZ", &scoreZ);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_ttX) {
@@ -180,6 +188,7 @@ void preprocess() {
             outTree->Branch("mass2", &mass2);
             outTree->Branch("scoreX", &scoreX);
             outTree->Branch("scoreY", &scoreY);
+            outTree->Branch("scoreZ", &scoreZ);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_others) {
@@ -232,8 +241,9 @@ void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const T
     tree->SetBranchAddress("mass1", &mass1);
     tree->SetBranchAddress("mass2", &mass2);
     if (NETWORK.Contains("Net")) {
-        tree->SetBranchAddress("score_"+signal+"_vs_ttFake", &scoreX);
-        tree->SetBranchAddress("score_"+signal+"_vs_ttX", &scoreY);
+        tree->SetBranchAddress("score_"+signal+"_vs_nonprompt", &scoreX);
+        tree->SetBranchAddress("score_"+signal+"_vs_diboson", &scoreY);
+        tree->SetBranchAddress("score_"+signal+"_vs_ttZ", &scoreZ);
     }
     tree->SetBranchAddress("weight", &weight);
     const double mA = getAmass(signal);
@@ -241,11 +251,6 @@ void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const T
     // loop
     for (unsigned int entry=0; entry < tree->GetEntries(); entry++) {
         tree->GetEntry(entry);
-        if (mass1 < mass2) {
-            auto temp = mass1;
-            mass1 = mass2;
-            mass2 = temp;
-        }
         // signal xsec scaled to be 5 fb
         if (sampleName.Contains("MA"))         weight /= 3.;
 

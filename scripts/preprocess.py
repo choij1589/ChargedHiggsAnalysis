@@ -8,11 +8,12 @@ from Preprocess import getMuons, getElectrons, getJets
 
 # global variables 
 WORKDIR = os.environ['WORKDIR']
-CHANNEL = "Skim3Mu"
+CHANNEL = "Skim1E2Mu"
 
 # no. of events to copy
 SIGNALs = ["MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"]
 NONPROMPTs = ["TTLL_powheg", "DYJetsToMuMu_MiNNLO"]
+#NONPROMPTs = ["TTLL_powheg", "DYJets_MG"]
 DIBOSONs = ["WZTo3LNu_mllmin0p1_powheg", "ZZTo4L_powheg"]
 TTZ = ["ttZToLLNuNu"]
 BACKGROUNDs = NONPROMPTs + DIBOSONs + TTZ

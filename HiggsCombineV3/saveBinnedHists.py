@@ -5,14 +5,10 @@ R.gROOT.SetBatch(True)
 
 ERA = "2018"
 CHANNEL = "Skim3Mu"
-NETWORK = ""
+NETWORK = "GraphNet"
 
 
-SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-15", "MHc-130_MA-15", "MHc-160_MA-15",
-           "MHc-70_MA-40", "MHc-130_MA-55", "MHc-100_MA-60", "MHc-70_MA-65",
-           "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120",
-           "MHc-130_MA-125", "MHc-160_MA-155"]
-#SIGNALs = ["MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"]
+SIGNALs = ["MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"]
 BACKGROUNDs = ["nonprompt", "conversion", "diboson", "ttX", "others"]
 
 matrixSysts = ["NonpromptUp", "NonpromptDown"]
@@ -28,6 +24,12 @@ promptSysts = ["L1PrefireUp", "L1PrefireDown",
                "ElectronResUp", "ElectronResDown"]
 systematics = ["Central"] + promptSysts + matrixSysts + convSysts
 
+scoreDict = {"MHc-70_MA-65": (0.43, 0.97, 0.4),
+             "MHc-160_MA-85": (0.21, 0.93, 0.5),
+             "MHc-130_MA-90": (0.6, 0.4, 0.57),
+             "MHc-100_MA-95": (0.7, 0.44, 0.91),
+             "MHc-160_MA-120": (0.4, 0.25, 0.35)}
+
 def getFitSigmaValue(mA):
     with open(f"samples/{ERA}/{CHANNEL}__/interpolResults.csv") as f:
         line = f.readlines()[2].split(",")
@@ -39,17 +41,22 @@ def getFitSigmaValue(mA):
 def getHist(processName, signal, syst="Central"):
     mA = float(signal.split("_")[1].split("-")[1])
     sigma = getFitSigmaValue(mA)
+    scoreX, scoreY, scoreZ = scoreDict[signal]
     if syst == "Central":
-        h = R.TH2D(f"{processName}", "", 20, mA-5*sigma, mA+5*sigma, 20, mA-5*sigma, mA+5*sigma)
+        h = R.TH1D(f"{processName}", "", 20, mA-5*sigma, mA+5*sigma)
     else:
-        h = R.TH2D(f"{processName}_{syst}", "", 20, mA-5*sigma, mA+5*sigma, 20, mA-5*sigma, mA+5*sigma)
+        h = R.TH1D(f"{processName}_{syst}", "", 20, mA-5*sigma, mA+5*sigma)
     
     if ("Net" in NETWORK):  f = R.TFile.Open(f"samples/{ERA}/{CHANNEL}__{NETWORK}__/{signal}/{processName}.root")
     else:                   f = R.TFile.Open(f"samples/{ERA}/{CHANNEL}__/{signal}/{processName}.root")
     tree = f.Get(f"{processName}_{syst}")
 
     for evt in tree:
-        h.Fill(evt.mass1, evt.mass2, evt.weight)
+        if (evt.scoreX < scoreX): continue
+        if (evt.scoreY < scoreY): continue
+        if (evt.scoreZ < scoreZ): continue
+        h.Fill(evt.mass1, evt.weight)
+        h.Fill(evt.mass2, evt.weight)
     h.SetDirectory(0)
     
     return h
@@ -63,7 +70,7 @@ for SIGNAL in SIGNALs:
     mA = float(SIGNAL.split("_")[1].split("-")[1])
     sigma = getFitSigmaValue(mA)
     f = R.TFile(f"{basePath}/shapes_input.root", "recreate")
-    data = R.TH2D("data_obs", "", 20, mA-5*sigma, mA+5*sigma, 20, mA-5*sigma, mA+5*sigma)
+    data = R.TH1D("data_obs", "", 20, mA-5*sigma, mA+5*sigma)
     for syst in systematics:
         if syst == "Central":     h = getHist(SIGNAL, SIGNAL)
         elif syst in promptSysts: h = getHist(SIGNAL, SIGNAL, syst)
