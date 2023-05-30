@@ -27,7 +27,7 @@ class DatacardManager():
         for bkg in ["nonprompt", "conversion", "diboson", "ttX", "others"]:
             # check if central event rates are positive
             h = self.rtfile.Get(bkg)
-            if h.Integral() < 0:
+            if not h.Integral() > 0:
                 print(f"# skip {bkg} for central event rate {h.Integral():.3f}")
                 continue
             self.backgrounds.append(bkg)
@@ -132,7 +132,6 @@ class DatacardManager():
             for process in ["signal"]+self.backgrounds:
                 if process in skip: syststring += "-\t\t"
                 elif value is None:
-                #if type == "shape": syststring += "-\t\t"
                     ratio = max(self.get_event_ratio(process, f"{syst}Up"), self.get_event_ratio(process, f"{syst}Down"))
                     syststring += f"{ratio:.3f}\t\t"
                 else:

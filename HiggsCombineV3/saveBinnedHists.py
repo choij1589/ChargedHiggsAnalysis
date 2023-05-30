@@ -3,7 +3,7 @@ import ROOT as R
 import pandas as pd
 R.gROOT.SetBatch(True)
 
-ERA = "2018"
+ERA = "2017"
 CHANNEL = "Skim3Mu"
 NETWORK = "GraphNet"
 
@@ -24,11 +24,33 @@ promptSysts = ["L1PrefireUp", "L1PrefireDown",
                "ElectronResUp", "ElectronResDown"]
 systematics = ["Central"] + promptSysts + matrixSysts + convSysts
 
-scoreDict = {"MHc-70_MA-65": (0.43, 0.97, 0.4),
-             "MHc-160_MA-85": (0.21, 0.93, 0.5),
-             "MHc-130_MA-90": (0.6, 0.4, 0.57),
-             "MHc-100_MA-95": (0.7, 0.44, 0.91),
-             "MHc-160_MA-120": (0.4, 0.25, 0.35)}
+if ERA == "2016preVFP":
+    scoreDict = {"MHc-70_MA-65": (0.49, 0.05, 0.22),
+                 "MHc-160_MA-85": (0.15, 0.57, 0.45),
+                 "MHc-130_MA-90": (0.63, 0.41, 0.52),
+                 "MHc-100_MA-95": (0.69, 0.47, 0.93),
+                 "MHc-160_MA-120": (0.4, 0.52, 0.78)}
+elif ERA == "2016postVFP":
+    scoreDict = {"MHc-70_MA-65": (0.43, 0.78, 0.98),
+                 "MHc-160_MA-85": (0.59, 0.67, 0.67),
+                 "MHc-130_MA-90": (0.63, 0.6, 0.56),
+                 "MHc-100_MA-95": (0.93, 0.65, 0.63),
+                 "MHc-160_MA-120": (0.98, 0.62, 0.99)}
+elif ERA == "2017":
+    scoreDict = {"MHc-70_MA-65": (0.56, 0.16, 0.48),
+                 "MHc-160_MA-85": (0.43, 0.97, 0.47),
+                 "MHc-130_MA-90": (0.78, 0.94, 0.54),
+                 "MHc-100_MA-95": (0.66, 0.48, 0.57),
+                 "MHc-160_MA-120": (0.44, 0.02, 0.45)}
+elif ERA == "2018":
+    scoreDict = {"MHc-70_MA-65": (0.43, 0.97, 0.4),
+                 "MHc-160_MA-85": (0.21, 0.93, 0.5),
+                 "MHc-130_MA-90": (0.6, 0.4, 0.57),
+                 "MHc-100_MA-95": (0.7, 0.44, 0.91),
+                 "MHc-160_MA-120": (0.4, 0.25, 0.35)}
+else:
+    print(f"Wrong era {ERA}")
+    exit(1)
 
 def getFitSigmaValue(mA):
     with open(f"samples/{ERA}/{CHANNEL}__/interpolResults.csv") as f:

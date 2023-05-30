@@ -10,7 +10,7 @@ using namespace std;
 // method2: independently fill two mass variables for each event, store as "mass1" and "mass2" for correlation study
 
 // data field
-const TString ERA = "2018";
+const TString ERA = "2017";
 const TString CHANNEL = "Skim3Mu";
 const TString NETWORK = "GraphNet";     // None, DenseNet, GraphNet
 const TString DATASTREAM = "DoubleMuon";

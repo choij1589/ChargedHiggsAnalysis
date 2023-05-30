@@ -41,7 +41,7 @@ const vector<TString> promptSysts = {"Central",
                                      "ElectronResUp", "ElectronResDown"};
 
 // global variables
-double mass1, mass2, scoreX, scoreY, weight;
+double mass1, mass2, weight;
 
 // function declarations
 TFile *getFile(const TString &sampleName, const bool isPrompt=true, const bool isSignal=false);
@@ -72,8 +72,6 @@ void preprocess() {
             outTree = new TTree(SIGNAL+"_"+syst, "");
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
-            outTree->Branch("scoreX", &scoreX);
-            outTree->Branch("scoreY", &scoreY);
             outTree->Branch("weight", &weight);
 
             f = getFile(SIGNAL, true, true);
@@ -93,8 +91,6 @@ void preprocess() {
             outTree = new TTree("nonprompt_"+syst, "");
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
-            outTree->Branch("scoreX", &scoreX);
-            outTree->Branch("scoreY", &scoreY);
             outTree->Branch("weight", &weight);
 
             f = getFile("nonprompt", false);
@@ -112,8 +108,6 @@ void preprocess() {
             outTree = new TTree("conversion_"+syst, "");
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
-            outTree->Branch("scoreX", &scoreX);
-            outTree->Branch("scoreY", &scoreY);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_conv) {
@@ -134,8 +128,6 @@ void preprocess() {
             outTree = new TTree("diboson_"+syst, "");
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
-            outTree->Branch("scoreX", &scoreX);
-            outTree->Branch("scoreY", &scoreY);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_VV) {
@@ -156,8 +148,6 @@ void preprocess() {
             outTree = new TTree("ttX_"+syst, "");
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
-            outTree->Branch("scoreX", &scoreX);
-            outTree->Branch("scoreY", &scoreY);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_ttX) {
@@ -178,8 +168,6 @@ void preprocess() {
             outTree = new TTree("others_"+syst, "");
             outTree->Branch("mass1", &mass1);
             outTree->Branch("mass2", &mass2);
-            outTree->Branch("scoreX", &scoreX);
-            outTree->Branch("scoreY", &scoreY);
             outTree->Branch("weight", &weight);
 
             for (const auto &sampleName: bkg_others) {
@@ -204,8 +192,8 @@ TFile *getFile(const TString &sampleName, const bool isPrompt, const bool isSign
         matrixPath = dataPath+"/MatrixUnbinned/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__/DATA";
     }
     else {
-        promptPath = dataPath+"/PromptUnbinned/"+ERA+"/"+CHANNEL+"__DenseNet__";
-        matrixPath = dataPath+"/MatrixUnbinned/"+ERA+"/"+CHANNEL+"__DenseNet__/DATA";
+        promptPath = dataPath+"/PromptUnbinned/"+ERA+"/"+CHANNEL+"__GraphNet__";
+        matrixPath = dataPath+"/MatrixUnbinned/"+ERA+"/"+CHANNEL+"__GraphNet__/DATA";
     }
     TString filePath;
     // data
@@ -231,10 +219,6 @@ TFile *getFile(const TString &sampleName, const bool isPrompt, const bool isSign
 void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const TString &signal, const TString &syst) {
     tree->SetBranchAddress("mass1", &mass1);
     tree->SetBranchAddress("mass2", &mass2);
-    if (NETWORK.Contains("Net")) {
-        tree->SetBranchAddress("score_"+signal+"_vs_ttFake", &scoreX);
-        tree->SetBranchAddress("score_"+signal+"_vs_ttX", &scoreY);
-    }
     tree->SetBranchAddress("weight", &weight);
     const double mA = getAmass(signal);
 
