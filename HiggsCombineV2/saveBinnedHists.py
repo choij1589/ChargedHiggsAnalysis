@@ -3,7 +3,7 @@ import ROOT as R
 import pandas as pd
 R.gROOT.SetBatch(True)
 
-ERA = "2018"
+ERA = "2017"
 CHANNEL = "Skim3Mu"
 NETWORK = ""
 

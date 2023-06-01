@@ -1,8 +1,8 @@
 void printLimit() {
-    const TString ERA = "2018";
+    const TString ERA = "2016preVFP";
     const TString CHANNEL = "Skim3Mu";
     const TString NETWORK = "GraphNet";
-    const TString MASSPOINT = "MHc-130_MA-90";
+    const TString MASSPOINT = "MHc-70_MA-65";
     const TString BASEDIR = "results/"+ERA+"/"+CHANNEL+"__"+NETWORK+"__"+MASSPOINT+"/";
 
     TFile *f = nullptr;

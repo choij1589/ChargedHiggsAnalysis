@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 # check arguments
 # check arguments
-channelList = ["Skim1E2Mu", "Skim3Mu"]
+channelList = ["Skim1E2Mu", "Skim3Mu", "Combined"]
 signalList = ["MHc-70", "MHc-100", "MHc-130", "MHc-160",
               "MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
@@ -52,10 +52,24 @@ WORKDIR = os.environ['WORKDIR']
 
 #### load dataset
 maxSize = 10000 if args.pilot else -1
-rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
-rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
+if args.channel == "Combined":
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim1E2Mu__/{args.signal}.root")
+    sigDataList1E2Mu = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim3Mu__/{args.signal}.root")
+    sigDataList3Mu = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+    sigDataList = shuffle(sigDataList1E2Mu+sigDataList3Mu, random_state=953)
+
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim1E2Mu__/{args.background}.root")
+    bkgDataList1E2Mu = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim3Mu__/{args.background}.root")
+    bkgDataList3Mu = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
+    bkgDataList = shuffle(bkgDataList1E2Mu+bkgDataList3Mu, random_state=953)
+else:
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
+    
+    sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+    bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
