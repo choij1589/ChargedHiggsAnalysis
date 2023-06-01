@@ -10,7 +10,7 @@ from torch_geometric.loader import DataLoader
 
 from Preprocess import GraphDataset
 from Preprocess import rtfileToDataListV2
-from Models      import GCN, GNN, ParticleNet
+from Models      import GCN, GNN, ParticleNetV2
 from MLTools      import EarlyStopper, SummaryWriter
 
 #### parse arguments
@@ -25,11 +25,12 @@ parser.add_argument("--optimizer", required=True, type=str, help="optimizer")
 parser.add_argument("--initLR", required=True, type=float, help="initial learning rate")
 parser.add_argument("--scheduler", required=True, type=str, help="lr scheduler")
 parser.add_argument("--device", default="cpu", type=str, help="cpu or cuda")
+parser.add_argument("--pilot", action="store_true", default=False, help="pilot mode")
 args = parser.parse_args()
 
 # check arguments
 # check arguments
-channelList = ["Skim1E2Mu", "Skim3Mu"]
+channelList = ["Skim1E2Mu", "Skim3Mu", "Combined"]
 signalList = ["MHc-70", "MHc-100", "MHc-130", "MHc-160",
               "MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
               "MHc-100_MA-15", "MHc-100_MA-60", "MHc-100_MA-95",
@@ -50,32 +51,46 @@ if not args.background in backgroundList:
 WORKDIR = os.environ['WORKDIR']
 
 #### load dataset
-MHc = int(args.signal.split("_")[0].split("-")[1])
-MA = int(args.signal.split("_")[1].split("-")[1])
-poleMass = MHc - MA
-rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
-rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
-sigDataList = shuffle(rtfileToDataListV2(rtSig, isSignal=True, poleMass=poleMass, maxSize=10000), random_state=42); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataListV2(rtBkg, isSignal=False, poleMass=poleMass, maxSize=10000), random_state=42); rtBkg.Close()
+maxSize = 10000 if args.pilot else -1
+if args.channel == "Combined":
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim1E2Mu__/{args.signal}.root")
+    sigDataList1E2Mu = shuffle(rtfileToDataListV2(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim3Mu__/{args.signal}.root")
+    sigDataList3Mu = shuffle(rtfileToDataListV2(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+    sigDataList = shuffle(sigDataList1E2Mu+sigDataList3Mu, random_state=953)
+
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim1E2Mu__/{args.background}.root")
+    bkgDataList1E2Mu = shuffle(rtfileToDataListV2(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim3Mu__/{args.background}.root")
+    bkgDataList3Mu = shuffle(rtfileToDataListV2(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
+    bkgDataList = shuffle(bkgDataList1E2Mu+bkgDataList3Mu, random_state=953)
+else:
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.signal}.root")
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{args.channel}__/{args.background}.root")
+
+    sigDataList = shuffle(rtfileToDataListV2(rtSig, isSignal=True, maxSize=maxSize), random_state=953); rtSig.Close()
+    bkgDataList = shuffle(rtfileToDataListV2(rtBkg, isSignal=False, maxSize=maxSize), random_state=953); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
 validset = GraphDataset(dataList[int(len(dataList)*0.6):int(len(dataList)*0.7)])
 testset  = GraphDataset(dataList[int(len(dataList)*0.7):])
 
-trainLoader = DataLoader(trainset, batch_size=1024, pin_memory=True, shuffle=True)
-validLoader = DataLoader(validset, batch_size=1024, pin_memory=True, shuffle=False)
-testLoader = DataLoader(testset, batch_size=1024, pin_memory=True, shuffle=False)
+trainLoader = DataLoader(trainset, batch_size=2048, pin_memory=True, shuffle=True)
+validLoader = DataLoader(validset, batch_size=2048, pin_memory=True, shuffle=False)
+testLoader = DataLoader(testset, batch_size=2048, pin_memory=True, shuffle=False)
+
 #### setup
 print(f"@@@@ Using model {args.model}...")
 nFeatures = 9
+nGraphFeatures = 3
 nClasses = 2
 if args.model == "GCN":
     model = GCN(nFeatures, nClasses).to(args.device)
 elif args.model == "GNN":
     model = GNN(nFeatures, nClasses).to(args.device)
 elif args.model == "ParticleNet":
-    model = ParticleNet(nFeatures, nClasses, args.nNodes, args.dropout_p).to(args.device)
+    model = ParticleNetV2(nFeatures, nGraphFeatures, nClasses, args.nNodes, args.dropout_p).to(args.device)
 else:
     print(f"[trainModel] Wrong model name {args.model}")
     exit(1)
@@ -122,7 +137,7 @@ def train(model, optimizer, scheduler):
     model.train()
 
     for data in trainLoader:
-        out = model(data.x.to(args.device), data.edge_index.to(args.device), data.batch.to(args.device))
+        out = model(data.x.to(args.device), data.edge_index.to(args.device), data.graphInput.to(args.device), data.batch.to(args.device))
         loss = F.cross_entropy(out, data.y.to(args.device))
         loss.backward()
         optimizer.step()
@@ -136,7 +151,7 @@ def test(model, loader):
     correct = 0.
     with torch.no_grad():
         for data in loader:
-            out = model(data.x.to(args.device), data.edge_index.to(args.device), data.batch.to(args.device))
+            out = model(data.x.to(args.device), data.edge_index.to(args.device), data.graphInput.to(args.device), data.batch.to(args.device))
             pred = out.argmax(dim=1)
             answer = data.y.to(args.device)
             loss += float(F.cross_entropy(out, answer).sum())

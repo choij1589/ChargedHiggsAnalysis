@@ -151,7 +151,7 @@ rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{SIG}.ro
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{BKG}.root")
 sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=953); rtSig.Close()
 bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
-dataList = shuffle(sigDataList+bkgDataList, random_state=953)
+dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
 validset = GraphDataset(dataList[int(len(dataList)*0.6):int(len(dataList)*0.7)])
@@ -167,7 +167,7 @@ models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
     modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    model = ParticleNet(9, 2, nNodes, dropout_p=0.3)
+    model = ParticleNet(9, 2, nNodes, dropout_p=0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
     models[idx] = model
