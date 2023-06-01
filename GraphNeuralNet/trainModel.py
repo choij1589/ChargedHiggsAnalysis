@@ -179,7 +179,7 @@ if __name__ == "__main__":
         print(f"[EPOCH {epoch}]\tTrain Acc: {trainAcc*100:.2f}%\tTrain Loss: {trainLoss:.4e}")
         print(f"[EPOCH {epoch}]\tVlaid Acc: {validAcc*100:.2f}%\tValid Loss: {validLoss:.4e}\n")
 
-        panelty = 3*max(0, validLoss-trainLoss)
+        panelty = max(0, validLoss-trainLoss)
         earlyStopper.update(validLoss, panelty, model)
         if earlyStopper.earlyStop:
             print(f"Early stopping in epoch {epoch}"); break
