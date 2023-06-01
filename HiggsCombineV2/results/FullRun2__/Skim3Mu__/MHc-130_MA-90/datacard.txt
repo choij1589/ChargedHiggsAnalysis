@@ -1,0 +1,35 @@
+Combination of era2016a=results/2016preVFP/Skim3Mu__/MHc-130_MA-90/datacard.txt  era2016b=results/2016postVFP/Skim3Mu__/MHc-130_MA-90/datacard.txt  era2017=results/2017/Skim3Mu__/MHc-130_MA-90/datacard.txt  era2018=results/2018/Skim3Mu__/MHc-130_MA-90/datacard.txt
+imax 4 number of bins
+jmax 5 number of processes minus 1
+kmax 9 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes *         era2016a  results/2016preVFP/Skim3Mu__/MHc-130_MA-90/shapes_input.root $PROCESS $PROCESS_$SYSTEMATIC
+shapes signal    era2016a  results/2016preVFP/Skim3Mu__/MHc-130_MA-90/shapes_input.root MHc-130_MA-90 MHc-130_MA-90_$SYSTEMATIC
+shapes *         era2016b  results/2016postVFP/Skim3Mu__/MHc-130_MA-90/shapes_input.root $PROCESS $PROCESS_$SYSTEMATIC
+shapes signal    era2016b  results/2016postVFP/Skim3Mu__/MHc-130_MA-90/shapes_input.root MHc-130_MA-90 MHc-130_MA-90_$SYSTEMATIC
+shapes *         era2017   results/2017/Skim3Mu__/MHc-130_MA-90/shapes_input.root $PROCESS $PROCESS_$SYSTEMATIC
+shapes signal    era2017   results/2017/Skim3Mu__/MHc-130_MA-90/shapes_input.root MHc-130_MA-90 MHc-130_MA-90_$SYSTEMATIC
+shapes *         era2018   results/2018/Skim3Mu__/MHc-130_MA-90/shapes_input.root $PROCESS $PROCESS_$SYSTEMATIC
+shapes signal    era2018   results/2018/Skim3Mu__/MHc-130_MA-90/shapes_input.root MHc-130_MA-90 MHc-130_MA-90_$SYSTEMATIC
+----------------------------------------------------------------------------------------------------------------------------------
+bin          era2016a  era2016b  era2017   era2018 
+observation  141.94    128.01    315.55    449.22  
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                  era2016a    era2016a    era2016a    era2016a    era2016a    era2016a    era2016b    era2016b    era2016b    era2016b    era2016b    era2016b    era2017     era2017     era2017     era2017     era2017     era2017     era2018     era2018     era2018     era2018     era2018     era2018   
+process                              signal      nonprompt   conversion  diboson     ttX         others      signal      nonprompt   conversion  diboson     ttX         others      signal      nonprompt   conversion  diboson     ttX         others      signal      nonprompt   conversion  diboson     ttX         others    
+process                              0           1           2           3           4           5           0           1           2           3           4           5           0           1           2           3           4           5           0           1           2           3           4           5         
+rate                                 -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1          -1        
+----------------------------------------------------------------------------------------------------------------------------------
+Conversion              shape?       -           -           1.0         -           -           -           -           -           1.368       -           -           -           -           -           1.374       -           -           -           -           -           1.0         -           -           -         
+JetEn                   shape?       1.01        -           -           1.06        1.004       1.017       1.0         -           -           1.0         1.0         1.0         1.011       -           -           1.071       1.004       1.023       1.0         -           -           1.0         1.0         1.0       
+JetRes                  shape        1.0         -           -           1.0         1.0         1.0         1.0         -           -           1.0         1.0         1.0         1.0         -           -           1.0         1.0         1.0         1.0         -           -           1.0         1.0         1.0       
+L1Prefire               lnN          1.01        -           -           1.011       1.012       1.014       1.01        -           -           1.01        1.012       1.016       1.005       -           -           1.005       1.007       1.012       1.002       -           -           1.002       1.002       1.002     
+MuonEn                  lnN          1.001       -           -           1.003       1.002       1.001       1.001       -           -           1.003       1.001       1.002       1.001       -           -           1.002       1.001       1.004       1.001       -           -           1.001       1.001       1.0       
+MuonIDSF                lnN          1.021       -           -           1.018       1.017       1.019       1.02        -           -           1.018       1.017       1.018       1.021       -           -           1.018       1.017       1.019       1.02        -           -           1.017       1.016       1.017     
+Nonprompt               shape        -           1.0         -           -           -           -           -           1.0         -           -           -           -           -           1.0         -           -           -           -           -           1.0         -           -           -           -         
+PileupReweight          shape?       1.012       -           -           1.014       1.01        1.012       1.006       -           -           1.008       1.006       1.012       1.008       -           -           1.015       1.008       1.009       1.0         -           -           1.0         1.0         1.0       
+lumi_13TeV              lnN          1.025       -           -           1.025       1.025       1.025       1.025       -           -           1.025       1.025       1.025       1.025       -           -           1.025       1.025       1.025       1.025       -           -           1.025       1.025       1.025     
+era2016a autoMCStats 5 0 1
+era2016b autoMCStats 5 0 1
+era2017 autoMCStats 5 0 1
+era2018 autoMCStats 5 0 1

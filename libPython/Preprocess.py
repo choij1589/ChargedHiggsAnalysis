@@ -103,44 +103,17 @@ def rtfileToDataList(rtfile,  isSignal, maxSize=-1):
     
     return dataList
 
-# infer neutrino eta from electron phi for 1e2mu channel, closest phi muon for 3mu channel
-def rtfileToDataListV2(rtfile, isSignal, poleMass, maxSize=-1): 
+def rtfileToDataListV2(rtfile, isSignal, maxSize=-1): 
     dataList = []
     for evt in rtfile.Events:
         muons = getMuons(evt)
         electrons = getElectrons(evt)
-        jets, bets = getJets(evt)
-        METv = Particle(evt.METvPt, 0., evt.METvPhi, 0.) 
-        # divide channel and find the sibling candidate
-        if len(muons) == 2 and len(electrons) == 1:
-            closest_lep = electrons[0]
-        elif len(muons) == 3 and len(electrons) == 0:
-            mu1, mu2, mu3 = tuple(muons)
-            dPhi = [mu1.DeltaPhi(METv), mu2.DeltaPhi(METv), mu3.DeltaPhi(METv)]
-            min_dPhi = min(dPhi)
-            closest_lep = muons[dPhi.index(min_dPhi)]
-        else:
-            print("[Preprocess::rtfileToDataList] Wrong channel")
-            print(f"[Preprocess::rtfileToDataList] nMuons = {len(muons)}\tnElectrons = {len(electrons)}]")
-            raise(ValueError)
+        jets, bjets = getJets(evt)
+        #METv = Particle(evt.METvPt, 0., evt.METvPhi, 0.)
 
-        # infer neutrino momentum
-        #eta_list = np.arange(-5, 5, 0.01)
-        #best_eta = 0.
-        #best_diff = 999.
-        #for eta in eta_list:
-        #    this_neutrino = Particle(evt.METvPt, eta, evt.METvPhi, 0.)
-        #    Wcand = closest_lep + this_neutrino
-        #    diff = min(abs(poleMass - Wcand.M()), abs(80.377 - Wcand.M()))
-        #    if diff < best_diff:
-        #        best_eta = eta
-        #        best_diff = diff
-        #print(best_eta, best_diff)
-        METv = Particle(evt.METvPt, closest_lep.Eta(), evt.METvPhi, 0.)
-            
         # convert event to a graph
         nodeList = []
-        objects = muons+electrons+jets; objects.append(METv)
+        objects = muons+electrons+jets[:4]
         for obj in objects:
             nodeList.append([obj.E(), obj.Px(), obj.Py(), obj.Pz(),
                              obj.Charge(), obj.BtagScore(),
@@ -148,12 +121,13 @@ def rtfileToDataListV2(rtfile, isSignal, poleMass, maxSize=-1):
         # NOTE: Each event converted to a directed graph
         # for each node, find 4 nearest particles and connect
         data = evtToGraph(nodeList, y=int(isSignal))
+        data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt]], dtype=torch.float)
         dataList.append(data)
 
         if len(dataList) == maxSize: break
     print(f"@@@@ no. of dataList ends with {len(dataList)}")
 
-    return dataList 
+    return dataList
 
 class ArrayDataset(Dataset):
     def __init__(self, sample):

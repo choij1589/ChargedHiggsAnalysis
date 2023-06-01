@@ -3,9 +3,9 @@ RUN=$1
 ERA=$2
 CHANNEL=$3
 
-./run${RUN}.sh $ERA $CHANNEL MHc-70_MA-15
-./run${RUN}.sh $ERA $CHANNEL MHc-70_MA-40
-./run${RUN}.sh $ERA $CHANNEL MHc-70_MA-65
+#./run${RUN}.sh $ERA $CHANNEL MHc-70_MA-15
+#./run${RUN}.sh $ERA $CHANNEL MHc-70_MA-40
+#./run${RUN}.sh $ERA $CHANNEL MHc-70_MA-65
 ./run${RUN}.sh $ERA $CHANNEL MHc-100_MA-15
 ./run${RUN}.sh $ERA $CHANNEL MHc-100_MA-60
 ./run${RUN}.sh $ERA $CHANNEL MHc-100_MA-95

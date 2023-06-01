@@ -85,7 +85,8 @@ bestBinX = 0
 bestBinY = 0
 bestBinZ = 0
 bestMetric = initMetric
-for binX, binY, binZ in product(range(nbinsX+1), range(nbinsY+1), range(nbinsZ+1)):
+#for binX, binY, binZ in product(range(nbinsX+1), range(nbinsY+1), range(nbinsZ+1)):
+for binX, binY, binZ in product(range(96), range(96), range(96)):
     nSig = h_sig.Integral(binX, nbinsX, binY, nbinsY, binZ, nbinsZ) / 3
     nBkg = h_bkg.Integral(binX, nbinsX, binY, nbinsY, binZ, nbinsZ)
     try:
@@ -100,5 +101,7 @@ for binX, binY, binZ in product(range(nbinsX+1), range(nbinsY+1), range(nbinsZ+1
         bestBinY = binY
         bestBinZ = binZ
         bestMetric = metric
+        print(bestBinX, bestBinY, bestBinZ, bestMetric)
+print("final results")
 print(bestBinX, bestBinY, bestBinZ, bestMetric)
 print((bestMetric-initMetric) / initMetric)

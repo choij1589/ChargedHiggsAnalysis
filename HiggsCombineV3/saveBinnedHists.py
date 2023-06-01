@@ -3,7 +3,7 @@ import ROOT as R
 import pandas as pd
 R.gROOT.SetBatch(True)
 
-ERA = "2017"
+ERA = "2016postVFP"
 CHANNEL = "Skim3Mu"
 NETWORK = "GraphNet"
 
@@ -31,11 +31,11 @@ if ERA == "2016preVFP":
                  "MHc-100_MA-95": (0.69, 0.47, 0.93),
                  "MHc-160_MA-120": (0.4, 0.52, 0.78)}
 elif ERA == "2016postVFP":
-    scoreDict = {"MHc-70_MA-65": (0.43, 0.78, 0.98),
+    scoreDict = {"MHc-70_MA-65": (0.5, 0.45, 0.57),
                  "MHc-160_MA-85": (0.59, 0.67, 0.67),
                  "MHc-130_MA-90": (0.63, 0.6, 0.56),
                  "MHc-100_MA-95": (0.93, 0.65, 0.63),
-                 "MHc-160_MA-120": (0.98, 0.62, 0.99)}
+                 "MHc-160_MA-120": (0.49, 0.37, 0.5)}
 elif ERA == "2017":
     scoreDict = {"MHc-70_MA-65": (0.56, 0.16, 0.48),
                  "MHc-160_MA-85": (0.43, 0.97, 0.47),

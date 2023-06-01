@@ -1,4 +1,4 @@
-# signal xsec scaled to be 15 fb
+# signal xsec scaled to be 5 fb
 imax		1 number of bins
 jmax		5 number of bins
 kmax		* number of nuisance parameters
@@ -6,7 +6,7 @@ kmax		* number of nuisance parameters
 shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-100_MA-95	MHc-100_MA-95_$SYSTEMATIC
 --------------------------------------------------
-observation	4.00
+observation	4.0009
 --------------------------------------------------
 bin			bin1		bin1		bin1		bin1		bin1		bin1		
 process			signal		nonprompt	conversion	diboson		ttX		others		
@@ -24,5 +24,5 @@ JetEn		shape	1		-		-		1		1		1
 MuonEn		shape	1		-		-		1		1		1		
 ElectronEn	lnN	1.000		-		-		1.000		1.000		1.000		
 ElectronRes	lnN	1.000		-		-		1.000		1.000		1.000		
-Nonprompt	shape	-		1		-		-		-		-		
+Nonprompt_2016postVFP	lnN	-		3.861		-		-		-		-		
 Conversion	lnN	-		-		1.368		-		-		-		
