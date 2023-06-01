@@ -167,7 +167,7 @@ models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
     modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    model = ParticleNet(9, 2, nNodes, dropout_p=0.3)
+    model = ParticleNet(9, 2, nNodes, dropout_p=0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
     models[idx] = model

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn import Sequential, Linear, ReLU, Dropout, BatchNorm1d, SELU, AlphaDropout
+from torch.nn import Sequential, Linear, ReLU, Dropout, BatchNorm1d, ELU, AlphaDropout
 from torch_geometric.nn import global_mean_pool, global_max_pool, knn_graph
 from torch_geometric.nn import GCNConv, GraphConv
 from torch_geometric.nn import GraphNorm
@@ -105,9 +105,9 @@ class EdgeConv(MessagePassing):
     def __init__(self, in_channels, out_channels, dropout_p):
         super().__init__(aggr="mean")
         self.mlp = Sequential(
-                Linear(2*in_channels, out_channels), ReLU(), BatchNorm1d(out_channels), Dropout(dropout_p),
-                Linear(out_channels, out_channels), ReLU(), BatchNorm1d(out_channels), Dropout(dropout_p),
-                Linear(out_channels, out_channels), ReLU(), BatchNorm1d(out_channels), Dropout(dropout_p)
+                Linear(2*in_channels, out_channels), ELU(), BatchNorm1d(out_channels), Dropout(dropout_p),
+                Linear(out_channels, out_channels), ELU(), BatchNorm1d(out_channels), Dropout(dropout_p),
+                Linear(out_channels, out_channels), ELU(), BatchNorm1d(out_channels), Dropout(dropout_p)
                 )
 
     def forward(self, x, edge_index, batch=None):
