@@ -77,7 +77,7 @@ class DatacardManager():
     
     def part3string(self):
         part3string = "bin\t\t\tbin1\n"
-        part3string = f"observation\t{self.get_event_rate('data_obs'):.2f}\n"
+        part3string = f"observation\t{self.get_event_rate('data_obs'):.4f}\n"
         part3string += "-"*50
         return part3string
    
@@ -102,15 +102,25 @@ class DatacardManager():
     def autoMCstring(self, threshold):
         return f"bin1\t\tautoMCStats\t{threshold}"
 
-    def syststring(self, syst, alias=None, type=None, value=None, skip=None):
+    def syststring(self, syst, alias=None, type=None, value=None, skip=None, denoteEra=False):
         if syst == "Nonprompt" and (not "nonprompt" in self.backgrounds): return ""
         if syst == "Conversion" and (not "conversion" in self.backgrounds): return ""
 
         # set alias
         if alias is None: alias = syst
+
+        if denoteEra: alias = f"{alias}_{args.era}"
         
         # check type
         if type is None:
+            # check every histogram input is not negative
+            for process in ["signal"]+self.backgrounds:
+                if process in skip: continue
+                rate_up = self.get_event_rate(process, f"{syst}Up")
+                rate_down = self.get_event_rate(process, f"{syst}Down")
+                if not (rate_up >0. and rate_down > 0.): type = "lnN"
+
+        if type != "lnN":
             for process in ["signal"]+self.backgrounds:
                 if process in skip: continue
                 mean, stddev = self.get_event_stat(process)
@@ -123,7 +133,8 @@ class DatacardManager():
                 if abs(mean - mean_down)/mean > 0.005:      type="shape"; break
                 if abs(stddev-stddev_up)/stddev > 0.005:    type="shape"; break
                 if abs(stddev-stddev_down)/stddev > 0.005:  type="shape"; break
-            if type != "shape": type = "lnN"
+        
+        if type != "shape": type = "lnN"
 
         if len(alias) < 8: syststring = f"{alias}\t\t{type}\t"
         else:              syststring = f"{alias}\t{type}\t"
@@ -149,7 +160,7 @@ class DatacardManager():
 
 if __name__ == "__main__":
     manager = DatacardManager(args.era, args.channel, args.network, args.masspoint)
-    print("# signal xsec scaled to be 15 fb")
+    print("# signal xsec scaled to be 5 fb")
     print(manager.part1string())
     print(manager.part2string())
     print(manager.part3string())
@@ -158,5 +169,5 @@ if __name__ == "__main__":
     print(manager.syststring(syst="lumi_13TeV", type="lnN", value=1.025, skip=["nonprompt", "conversion"]))
     for syst in promptSysts:
         print(manager.syststring(syst=syst, skip=["nonprompt", "conversion"]))
-    print(manager.syststring(syst="Nonprompt", skip=["signal", "conversion", "diboson", "ttX", "others"]))
+    print(manager.syststring(syst="Nonprompt", skip=["signal", "conversion", "diboson", "ttX", "others"], denoteEra=True))
     print(manager.syststring(syst="Conversion", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))
