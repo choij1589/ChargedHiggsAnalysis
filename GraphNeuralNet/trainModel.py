@@ -7,6 +7,7 @@ from ROOT import TFile
 import torch
 import torch.nn.functional as F
 from torch_geometric.loader import DataLoader
+from torchlars import LARS
 
 from Preprocess import GraphDataset
 from Preprocess import rtfileToDataList
@@ -109,6 +110,8 @@ elif args.optimizer == "RAdam":
 else:
     print(f"[trainModel] Wrong optimizer name {args.optimizer}")
     exit(1)
+optimizer = LARS(optimizer=optimizer, eps=1e-8, trust_coef=0.001)
+
 
 print(f"@@@@ Using lr scheduler {args.scheduler}...")
 if args.scheduler == "StepLR":
