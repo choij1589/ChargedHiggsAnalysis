@@ -105,9 +105,9 @@ class EdgeConv(MessagePassing):
     def __init__(self, in_channels, out_channels, dropout_p):
         super().__init__(aggr="mean")
         self.mlp = Sequential(
-                Linear(2*in_channels, out_channels), ELU(), BatchNorm1d(out_channels), Dropout(dropout_p),
-                Linear(out_channels, out_channels), ELU(), BatchNorm1d(out_channels), Dropout(dropout_p),
-                Linear(out_channels, out_channels), ELU(), BatchNorm1d(out_channels), Dropout(dropout_p)
+                Linear(2*in_channels, out_channels), ReLU(), BatchNorm1d(out_channels), Dropout(dropout_p),
+                Linear(out_channels, out_channels), ReLU(), BatchNorm1d(out_channels), Dropout(dropout_p),
+                Linear(out_channels, out_channels), ReLU(), BatchNorm1d(out_channels), Dropout(dropout_p)
                 )
 
     def forward(self, x, edge_index, batch=None):
@@ -131,6 +131,7 @@ class DynamicEdgeConv(EdgeConv):
         out = super().forward(x, edge_index, batch=batch)
         out += self.shortcut(x)
         return out
+
 
 class ParticleNet(torch.nn.Module):
     def __init__(self, num_features, num_classes, num_nodes, dropout_p):
@@ -168,11 +169,58 @@ class ParticleNet(torch.nn.Module):
 
         return F.softmax(x, dim=1)
 
+class ParticleNetTest(torch.nn.Module):
+    def __init__(self, num_features, num_classes, num_nodes, dropout_p):
+        super(ParticleNetTest, self).__init__()
+        self.gn0 = GraphNorm(num_features)
+        self.gn1 = GraphNorm(num_nodes)
+        self.gn2 = GraphNorm(num_nodes)
+        self.gn3 = GraphNorm(num_nodes)
+        self.conv1 = DynamicEdgeConv(num_features, num_nodes, dropout_p, training=self.training, k=4)
+        self.conv2 = DynamicEdgeConv(num_nodes, num_nodes, dropout_p, training=self.training, k=4)
+        self.conv3 = DynamicEdgeConv(num_nodes, num_nodes, dropout_p, training=self.training, k=4)
+        self.dense1 = Linear(num_nodes, num_nodes)
+        self.bn1 = BatchNorm1d(num_nodes)
+        self.dense2 = Linear(num_nodes, num_nodes)
+        self.bn2 = BatchNorm1d(num_nodes)
+        self.output = Linear(num_nodes, num_classes)
+        self.dropout_p = dropout_p
+
+    def forward(self, x, edge_index, batch=None):
+        # Convolution layers
+        x = self.gn0(x, batch=batch)
+        conv1 = self.conv1(x, batch=batch)
+        conv1 = self.gn1(conv1, batch=batch)
+        conv2 = self.conv2(x, batch=batch)
+        conv2 = self.gn2(conv2, batch=batch)
+        conv3 = self.conv3(x, batch=batch)
+        conv3 = self.gn3(x, batch=batch)
+        x = conv1 + conv2 + conv3
+
+        # readout layers
+        x = global_mean_pool(x, batch=batch)
+
+        # dense layers
+        x = F.relu(self.dense1(x))
+        x = self.bn1(x)
+        x = F.dropout1d(x, p=self.dropout_p, training=self.training)
+        x = F.relu(self.dense2(x))
+        x = self.bn2(x)
+        x = F.dropout1d(x, p=self.dropout_p, training=self.training)
+        x = self.output(x)
+
+        return F.softmax(x, dim=1)
+
+
+
 class ParticleNetV2(torch.nn.Module):
     def __init__(self, num_node_features, num_graph_features, num_classes, num_hidden, dropout_p):
         super(ParticleNetV2, self).__init__()
         self.gn0 = GraphNorm(num_node_features)
-        self.bn0 = BatchNorm1d(num_graph_features)
+        self.gn1 = GraphNorm(num_hidden)
+        self.gn2 = GraphNorm(num_hidden)
+        self.gn3 = GraphNorm(num_hidden)
+        self.bn0 = BatchNorm1d(num_hidden+num_graph_features)
         self.conv1 = DynamicEdgeConv(num_node_features, num_hidden, dropout_p, training=self.training, k=4)
         self.conv2 = DynamicEdgeConv(num_hidden, num_hidden, dropout_p, training=self.training, k=4)
         self.conv3 = DynamicEdgeConv(num_hidden, num_hidden, dropout_p, training=self.training, k=4)
@@ -186,21 +234,25 @@ class ParticleNetV2(torch.nn.Module):
     def forward(self, x, edge_index, graph_input, batch=None):
         # Convolution layers
         x = self.gn0(x, batch=batch)
-        y = self.bn0(graph_input)
+        #y = self.bn0(graph_input)
         conv1 = self.conv1(x, edge_index, batch=batch)
+        conv1 = self.gn1(conv1, batch=batch)
         conv2 = self.conv2(conv1, batch=batch)
+        conv2 = self.gn2(conv2, batch=batch)
         conv3 = self.conv3(conv2, batch=batch)
+        conv3 = self.gn3(conv3, batch=batch)
         x = conv1 + conv2 + conv3
 
         # readout layers
         x = global_mean_pool(x, batch=batch)
-        x = torch.cat([x, y], dim=1)
+        x = torch.cat([x, graph_input], dim=1)
+        x = self.bn0(x)
 
         # dense layers
-        x = F.relu(self.dense1(x))
+        x = F.selu(self.dense1(x))
         x = self.bn1(x)
         x = F.dropout1d(x, p=self.dropout_p, training=self.training)
-        x = F.relu(self.dense2(x))
+        x = F.selu(self.dense2(x))
         x = self.bn2(x)
         x = F.dropout1d(x, p=self.dropout_p, training=self.training)
         x = self.output(x)

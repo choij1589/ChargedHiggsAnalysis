@@ -109,11 +109,11 @@ def rtfileToDataListV2(rtfile, isSignal, maxSize=-1):
         muons = getMuons(evt)
         electrons = getElectrons(evt)
         jets, bjets = getJets(evt)
-        #METv = Particle(evt.METvPt, 0., evt.METvPhi, 0.)
+        METv = Particle(evt.METvPt, 0., evt.METvPhi, 0.)
 
         # convert event to a graph
         nodeList = []
-        objects = muons+electrons+jets[:4]
+        objects = muons+electrons+jets+[METv]
         for obj in objects:
             nodeList.append([obj.E(), obj.Px(), obj.Py(), obj.Pz(),
                              obj.Charge(), obj.BtagScore(),
@@ -121,7 +121,18 @@ def rtfileToDataListV2(rtfile, isSignal, maxSize=-1):
         # NOTE: Each event converted to a directed graph
         # for each node, find 4 nearest particles and connect
         data = evtToGraph(nodeList, y=int(isSignal))
-        data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt]], dtype=torch.float)
+        # make MTs
+        if len(muons) == 3:
+            MT1 = (muons[0]+METv).Mt()
+            MT2 = (muons[1]+METv).Mt()
+            MT3 = (muons[2]+METv).Mt()
+            data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt, MT1, MT2, MT3]], dtype=torch.float)
+        elif len(electrons) == 1 and  len(muons) == 2:
+            MT = (electrons[0]+METv).Mt()
+            data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt, MT]], dtype=torch.float)
+        else:
+            print(f"Wrong size of muons {len(muons)} and electrons {len(electrons)}")
+            exit(1)
         dataList.append(data)
 
         if len(dataList) == maxSize: break

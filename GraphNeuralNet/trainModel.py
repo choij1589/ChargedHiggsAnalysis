@@ -11,7 +11,7 @@ from torchlars import LARS
 
 from Preprocess import GraphDataset
 from Preprocess import rtfileToDataList
-from Models      import GCN, GNN, ParticleNet
+from Models      import GCN, GNN, ParticleNet, ParticleNetTest
 from MLTools      import EarlyStopper, SummaryWriter
 
 #### parse arguments
@@ -90,6 +90,8 @@ elif args.model == "GNN":
     model = GNN(nFeatures, nClasses).to(args.device)
 elif args.model == "ParticleNet":
     model = ParticleNet(nFeatures, nClasses, args.nNodes, args.dropout_p).to(args.device)
+elif args.model == "ParticleNetTest":
+    model = ParticleNetTest(nFeatures, nClasses, args.nNodes, args.dropout_p).to(args.device)
 else:
     print(f"[trainModel] Wrong model name {args.model}")
     exit(1)

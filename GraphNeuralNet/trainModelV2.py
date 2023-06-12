@@ -83,7 +83,7 @@ testLoader = DataLoader(testset, batch_size=2048, pin_memory=True, shuffle=False
 #### setup
 print(f"@@@@ Using model {args.model}...")
 nFeatures = 9
-nGraphFeatures = 3
+nGraphFeatures = 6 if args.channel == "Skim3Mu" else 4
 nClasses = 2
 if args.model == "GCN":
     model = GCN(nFeatures, nClasses).to(args.device)
