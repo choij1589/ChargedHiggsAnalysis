@@ -225,9 +225,7 @@ class ParticleNetV2(torch.nn.Module):
         self.conv2 = DynamicEdgeConv(num_hidden, num_hidden, dropout_p, training=self.training, k=4)
         self.conv3 = DynamicEdgeConv(num_hidden, num_hidden, dropout_p, training=self.training, k=4)
         self.dense1 = Linear(num_hidden+num_graph_features, num_hidden)
-        self.bn1 = BatchNorm1d(num_hidden)
         self.dense2 = Linear(num_hidden, num_hidden)
-        self.bn2 = BatchNorm1d(num_hidden)
         self.output = Linear(num_hidden, num_classes)
         self.dropout_p = dropout_p
 
@@ -250,11 +248,9 @@ class ParticleNetV2(torch.nn.Module):
 
         # dense layers
         x = F.selu(self.dense1(x))
-        x = self.bn1(x)
-        x = F.dropout1d(x, p=self.dropout_p, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = F.selu(self.dense2(x))
-        x = self.bn2(x)
-        x = F.dropout1d(x, p=self.dropout_p, training=self.training)
+        x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = self.output(x)
 
         return F.softmax(x, dim=1)
