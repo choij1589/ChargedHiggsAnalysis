@@ -37,7 +37,7 @@ def evalFitness(population):
         if population[idx]['fitness'] is not None:
             continue
         nNodes, optimizer, initLR, scheduler = population[idx]['chromosome']
-        command = f"python {WORKDIR}/GraphNeuralNet/trainModel.py --signal {args.signal} --background {args.background}"
+        command = f"python {WORKDIR}/GraphNeuralNet/trainModelV2.py --signal {args.signal} --background {args.background}"
         command += f" --channel {args.channel}"
         command += f" --model ParticleNet"
         command += f" --nNodes {nNodes}"
