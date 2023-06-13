@@ -10,8 +10,8 @@ from sklearn.utils import shuffle
 from sklearn import metrics
 from torch_geometric.loader import DataLoader
 from ROOT import TFile, TTree, TH1D
-from Preprocess import rtfileToDataList, GraphDataset
-from Models import ParticleNet
+from Preprocess import rtfileToDataListV2, GraphDataset
+from Models import ParticleNetV2
 
 from pprint import pprint
 
@@ -149,8 +149,8 @@ def plotTrainingStage(idx, path):
 #### load datasets
 rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{SIG}.root")
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{BKG}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=953); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
+sigDataList = shuffle(rtfileToDataListV2(rtSig, isSignal=True), random_state=953); rtSig.Close()
+bkgDataList = shuffle(rtfileToDataListV2(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
@@ -167,7 +167,7 @@ models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
     modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    model = ParticleNet(9, 2, nNodes, dropout_p=0.4)
+    model = ParticleNetV2(9, 6, 2, nNodes, dropout_p=0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
     models[idx] = model
