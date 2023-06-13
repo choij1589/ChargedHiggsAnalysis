@@ -250,9 +250,13 @@ class ParticleNetV2(torch.nn.Module):
 
         # dense layers
         x = F.selu(self.dense1(x))
+        #x = F.relu(self.dense1(x))
+        #x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = self.bn1(x)
         x = F.dropout1d(x, p=self.dropout_p, training=self.training)
         x = F.selu(self.dense2(x))
+        #x = F.relu(self.dense2(x))
+        #x = F.alpha_dropout(x, p=self.dropout_p, training=self.training)
         x = self.bn2(x)
         x = F.dropout1d(x, p=self.dropout_p, training=self.training)
         x = self.output(x)

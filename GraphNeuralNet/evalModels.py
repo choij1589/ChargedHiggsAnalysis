@@ -26,12 +26,15 @@ CHANNEL = args.channel
 SIG = args.signal
 BKG = args.background
 
+lenGenerations = 5
+lenChromosomes = 12
+
 def getChromosomes(SIG, BKG, top=10):
     BASEDIR = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}" 
     chromosomes = {}
-    for i in range(5):
+    for i in range(lenGenerations):
         csv = pd.read_csv(f"{BASEDIR}/CSV/GAOptimGen{i}.csv").transpose()
-        for idx in range(14):
+        for idx in range(lenChromosomes):
             key = eval(csv.loc[str(idx), 'chromosome'])
             if key in chromosomes.keys(): continue
             chromosomes[key] = float(csv.loc[str(idx), 'fitness'])
@@ -91,7 +94,7 @@ def prepareROC(model, loader):
     answers = []
     with torch.no_grad():
         for data in loader:
-            pred = model(data.x, data.edge_index, data.batch)
+            pred = model(data.x, data.edge_index, data.graphInput, data.batch)
             for p in pred: predictions.append(p[1].numpy())
             for a in data.y: answers.append(a.numpy())
     predictions = np.array(predictions)
@@ -204,7 +207,7 @@ for data in trainLoader:
     with torch.no_grad():
         for idx, model in models.items():
             model.eval()
-            scores = model(data.x, data.edge_index, data.batch)
+            scores = model(data.x, data.edge_index, data.graphInput, data.batch)
             for score in scores: 
                 scoreBatch[idx].append(score[1].numpy())
     
@@ -226,7 +229,7 @@ for data in validLoader:
     with torch.no_grad():
         for idx, model in models.items():
             model.eval()
-            scores = model(data.x, data.edge_index, data.batch)
+            scores = model(data.x, data.edge_index, data.graphInput, data.batch)
             for score in scores: 
                 scoreBatch[idx].append(score[1].numpy())
     
@@ -248,7 +251,7 @@ for data in testLoader:
     with torch.no_grad():
         for idx, model in models.items():
             model.eval()
-            scores = model(data.x, data.edge_index, data.batch)
+            scores = model(data.x, data.edge_index, data.graphInput, data.batch)
             for score in scores: 
                 scoreBatch[idx].append(score[1].numpy())
     
