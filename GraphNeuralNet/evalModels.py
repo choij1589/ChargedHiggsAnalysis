@@ -10,8 +10,8 @@ from sklearn.utils import shuffle
 from sklearn import metrics
 from torch_geometric.loader import DataLoader
 from ROOT import TFile, TTree, TH1D
-from Preprocess import rtfileToDataList, GraphDataset
-from Models import ParticleNet
+from Preprocess import rtfileToDataListV2, GraphDataset
+from Models import ParticleNetV2
 
 from pprint import pprint
 
@@ -26,12 +26,15 @@ CHANNEL = args.channel
 SIG = args.signal
 BKG = args.background
 
+lenGenerations = 5
+lenChromosomes = 12
+
 def getChromosomes(SIG, BKG, top=10):
     BASEDIR = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}" 
     chromosomes = {}
-    for i in range(5):
+    for i in range(lenGenerations):
         csv = pd.read_csv(f"{BASEDIR}/CSV/GAOptimGen{i}.csv").transpose()
-        for idx in range(14):
+        for idx in range(lenChromosomes):
             key = eval(csv.loc[str(idx), 'chromosome'])
             if key in chromosomes.keys(): continue
             chromosomes[key] = float(csv.loc[str(idx), 'fitness'])
@@ -91,7 +94,7 @@ def prepareROC(model, loader):
     answers = []
     with torch.no_grad():
         for data in loader:
-            pred = model(data.x, data.edge_index, data.batch)
+            pred = model(data.x, data.edge_index, data.graphInput, data.batch)
             for p in pred: predictions.append(p[1].numpy())
             for a in data.y: answers.append(a.numpy())
     predictions = np.array(predictions)
@@ -149,8 +152,8 @@ def plotTrainingStage(idx, path):
 #### load datasets
 rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{SIG}.root")
 rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{BKG}.root")
-sigDataList = shuffle(rtfileToDataList(rtSig, isSignal=True), random_state=953); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataList(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
+sigDataList = shuffle(rtfileToDataListV2(rtSig, isSignal=True), random_state=953); rtSig.Close()
+bkgDataList = shuffle(rtfileToDataListV2(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
@@ -167,7 +170,7 @@ models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
     modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    model = ParticleNet(9, 2, nNodes, dropout_p=0.4)
+    model = ParticleNetV2(9, 6, 2, nNodes, dropout_p=0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
     models[idx] = model
@@ -204,7 +207,7 @@ for data in trainLoader:
     with torch.no_grad():
         for idx, model in models.items():
             model.eval()
-            scores = model(data.x, data.edge_index, data.batch)
+            scores = model(data.x, data.edge_index, data.graphInput, data.batch)
             for score in scores: 
                 scoreBatch[idx].append(score[1].numpy())
     
@@ -226,7 +229,7 @@ for data in validLoader:
     with torch.no_grad():
         for idx, model in models.items():
             model.eval()
-            scores = model(data.x, data.edge_index, data.batch)
+            scores = model(data.x, data.edge_index, data.graphInput, data.batch)
             for score in scores: 
                 scoreBatch[idx].append(score[1].numpy())
     
@@ -248,7 +251,7 @@ for data in testLoader:
     with torch.no_grad():
         for idx, model in models.items():
             model.eval()
-            scores = model(data.x, data.edge_index, data.batch)
+            scores = model(data.x, data.edge_index, data.graphInput, data.batch)
             for score in scores: 
                 scoreBatch[idx].append(score[1].numpy())
     
