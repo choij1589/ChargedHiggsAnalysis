@@ -4,7 +4,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
  
 # Style and pads
-ERA = "FullRun2__"
+ERA = "2018"
 CHANNEL = "Skim3Mu"
 
 lumiDict = {
@@ -12,7 +12,7 @@ lumiDict = {
         "2016postVFP": "16.8",
         "2017": "41.5",
         "2018": "59.8",
-        "FullRun2__": "139"
+        "FullRun2__": "137.5"
 }
 
 
@@ -37,7 +37,7 @@ legend = PositionedLegend(0.3, 0.2, 3, 0.015)
  
 # Set the standard green and yellow colors and draw
 StyleLimitBand(graphs)
-DrawLimitBand(pads[0], graphs, draw=['exp2', 'exp1', 'exp0'], legend=legend)
+DrawLimitBand(pads[0], graphs, draw=['exp2', 'exp1', 'exp0', 'obs'], legend=legend)
 #cnc = graphs_cnc["exp0"]
 #cnc.SeNoCutColor(ROOT.kGray)
 #cnc.SetLineWidth(2)
@@ -67,7 +67,7 @@ pads[0].GetFrame().Draw()
 # Adjust the y-axis range such that the maximum graph value sits 25% below
 # the top of the frame. Fix the minimum to zero.
 #FixBothRanges(pads[0], 0, 0, GetPadYMax(pads[0]), 0.25)
-FixBothRanges(pads[0], 0, 0, 4, 0.25)
+FixBothRanges(pads[0], 0, 0, 15, 0.25)
 
 # Standard CMS logo
 DrawCMSLogo(pads[0], 'CMS', 'Internal', 11, 0.045, 0.035, 1.2, '', 0.8)

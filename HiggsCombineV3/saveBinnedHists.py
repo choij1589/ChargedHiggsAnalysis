@@ -97,9 +97,11 @@ def getHist(processName, signal, syst="Central"):
     cut = scoreDict[signal]
     clf = joblib.load(f"results/{ERA}/{CHANNEL}__{NETWORK}__/{signal}/classifier.pkl")
     if syst == "Central":
-        h = R.TH1D(f"{processName}", "", 20, mA-5*sigma, mA+5*sigma)
+        h_tag0 = R.TH1D(f"{processName}_tag0", "", 20, mA-5*sigma, mA+5*sigma)
+        h_tag1 = R.TH1D(f"{processName}_tag1", "", 20, mA-5*sigma, mA+5*sigma)
     else:
-        h = R.TH1D(f"{processName}_{syst}", "", 20, mA-5*sigma, mA+5*sigma)
+        h_tag0 = R.TH1D(f"{processName}_tag0_{syst}", "", 20, mA-5*sigma, mA+5*sigma)
+        h_tag1 = R.TH1D(f"{processName}_tag1_{syst}", "", 20, mA-5*sigma, mA+5*sigma)
     
     if ("Net" in NETWORK):  f = R.TFile.Open(f"samples/{ERA}/{CHANNEL}__{NETWORK}__/{signal}/{processName}.root")
     else:                   f = R.TFile.Open(f"samples/{ERA}/{CHANNEL}__/{signal}/{processName}.root")
@@ -122,13 +124,16 @@ def getHist(processName, signal, syst="Central"):
         #h.Fill(evt.mass2, evt.weight)
     scores = clf.predict_proba(inputs)
     for score, weight, mass in zip(scores, weights, masses):
-        if score[1] < cut: continue
-        h.Fill(mass[0], evt.weight)
-        h.Fill(mass[1], evt.weight)
-
-    h.SetDirectory(0)
+        if score[1] > cut:
+            h_tag0.Fill(mass[0], evt.weight)
+            h_tag0.Fill(mass[1], evt.weight)
+        elif score[1] < 0.2:
+            h_tag1.Fill(mass[0], evt.weight)
+            h_tag1.Fill(mass[1], evt.weight)
+    h_tag0.SetDirectory(0)
+    h_tag1.SetDirectory(0)
     
-    return h
+    return (h_tag0, h_tag1)
 
 for SIGNAL in SIGNALs:
     print(f"@@@@ processing {SIGNAL}...")
@@ -139,73 +144,86 @@ for SIGNAL in SIGNALs:
     mA = float(SIGNAL.split("_")[1].split("-")[1])
     sigma = getFitSigmaValue(mA)
     f = R.TFile(f"{basePath}/shapes_input.root", "recreate")
-    data = R.TH1D("data_obs", "", 20, mA-5*sigma, mA+5*sigma)
+    data_tag0 = R.TH1D("data_obs_tag0", "", 20, mA-5*sigma, mA+5*sigma)
+    data_tag1 = R.TH1D("data_obs_tag1", "", 20, mA-5*sigma, mA+5*sigma)
     print(f"@@@@ processing signal...")
     for syst in systematics:
-        if syst == "Central":     h = getHist(SIGNAL, SIGNAL)
-        elif syst in promptSysts: h = getHist(SIGNAL, SIGNAL, syst)
+        if syst == "Central":     h_tag0, h_tag1 = getHist(SIGNAL, SIGNAL)
+        elif syst in promptSysts: h_tag0, h_tag1 = getHist(SIGNAL, SIGNAL, syst)
         else:                     continue
         f.cd()
-        h.Write()
+        h_tag0.Write()
+        h_tag1.Write()
     
     print(f"@@@@ processing nonprompt...")
     for syst in systematics:
         if syst == "Central":     
-            h = getHist("nonprompt", SIGNAL)
-            data.Add(h)
+            h_tag0, h_tag1 = getHist("nonprompt", SIGNAL)
+            data_tag0.Add(h_tag0)
+            data_tag1.Add(h_tag1)
         elif syst in matrixSysts: 
-            h = getHist("nonprompt", SIGNAL, syst)
+            h_tag0, h_tag1 = getHist("nonprompt", SIGNAL, syst)
         else:                     
             continue
         f.cd()
-        h.Write()
+        h_tag0.Write()
+        h_tag1.Write()
 
     print(f"@@@@ processing conversion...")
     for syst in systematics:
         if syst == "Central":   
-            h = getHist("conversion", SIGNAL)
-            data.Add(h)
+            h_tag0, h_tag1 = getHist("conversion", SIGNAL)
+            data_tag0.Add(h_tag0)
+            data_tag1.Add(h_tag1)
         elif syst in convSysts: 
-            h = getHist("conversion", SIGNAL, syst)
+            h_tag0, h_tag1 = getHist("conversion", SIGNAL, syst)
         else:                   
             continue
         f.cd()
-        h.Write()
+        h_tag0.Write()
+        h_tag1.Write()
 
     print(f"@@@@ processing diboson...")
     for syst in systematics:
         if syst == "Central":     
-            h = getHist("diboson", SIGNAL)
-            data.Add(h)
+            h_tag0, h_tag1 = getHist("diboson", SIGNAL)
+            data_tag0.Add(h_tag0)
+            data_tag1.Add(h_tag1)
         elif syst in promptSysts: 
-            h = getHist("diboson", SIGNAL, syst)
+            h_tag0, h_tag1 = getHist("diboson", SIGNAL, syst)
         else:                     
             continue
         f.cd()
-        h.Write()
+        h_tag0.Write()
+        h_tag1.Write()
 
     print(f"@@@@ processing ttX...")
     for syst in systematics:
         if syst == "Central":     
-            h = getHist("ttX", SIGNAL)
-            data.Add(h)
+            h_tag0, h_tag1 = getHist("ttX", SIGNAL)
+            data_tag0.Add(h_tag0)
+            data_tag1.Add(h_tag1)
         elif syst in promptSysts: 
-            h = getHist("ttX", SIGNAL, syst)
+            h_tag0, h_tag1 = getHist("ttX", SIGNAL, syst)
         else:                     
             continue
         f.cd()
-        h.Write()
+        h_tag0.Write()
+        h_tag1.Write()
     
     print(f"@@@@ processing others...")
     for syst in systematics:
         if syst == "Central":     
-            h = getHist("others", SIGNAL)
-            data.Add(h)
+            h_tag0, h_tag1 = getHist("others", SIGNAL)
+            data_tag0.Add(h_tag0)
+            data_tag1.Add(h_tag1)
         elif syst in promptSysts: 
-            h = getHist("others", SIGNAL, syst)
+            h_tag0, h_tag1 = getHist("others", SIGNAL, syst)
         else:                     
             continue
         f.cd()
-        h.Write()
-    data.Write()
+        h_tag0.Write()
+        h_tag1.Write()
+    data_tag0.Write()
+    data_tag1.Write()
     f.Close()
