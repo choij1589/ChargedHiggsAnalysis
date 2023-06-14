@@ -10,7 +10,7 @@ using namespace std;
 // method2: independently fill two mass variables for each event, store as "mass1" and "mass2" for correlation study
 
 // data field
-const TString ERA = "2017";
+const TString ERA = "2018";
 const TString CHANNEL = "Skim3Mu";
 const TString NETWORK = "GraphNet";     // None, DenseNet, GraphNet
 const TString DATASTREAM = "DoubleMuon";
@@ -20,6 +20,7 @@ const vector<TString> SIGNALs = {"MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90
 const vector<TString> bkg_VV = {"WZTo3LNu_amcatnlo", "ZZTo4L_powheg"};
 const vector<TString> bkg_ttX = {"ttWToLNu", "ttZToLLNuNu", "ttHToNonbb"};
 const vector<TString> bkg_conv = {"DYJets", "DYJets10to50_MG", "ZGToLLG"};
+const vector<TString> bkg_nonprompt_mc = {"TTLL_powheg"};
 const vector<TString> bkg_others = {"WWW", "WWZ", "WZZ", "ZZZ",
                                     "GluGluHToZZTo4L", "VBF_HToZZTo4L",
                                     "tZq", "TTG", "WWG", "TTTT", "tHq"};
