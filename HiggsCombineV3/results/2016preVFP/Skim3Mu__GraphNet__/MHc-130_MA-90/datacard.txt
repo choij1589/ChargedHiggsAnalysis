@@ -1,5 +1,5 @@
-# skip conversion for central event rate 0.000
-# signal xsec scaled to be 15 fb
+# skip conversion for central event rate -0.001
+# signal xsec scaled to be 5 fb
 imax		1 number of bins
 jmax		4 number of bins
 kmax		* number of nuisance parameters
@@ -7,7 +7,7 @@ kmax		* number of nuisance parameters
 shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-130_MA-90	MHc-130_MA-90_$SYSTEMATIC
 --------------------------------------------------
-observation	19.34
+observation	25.1747
 --------------------------------------------------
 bin			bin1		bin1		bin1		bin1		bin1		
 process			signal		nonprompt	diboson		ttX		others		
@@ -16,9 +16,9 @@ rate			-1		-1		-1		-1		-1
 --------------------------------------------------
 bin1		autoMCStats	5
 lumi_13TeV	lnN	1.025		-		1.025		1.025		1.025		
-L1Prefire	lnN	1.010		-		1.010		1.012		1.014		
-PileupReweight	lnN	1.012		-		1.020		1.011		1.003		
-MuonIDSF	lnN	1.022		-		1.015		1.016		1.017		
+L1Prefire	lnN	1.010		-		1.011		1.011		1.012		
+PileupReweight	lnN	1.013		-		1.018		1.010		1.008		
+MuonIDSF	lnN	1.021		-		1.015		1.016		1.017		
 DblMuTrigSF	lnN	1.000		-		1.000		1.000		1.000		
 JetRes		shape	1		-		1		1		1		
 JetEn		shape	1		-		1		1		1		
@@ -27,31 +27,3 @@ ElectronEn	lnN	1.000		-		1.000		1.000		1.000
 ElectronRes	lnN	1.000		-		1.000		1.000		1.000		
 Nonprompt	shape	-		1		-		-		-		
 
-# signal xsec scaled to be 5 fb
-imax		1 number of bins
-jmax		5 number of bins
-kmax		* number of nuisance parameters
---------------------------------------------------
-shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
-shapes	signal	*	shapes_input.root	MHc-130_MA-90	MHc-130_MA-90_$SYSTEMATIC
---------------------------------------------------
-observation	18.1964
---------------------------------------------------
-bin			bin1		bin1		bin1		bin1		bin1		bin1		
-process			signal		nonprompt	conversion	diboson		ttX		others		
-process			0		1		2		3		4		5		
-rate			-1		-1		-1		-1		-1		-1		
---------------------------------------------------
-bin1		autoMCStats	5
-lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
-L1Prefire	lnN	1.013		-		-		1.006		1.005		1.008		
-PileupReweight	lnN	1.040		-		-		1.061		1.433		1.141		
-MuonIDSF	lnN	1.002		-		-		1.013		1.008		1.004		
-DblMuTrigSF	lnN	1.000		-		-		1.000		1.000		1.000		
-JetRes		shape	1		-		-		1		1		1		
-JetEn		lnN	1.016		-		-		1.066		1.008		1.027		
-MuonEn		lnN	1.001		-		-		1.004		1.005		1.002		
-ElectronEn	lnN	1.000		-		-		1.000		1.000		1.000		
-ElectronRes	lnN	1.000		-		-		1.000		1.000		1.000		
-Nonprompt_2016preVFP	lnN	-		2.757		-		-		-		-		
-Conversion	lnN	-		-		1.368		-		-		-		

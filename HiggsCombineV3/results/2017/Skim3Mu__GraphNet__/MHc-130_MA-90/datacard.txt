@@ -6,7 +6,7 @@ kmax		* number of nuisance parameters
 shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-130_MA-90	MHc-130_MA-90_$SYSTEMATIC
 --------------------------------------------------
-observation	69.9979
+observation	52.7293
 --------------------------------------------------
 bin			bin1		bin1		bin1		bin1		bin1		bin1		
 process			signal		nonprompt	conversion	diboson		ttX		others		
@@ -15,14 +15,14 @@ rate			-1		-1		-1		-1		-1		-1
 --------------------------------------------------
 bin1		autoMCStats	5
 lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
-L1Prefire	lnN	1.005		-		-		1.003		1.003		1.001		
-PileupReweight	lnN	1.268		-		-		1.099		1.038		1.096		
-MuonIDSF	lnN	1.022		-		-		1.037		1.033		1.059		
+L1Prefire	lnN	1.005		-		-		1.006		1.007		1.012		
+PileupReweight	shape	1		-		-		1		1		1		
+MuonIDSF	lnN	1.022		-		-		1.016		1.016		1.016		
 DblMuTrigSF	lnN	1.000		-		-		1.000		1.000		1.000		
 JetRes		shape	1		-		-		1		1		1		
 JetEn		shape	1		-		-		1		1		1		
-MuonEn		lnN	1.001		-		-		1.002		1.002		1.001		
+MuonEn		shape	1		-		-		1		1		1		
 ElectronEn	lnN	1.000		-		-		1.000		1.000		1.000		
 ElectronRes	lnN	1.000		-		-		1.000		1.000		1.000		
-Nonprompt_2017	lnN	-		2.057		-		-		-		-		
+Nonprompt	shape	-		1		-		-		-		-		
 Conversion	lnN	-		-		1.374		-		-		-		

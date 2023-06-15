@@ -42,7 +42,7 @@ col_sig = []
 f = ROOT.TFile(f"samples/{args.era}/{args.channel}__GraphNet__/{args.signal}/{args.signal}.root")
 tree = f.Get(f"{args.signal}_Central")
 for idx, evt in enumerate(tree, start=1):
-    condition = (mA - 7*sigma < evt.mass1 < mA + 7*sigma) or (mA - 7*sigma < evt.mass2 < mA + 7*sigma)
+    condition = (mA - 6*sigma < evt.mass1 < mA + 6*sigma) or (mA - 6*sigma < evt.mass2 < mA + 6*sigma)
     if not condition:
         continue
     col_sig.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, 1.])
@@ -52,7 +52,7 @@ col_VV = []
 f = ROOT.TFile(f"samples/{args.era}/{args.channel}__GraphNet__/{args.signal}/diboson.root")
 tree = f.Get("diboson_Central")
 for idx, evt in enumerate(tree, start=1):
-    condition = (mA - 7*sigma < evt.mass1 < mA + 7*sigma) or (mA - 7*sigma < evt.mass2 < mA + 7*sigma)
+    condition = (mA - 6*sigma < evt.mass1 < mA + 6*sigma) or (mA - 6*sigma < evt.mass2 < mA + 6*sigma)
     if not condition:
         continue
     col_VV.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, 0.])
@@ -62,7 +62,7 @@ col_ttX = []
 f = ROOT.TFile(f"samples/{args.era}/{args.channel}__GraphNet__/{args.signal}/ttX.root")
 tree = f.Get("ttX_Central")
 for idx, evt in enumerate(tree, start=1):
-    condition = (mA - 7*sigma < evt.mass1 < mA + 7*sigma) or (mA - 7*sigma < evt.mass2 < mA + 7*sigma)
+    condition = (mA - 6*sigma < evt.mass1 < mA + 6*sigma) or (mA - 6*sigma < evt.mass2 < mA + 6*sigma)
     if not condition:
         continue
     col_ttX.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, 0.])
@@ -72,7 +72,7 @@ col_conv = []
 f = ROOT.TFile(f"samples/{args.era}/{args.channel}__GraphNet__/{args.signal}/conversion.root")
 tree = f.Get("conversion_Central")
 for idx, evt in enumerate(tree, start=1):
-    condition = (mA - 7*sigma < evt.mass1 < mA + 7*sigma) or (mA - 7*sigma < evt.mass2 < mA + 7*sigma)
+    condition = (mA - 6*sigma < evt.mass1 < mA + 6*sigma) or (mA - 6*sigma < evt.mass2 < mA + 6*sigma)
     if not condition:
         continue
     col_conv.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, 0.])
@@ -82,7 +82,7 @@ col_fake = []
 f = ROOT.TFile(f"samples/{args.era}/{args.channel}__GraphNet__/{args.signal}/nonprompt.root")
 tree = f.Get("nonprompt_Central")
 for idx, evt in enumerate(tree, start=1):
-    condition = (mA - 7*sigma < evt.mass1 < mA + 7*sigma) or (mA - 7*sigma < evt.mass2 < mA + 7*sigma)
+    condition = (mA - 6*sigma < evt.mass1 < mA + 6*sigma) or (mA - 6*sigma < evt.mass2 < mA + 6*sigma)
     if not condition:
         continue
     col_fake.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, 0.])
@@ -92,7 +92,7 @@ col_others = []
 f = ROOT.TFile(f"samples/{args.era}/{args.channel}__GraphNet__/{args.signal}/others.root")
 tree = f.Get("others_Central")
 for idx, evt in enumerate(tree, start=1):
-    condition = (mA - 7*sigma < evt.mass1 < mA + 7*sigma) or (mA - 7*sigma < evt.mass2 < mA + 7*sigma)
+    condition = (mA - 6*sigma < evt.mass1 < mA + 7*sigma) or (mA - 6*sigma < evt.mass2 < mA + 6*sigma)
     if not condition:
         continue
     col_others.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, 0.])
@@ -216,8 +216,8 @@ clf = GradientBoostingClassifier(n_estimators=50, max_depth=3)
 clf.fit(X_train, y_train, sample_weight=sw_train)
 print("@@@@ feature importance")
 print(f"@@@@ scoreX = {clf.feature_importances_[0]}")
-print(f"@@@@ scoreX = {clf.feature_importances_[1]}")
-print(f"@@@@ scoreX = {clf.feature_importances_[2]}")
+print(f"@@@@ scoreY = {clf.feature_importances_[1]}")
+print(f"@@@@ scoreZ = {clf.feature_importances_[2]}")
 
 
 ## save the trained results
