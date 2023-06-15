@@ -7,7 +7,7 @@ from helper.fitResults import getFitSigmaValue
 ROOT.gROOT.SetBatch(True)
 
 
-ERA = "2018"
+ERA = "2017"
 CHANNEL = "Skim3Mu"
 
 SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65", 
