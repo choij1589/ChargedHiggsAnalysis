@@ -82,9 +82,10 @@ class DatacardManager():
         part1string += "-"*50
         
         if not self.method == "CutNCount":
-            part2string = "shapes\t*\t*\tshapes_input.root\t$PROCESS\t$PROCESS_$SYSTEMATIC\n"
-            part2string += f"shapes\tsignal\t*\tshapes_input.root\t{self.signal}\t{self.signal}_$SYSTEMATIC\n"
-            part2string += "-"*50
+            part1string += "\n"
+            part1string += "shapes\t*\t*\tshapes_input.root\t$PROCESS\t$PROCESS_$SYSTEMATIC\n"
+            part1string += f"shapes\tsignal\t*\tshapes_input.root\t{self.signal}\t{self.signal}_$SYSTEMATIC\n"
+            part1string += "-"*50
 
         return part1string
     
@@ -126,7 +127,7 @@ class DatacardManager():
     def autoMCstring(self, threshold):
         if self.method == "CutNCount":
             print("[Datacardmanager] autoMCstat only supports for the shape method")
-            return f"signal_region\t\tautoMCStats\t{threshold}"
+        return f"signal_region\tautoMCStats\t{threshold}"
 
     def syststring(self, syst, alias=None, sysType=None, value=None, skip=None, denoteEra=False):
         if syst == "Nonprompt" and (not "nonprompt" in self.backgrounds): return ""
@@ -157,11 +158,11 @@ class DatacardManager():
                     mean_down, stddev_down = self.get_event_statistic(process, f"{syst}Down")
 
                     # if mean & stddev within 0.5%, only vary normalization
-                    if stddev < 10e-6:                          continue
-                    if abs(mean - mean_up)/mean > 0.005:        islnN = True; break
-                    if abs(mean - mean_down)/mean > 0.005:      islnN = True; break
-                    if abs(stddev-stddev_up)/stddev > 0.005:    islnN = True; break
-                    if abs(stddev-stddev_down)/stddev > 0.005:  islnN = True; break
+                    if stddev < 10e-6:                              continue
+                    if abs(mean - mean_up)/mean > 0.005:            islnN = False; break
+                    if abs(mean - mean_down)/mean > 0.005:          islnN = False; break
+                    if abs(stddev-stddev_up)/stddev > 0.005:        islnN = False; break
+                    if abs(stddev-stddev_down)/stddev > 0.005:      islnN = False; break
             if islnN: sysType = "lnN"
             else:     sysType = "shape"
         else:
@@ -220,12 +221,12 @@ if __name__ == "__main__":
         print(manager.syststring(syst="stat", sysType="lnN", alias="norm_diboson", skip=["signal", "nonprompt", "conversion", "ttX", "others"]))
         print(manager.syststring(syst="stat", sysType="lnN", alias="norm_ttX", skip=["signal", "nonprompt", "conversion", "diboson", "others"]))
         print(manager.syststring(syst="stat", sysType="lnN", alias="norm_others", skip=["signal", "nonprompt", "conversion", "diboson", "ttX"]))
-        print(manager.syststring(syst="L1Prefire", sysType="lnN", alias="l1prefire", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="PileupReweight", sysType="lnN", alias="pileup", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="MuonIDSF", sysType="lnN", alias="idsf_muon", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="DblMuTrigSF", sysType="lnN", alias="trig_dblmu", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="JetRes", sysType="shape", alias="res_jet", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="JetEn", sysType="shape", alias="en_jet", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="MuonEn", sysType="shape", alias="en_muon", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="L1Prefire", sysType="lnN", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="PileupReweight", sysType="lnN", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="MuonIDSF", sysType="lnN", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="DblMuTrigSF", sysType="lnN", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="JetRes", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="JetEn", skip=["nonprompt", "conversion"]))
+        print(manager.syststring(syst="MuonEn", skip=["nonprompt", "conversion"]))
         print(manager.syststring(syst="Nonprompt", skip=["signal", "conversion", "diboson", "ttX", "others"]))
-        print(manager.syststring(syst="Conversion", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))
+        print(manager.syststring(syst="Conversion", sysType="lnN", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))

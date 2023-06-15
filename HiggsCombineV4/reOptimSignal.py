@@ -39,6 +39,8 @@ def load_dataset(process, max_window=5):
         if not condition:
             continue
         events.append([evt.scoreX, evt.scoreY, evt.scoreZ, evt.weight, int(process == args.signal)])
+    if len(events) == 0:
+        return None
     return np.array(events)
 
 def plotInput(h_sig, h_bkg, title):
@@ -62,17 +64,18 @@ def plotInput(h_sig, h_bkg, title):
     h_bkg.Draw("hist&same")
     c.SaveAs(f"{outPlotDir}/{title}.png")
 
-def train(max_window):
-    print(f"@@@@ Start training with max_window = {max_window}...")
+def train(max_window, n_estimator=50):
+    print(f"@@@@ Start training with max_window = {max_window}, n_estimator = {n_estimator}...")
     #### load dataset
     events_sig = load_dataset(args.signal, max_window)
-    events_diboson = load_dataset("diboson", max_window)
-    events_ttX = load_dataset("ttX", max_window)
-    events_conversion = load_dataset("conversion", max_window)
-    events_nonprompt = load_dataset("nonprompt", max_window)
-    events_others = load_dataset("others", max_window)
-    events_bkg = np.concatenate([events_diboson, events_ttX, events_conversion, events_nonprompt, events_others], axis=0)
-
+    events_bkg = []
+    for bkg in ["diboson", "ttX", "conversion", "nonprompt", "others"]:
+        events_temp = load_dataset(bkg, max_window)
+        if events_temp is None:
+            continue
+        events_bkg.append(events_temp)
+    events_bkg = np.concatenate(events_bkg, axis=0)
+    
     ## scale signal so that the total events of signals and backgrounds are the same
     hX_sig = ROOT.TH1D("hX_sig", "", 100, 0., 1.)
     hY_sig = ROOT.TH1D("hY_sig", "", 100, 0., 1.)
@@ -114,7 +117,7 @@ def train(max_window):
     X_train, X_test, y_train, y_test, sw_train, sw_test = train_test_split(X, y, weights, test_size=0.4, random_state=42)
     ## train GBclassifier
     print("@@@@ Start training...")
-    clf = GradientBoostingClassifier(n_estimators=50, max_depth=3)
+    clf = GradientBoostingClassifier(n_estimators=n_estimator, max_depth=3)
     clf.fit(X_train, y_train, sample_weight=sw_train)
     print("@@@@ feature importance")
     print(f"@@@@ scoreX = {clf.feature_importances_[0]}")
@@ -143,7 +146,7 @@ def train(max_window):
     print(f"@@@@ ksProbSig = {ksProbSig}")
     print(f"@@@@ ksProbBkg = {ksProbBkg}")
     if ksProbSig < 0.05 or ksProbBkg < 0.05:
-        print("@@@@ failed training with max_window {max_window}")
+        print(f"@@@@ failed training with max_window {max_window}, n_estimator {n_estimator}")
         return False
     
     print("@@@@ save results...")
@@ -165,12 +168,11 @@ def train(max_window):
     hSigTest.Scale(1./hSigTest.Integral())
     hBkgTest.Scale(1./hBkgTest.Integral())
     yMax = max(hSigTrain.GetMaximum(), hBkgTrain.GetMaximum())
-    hSigTrain.GetYaxis().SetRangeUser(0., yMax*1.4)
-    hSigTrain.SetTitle("GB classifier score")
+    hSigTrain.GetYaxis().SetRangeUser(0., yMax*1.6)
+    hSigTrain.SetTitle("Gradient Boosting Classifier")
     hSigTrain.GetXaxis().SetTitle("score")
     hSigTrain.GetYaxis().SetTitle("events")
-    ksProbSigText = ROOT.TLatex()
-    ksProbBkgText = ROOT.TLatex()
+    latex = ROOT.TLatex()
     
     c = ROOT.TCanvas()
     c.cd()
@@ -178,8 +180,11 @@ def train(max_window):
     hBkgTrain.Draw("hist&same")
     hSigTest.Draw("p&same")
     hBkgTest.Draw("p&same")
-    ksProbSigText.DrawLatexNDC(0.5, 0.8, f"ks score (sig) = {ksProbSig}")
-    ksProbBkgText.DrawLatexNDC(0.5, 0.75, f"ks score (bkg) = {ksProbBkg}")
+    latex.DrawLatexNDC(0.6, 0.83, f"n_estimator = {n_estimator}")
+    latex.DrawLatexNDC(0.6, 0.78, "max_depth = 3")
+    latex.DrawLatexNDC(0.2, 0.85, f"mass window = {max_window}"+"#sigma_{A}")
+    latex.DrawLatexNDC(0.2, 0.8, f"ks score (sig) = {ksProbSig}")
+    latex.DrawLatexNDC(0.2, 0.75, f"ks score (bkg) = {ksProbBkg}")
     c.SaveAs(f"{outPlotDir}/finalScore.png")
 
     #### save the classifier
@@ -220,22 +225,24 @@ def train(max_window):
     print(f"@@@@ initMetric = {initMetric:.3f}")
     print(f"@@@@ bestMetric = {bestMetric:.3f}")
     print(f"@@@@ improvement = {improvement*100:.2f}%")
-    print(f"@@@@ best cut = {bestCut}")
+    print(f"@@@@ best cut = {bestCut:.2f}")
     graph.SetLineColor(ROOT.kBlack)
     graph.SetLineWidth(2)
     graph.GetXaxis().SetTitle("score")
     graph.GetYaxis().SetTitle("test statistic")
-    improvementText = ROOT.TLatex()
-    bestCutText = ROOT.TLatex()
+    latex = ROOT.TLatex()
     c = ROOT.TCanvas()
     c.cd()
     graph.Draw()
-    bestCutText.DrawLatexNDC(0.15, 0.83, f"best cut = {bestCut}")
-    improvementText.DrawLatexNDC(0.15, 0.78, f"improved {improvement*100:.2f}%")
+    latex.DrawLatexNDC(0.15, 0.83, f"best cut = {bestCut}")
+    latex.DrawLatexNDC(0.15, 0.78, f"initMetric = {initMetric:.3f}")
+    latex.DrawLatexNDC(0.15, 0.73, f"bestMetric = {bestMetric:.3f}")
+    latex.DrawLatexNDC(0.15, 0.68, f"improved {improvement*100:.2f}%")
     c.SaveAs(f"{outPlotDir}/metric.png")
     return True
     
 if __name__ == "__main__":
     for max_window in [5, 5.5, 6, 6.5, 7]:
-        if train(max_window): break
-        print()
+        for n_estimator in [50, 40, 30]:
+            if train(max_window, n_estimator):
+                exit(0)

@@ -11,7 +11,7 @@ using namespace std;
 // before using any method, it is easier to make trees that store needed informations
 
 // data field
-const TString ERA = "2018";
+const TString ERA = "2017";
 const TString CHANNEL = "Skim3Mu";
 const TString NETWORK = "GraphNet";     // None, GraphNet
 const TString DATASTREAM = "DoubleMuon";
