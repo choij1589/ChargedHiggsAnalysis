@@ -4,7 +4,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
  
 # Style and pads
-ERA = "2018"
+ERA = "2016postVFP"
 CHANNEL = "Skim3Mu"
 
 lumiDict = {
@@ -37,7 +37,7 @@ legend = PositionedLegend(0.3, 0.2, 3, 0.015)
  
 # Set the standard green and yellow colors and draw
 StyleLimitBand(graphs)
-DrawLimitBand(pads[0], graphs, draw=['exp2', 'exp1', 'exp0', 'obs'], legend=legend)
+DrawLimitBand(pads[0], graphs, draw=['exp2', 'exp1', 'exp0'], legend=legend)
 #cnc = graphs_cnc["exp0"]
 #cnc.SeNoCutColor(ROOT.kGray)
 #cnc.SetLineWidth(2)
@@ -50,10 +50,12 @@ withcut.Draw("LSAME")
 #legend.AddEntry(withcut, "Expected (with GNN optim)", "L")
 
 nocut = graphs_nocut["exp0"]
-nocut.SetLineColor(ROOT.kInvertedDarkBodyRadiator)
-nocut.SetLineWidth(2)
+#nocut.SetLineColor(ROOT.kInvertedDarkBodyRadiator)
+nocut.SetLineColor(ROOT.kViolet)
+nocut.SetLineWidth(3)
+nocut.SetLineStyle(4)
 nocut.Draw("LSAME")
-legend.AddEntry(nocut, "Expected (no GNN optim)", "L") 
+legend.AddEntry(nocut, "Expected (no GNN)", "L")
 
 # Redraw central values
 graphs["exp0"].Draw("LSAME")

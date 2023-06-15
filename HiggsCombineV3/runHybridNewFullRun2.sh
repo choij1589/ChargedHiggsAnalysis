@@ -4,7 +4,7 @@ CHANNEL=$2
 MASSPOINT=$3
 
 HOMEDIR=$PWD
-BASEDIR=${HOMEDIR}/results/FullRun2__/Skim3Mu__GraphNet__/${MASSPOINT}
+BASEDIR=${HOMEDIR}/results/FullRun2/Skim3Mu__GraphNet__/${MASSPOINT}
 echo $BASEDIR
 
 # prepare datacard

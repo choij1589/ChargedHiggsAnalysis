@@ -169,5 +169,5 @@ if __name__ == "__main__":
     print(manager.syststring(syst="lumi_13TeV", type="lnN", value=1.025, skip=["nonprompt", "conversion"]))
     for syst in promptSysts:
         print(manager.syststring(syst=syst, skip=["nonprompt", "conversion"]))
-    print(manager.syststring(syst="Nonprompt", skip=["signal", "conversion", "diboson", "ttX", "others"], denoteEra=True))
+    print(manager.syststring(syst="Nonprompt", skip=["signal", "conversion", "diboson", "ttX", "others"]))
     print(manager.syststring(syst="Conversion", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))

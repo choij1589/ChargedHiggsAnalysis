@@ -1,31 +1,3 @@
-# signal xsec scaled to be 15 fb
-imax		1 number of bins
-jmax		5 number of bins
-kmax		* number of nuisance parameters
---------------------------------------------------
-shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
-shapes	signal	*	shapes_input.root	MHc-70_MA-65	MHc-70_MA-65_$SYSTEMATIC
---------------------------------------------------
-observation	5.51
---------------------------------------------------
-bin			bin1		bin1		bin1		bin1		bin1		bin1		
-process			signal		nonprompt	conversion	diboson		ttX		others		
-process			0		1		2		3		4		5		
-rate			-1		-1		-1		-1		-1		-1		
---------------------------------------------------
-bin1		autoMCStats	5
-lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
-L1Prefire	lnN	1.010		-		-		1.012		1.012		1.013		
-PileupReweight	shape	1		-		-		1		1		1		
-MuonIDSF	lnN	1.022		-		-		1.023		1.021		1.024		
-DblMuTrigSF	lnN	1.000		-		-		1.000		1.000		1.000		
-JetRes		shape	1		-		-		1		1		1		
-JetEn		shape	1		-		-		1		1		1		
-MuonEn		shape	1		-		-		1		1		1		
-ElectronEn	lnN	1.000		-		-		1.000		1.000		1.000		
-ElectronRes	lnN	1.000		-		-		1.000		1.000		1.000		
-Nonprompt	shape	-		1		-		-		-		-		
-Conversion	lnN	-		-		1.368		-		-		-		
 # signal xsec scaled to be 5 fb
 imax		1 number of bins
 jmax		5 number of bins
@@ -34,7 +6,7 @@ kmax		* number of nuisance parameters
 shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-70_MA-65	MHc-70_MA-65_$SYSTEMATIC
 --------------------------------------------------
-observation	5.8462
+observation	5.5365
 --------------------------------------------------
 bin			bin1		bin1		bin1		bin1		bin1		bin1		
 process			signal		nonprompt	conversion	diboson		ttX		others		
@@ -43,14 +15,14 @@ rate			-1		-1		-1		-1		-1		-1
 --------------------------------------------------
 bin1		autoMCStats	5
 lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
-L1Prefire	lnN	1.009		-		-		1.006		1.005		1.008		
-PileupReweight	lnN	1.641		-		-		1.061		1.433		1.141		
-MuonIDSF	lnN	1.005		-		-		1.013		1.008		1.004		
+L1Prefire	lnN	1.010		-		-		1.010		1.012		1.014		
+PileupReweight	shape	1		-		-		1		1		1		
+MuonIDSF	lnN	1.022		-		-		1.022		1.021		1.025		
 DblMuTrigSF	lnN	1.000		-		-		1.000		1.000		1.000		
 JetRes		shape	1		-		-		1		1		1		
 JetEn		shape	1		-		-		1		1		1		
 MuonEn		shape	1		-		-		1		1		1		
 ElectronEn	lnN	1.000		-		-		1.000		1.001		1.000		
 ElectronRes	lnN	1.000		-		-		1.000		1.000		1.000		
-Nonprompt_2016preVFP	lnN	-		2.757		-		-		-		-		
+Nonprompt	shape	-		1		-		-		-		-		
 Conversion	lnN	-		-		1.368		-		-		-		
