@@ -1,0 +1,27 @@
+# signal xsec scaled to be 5 fb
+imax			1 number of bins
+jmax			5 number of bins
+kmax			* number of nuisance parameters
+--------------------------------------------------
+bin			signal_region
+observation		13.36
+--------------------------------------------------
+bin			signal_region	signal_region	signal_region	signal_region	signal_region	signal_region	
+process			signal		nonprompt	conversion	diboson		ttX		others		
+process			0		1		2		3		4		5		
+rate			3.64		6.67		0.16		2.15		3.24		1.14		
+--------------------------------------------------
+lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
+norm_signal	lnN	1.005		-		-		-		-		-		
+norm_diboson	lnN	-		-		-		1.120		-		-		
+norm_ttX	lnN	-		-		-		-		1.033		-		
+norm_others	lnN	-		-		-		-		-		1.122		
+l1prefire	lnN	1.010		-		-		1.010		1.012		1.013		
+pileup		lnN	1.012		-		-		1.012		1.012		1.031		
+idsf_muon	lnN	1.018		-		-		1.015		1.015		1.019		
+trig_dblmu	lnN	1.000		-		-		1.000		1.000		1.000		
+res_jet		lnN	1.002		-		-		1.052		1.001		1.011		
+en_jet		lnN	1.015		-		-		1.058		1.002		1.011		
+en_muon		lnN	1.001		-		-		1.025		1.007		1.009		
+nonprompt	lnN	-		1.732		-		-		-		-		
+conversion	lnN	-		-		1.368		-		-		-		

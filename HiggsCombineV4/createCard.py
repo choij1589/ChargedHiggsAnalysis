@@ -52,7 +52,7 @@ class DatacardManager():
                 else:                           
                     if process == "signal": h = self.rtfile.Get(f"{args.masspoint}_{syst}")
                     else:                   h = self.rtfile.Get(f"{process}_{syst}")
-                content = h.IntegralAndError(0, h.GetNbinsX()+1, err)
+                content = h.IntegralAndError(1, h.GetNbinsX(), err)
                 if syst == "stat": return err.value
                 else:              return content
 
@@ -73,7 +73,7 @@ class DatacardManager():
         if syst == "stat":
             return 1. + self.get_event_rate(process, syst) / self.get_event_rate(process)
         else:
-            return 1. + abs(self.get_event_rate(process, syst) / self.get_event_rate(process) - 1.)
+            return 1. + abs(max(self.get_event_rate(process, syst), 0.) / self.get_event_rate(process) - 1.)
     
     def part1string(self):
         part1string = f"imax\t\t\t1 number of bins\n"
@@ -96,7 +96,7 @@ class DatacardManager():
         else:
             observation = self.get_event_rate("data_obs")
         part2string = "bin\t\t\tsignal_region\n"
-        part2string += f"observation\t\t{observation:.2f}\n"
+        part2string += f"observation\t\t{observation:.4f}\n"
         part2string += "-"*50
         return part2string
     
@@ -149,7 +149,7 @@ class DatacardManager():
                 rate_down = self.get_event_rate(process, f"{syst}Down")
                 if not (rate_up >0. and rate_down > 0.): islnN = True
 
-            # not check the mean and stddev
+            # now check the mean and stddev
             if not islnN:
                 for process in ["signal"]+self.backgrounds:
                     if process in skip: continue
@@ -163,6 +163,16 @@ class DatacardManager():
                     if abs(mean - mean_down)/mean > 0.005:          islnN = False; break
                     if abs(stddev-stddev_up)/stddev > 0.005:        islnN = False; break
                     if abs(stddev-stddev_down)/stddev > 0.005:      islnN = False; break
+                
+			    # final check for nonprompt & conversion
+                #if syst == "Nonprompt":
+                #    rate_up = self.get_event_rate("nonprompt", "NonpromptUp")
+                #    rate_down = self.get_event_rate("nonprompt", "NonpromptDown")
+                #    if not (rate_up > 0. and rate_down > 0.): islnN = True
+                #if syst == "Conversion":
+                #    rate_up = self.get_event_rate("conversion", "ConversionUp")
+                #    rate_down = self.get_event_rate("conversion", "ConversionDown")
+                #    if not (rate_up > 0. and rate_down > 0.): islnN = True
             if islnN: sysType = "lnN"
             else:     sysType = "shape"
         else:
@@ -229,4 +239,4 @@ if __name__ == "__main__":
         print(manager.syststring(syst="JetEn", skip=["nonprompt", "conversion"]))
         print(manager.syststring(syst="MuonEn", skip=["nonprompt", "conversion"]))
         print(manager.syststring(syst="Nonprompt", skip=["signal", "conversion", "diboson", "ttX", "others"]))
-        print(manager.syststring(syst="Conversion", sysType="lnN", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))
+        print(manager.syststring(syst="Conversion", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))
