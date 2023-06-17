@@ -7,7 +7,7 @@ shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-70_MA-40	MHc-70_MA-40_$SYSTEMATIC
 --------------------------------------------------
 bin			signal_region
-observation		11.68
+observation		11.6835
 --------------------------------------------------
 bin			signal_region	signal_region	signal_region	signal_region	signal_region	signal_region	
 process			signal		nonprompt	conversion	diboson		ttX		others		
