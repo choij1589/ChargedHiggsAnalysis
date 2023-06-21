@@ -16,10 +16,6 @@ rate			-1		-1		-1		-1		-1		-1
 --------------------------------------------------
 signal_region	autoMCStats	5
 lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
-norm_signal	lnN	1.004		-		-		-		-		-		
-norm_diboson	lnN	-		-		-		1.103		-		-		
-norm_ttX	lnN	-		-		-		-		1.027		-		
-norm_others	lnN	-		-		-		-		-		1.115		
 L1Prefire	lnN	1.006		-		-		1.004		1.007		1.011		
 PileupReweight	lnN	1.009		-		-		1.042		1.010		1.021		
 MuonIDSF	lnN	1.034		-		-		1.032		1.029		1.030		

@@ -1,0 +1,17 @@
+# signal xsec scaled to be 5 fb
+imax			1 number of bins
+jmax			4 number of bins
+kmax			* number of nuisance parameters
+--------------------------------------------------
+shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
+shapes	signal	*	shapes_input.root	MHc-160_MA-85	MHc-160_MA-85_$SYSTEMATIC
+--------------------------------------------------
+bin			signal_region
+observation		16.6101
+--------------------------------------------------
+bin			signal_region	signal_region	signal_region	signal_region	signal_region	
+process			signal		nonprompt	diboson		ttX		others		
+process			0		1		2		3		4		
+rate			-1		-1		-1		-1		-1		
+--------------------------------------------------
+signal_region	autoMCStats	5

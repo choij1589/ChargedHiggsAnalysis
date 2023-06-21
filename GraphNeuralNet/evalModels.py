@@ -28,6 +28,7 @@ BKG = args.background
 
 lenGenerations = 5
 lenChromosomes = 12
+nModels = 10
 
 def getChromosomes(SIG, BKG, top=10):
     BASEDIR = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}" 
@@ -165,7 +166,7 @@ validLoader = DataLoader(validset, batch_size=1024, shuffle=False, pin_memory=Tr
 testLoader  = DataLoader(testset, batch_size=1024, shuffle=False, pin_memory=True)
 
 #### load models
-chromosomes = getChromosomes(SIG, BKG, top=10)
+chromosomes = getChromosomes(SIG, BKG, top=nModels)
 models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
@@ -270,7 +271,7 @@ f = TFile.Open(f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/results/score
 tree = f.Get("Events")
 
 scores = {}
-for idx in range(10):
+for idx in range(nModels):
     scores[f"model{idx}"] = array('f', [0.]); tree.SetBranchAddress(f"score-model{idx}", scores[f"model{idx}"])
 trainMask = array("B", [False]); tree.SetBranchAddress(f"trainMask", trainMask)
 validMask = array("B", [False]); tree.SetBranchAddress(f"validMask", validMask)
@@ -279,7 +280,7 @@ signalMask = array("B", [False]); tree.SetBranchAddress(f"signalMask", signalMas
 
 bestModelIdx = -1
 fitness = 0.
-for idx in range(10):
+for idx in range(nModels):
     ksProbSig, ksProbBkg = getKSprob(tree, idx)
     print(idx, ksProbSig, ksProbBkg)
     if not (ksProbSig > 0.05 and ksProbBkg > 0.05): continue

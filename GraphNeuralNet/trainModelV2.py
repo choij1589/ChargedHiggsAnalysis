@@ -169,7 +169,7 @@ if __name__ == "__main__":
     earlyStopper = EarlyStopper(patience=15, path=checkptpath)
     summaryWriter = SummaryWriter(name=modelName)
 
-    for epoch in range(90):
+    for epoch in range(120):
         train(model, optimizer, scheduler)
         trainLoss, trainAcc = test(model, trainLoader)
         validLoss, validAcc = test(model, validLoader)
