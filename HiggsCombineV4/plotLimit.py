@@ -4,7 +4,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
  
 # Style and pads
-ERA = "2018"
+ERA = "2017"
 CHANNEL = "Skim3Mu"
 METHOD = "GNNOptim"
 
@@ -83,7 +83,7 @@ pads[0].GetFrame().Draw()
 # Adjust the y-axis range such that the maximum graph value sits 25% below
 # the top of the frame. Fix the minimum to zero.
 #FixBothRanges(pads[0], 0, 0, GetPadYMax(pads[0]), 0.25)
-FixBothRanges(pads[0], 0, 0, 10, 0.25)
+FixBothRanges(pads[0], 0, 0, 20, 0.25)
 
 # Standard CMS logo
 DrawCMSLogo(pads[0], 'CMS', 'Internal', 11, 0.045, 0.035, 1.2, '', 0.8)

@@ -16,10 +16,6 @@ rate			-1		-1		-1		-1		-1		-1
 --------------------------------------------------
 signal_region	autoMCStats	5
 lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
-norm_signal	lnN	1.004		-		-		-		-		-		
-norm_diboson	lnN	-		-		-		1.082		-		-		
-norm_ttX	lnN	-		-		-		-		1.019		-		
-norm_others	lnN	-		-		-		-		-		1.102		
 L1Prefire	lnN	1.005		-		-		1.005		1.006		1.009		
 PileupReweight	lnN	1.006		-		-		1.052		1.012		1.027		
 MuonIDSF	lnN	1.022		-		-		1.026		1.022		1.025		
@@ -27,5 +23,5 @@ DblMuTrigSF	lnN	1.000		-		-		1.000		1.000		1.000
 JetRes		shape	1		-		-		1		1		1		
 JetEn		shape	1		-		-		1		1		1		
 MuonEn		shape	1		-		-		1		1		1		
-Nonprompt	shape	-		1		-		-		-		-		
+Nonprompt	lnN	-		1.980		-		-		-		-		
 Conversion	shape	-		-		1		-		-		-		

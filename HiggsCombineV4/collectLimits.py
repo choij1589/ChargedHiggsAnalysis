@@ -1,6 +1,7 @@
 import argparse
 import json
 import ROOT
+from pprint import pprint
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--era", type=str, required=True, help="era")
@@ -8,7 +9,7 @@ parser.add_argument("--channel", type=str, required=True, help="channel")
 parser.add_argument("--method", type=str, required=True, help="used method")
 args = parser.parse_args()
 
-MASSPOINTs = ["MHc-130_MA-15", "MHc-70_MA-40", "MHc-130_MA-55", "MHc-100_MA-60",
+MASSPOINTs = ["MHc-100_MA-15", "MHc-70_MA-40", "MHc-130_MA-55", "MHc-100_MA-60",
               "MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95",
               "MHc-160_MA-120", "MHc-130_MA-125", "MHc-160_MA-155"]
 
@@ -32,22 +33,21 @@ def parseAsymptoticLimit(masspoint):
     return out
 
 def readHybridNewResult(path):
-    f = ROOT.TFile(path)
     print(path)
+    f = ROOT.TFile(path)
     limit = f.Get("limit")
     try:
         for entry in limit:
             out = entry.limit
-            #print(out)
     except Exception as e:
-        print(path)
         print(e)
+    f.Close()
     return out * 5
 
 def parseHybridNewLimit(masspoint):
     BASEDIR = f"results/{args.era}/{args.channel}__{args.method}__/{masspoint}"
     
-    if args.method == "GNNOptim" and masspoint not in MASSPOINTsGNN:
+    if args.method == "GNNOptim" and (masspoint not in MASSPOINTsGNN):
         BASEDIR = f"results/{args.era}/{args.channel}__Shape__/{masspoint}"
         
     out = {}
@@ -61,9 +61,12 @@ def parseHybridNewLimit(masspoint):
 
 limits = {}
 for masspoint in MASSPOINTs:
+    print(masspoint)
     mA = masspoint.split("_")[1].split("-")[1]
-    limits[mA] = parseHybridNewLimit(masspoint)
+    out = parseHybridNewLimit(masspoint)
+    print(out)
+    limits[mA] = out
 
-print(limits)
+pprint(limits)
 with open(f"limits/limits.{args.era}.{args.channel}.HybridNew.{args.method}.json", "w") as f:
     json.dump(limits, f, indent=2)

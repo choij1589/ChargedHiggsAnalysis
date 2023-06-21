@@ -1,6 +1,6 @@
 #!/bin/sh
 if [[ $HOSTNAME == *"tamsa2"* ]]; then
-    echo "@@@@ Working on tamsa2"
+    echo @@@@ Working on tamsa2
     export WORKDIR="/data6/Users/choij/ChargedHiggsAnalysis"
 
     # Python setup
@@ -8,6 +8,12 @@ if [[ $HOSTNAME == *"tamsa2"* ]]; then
     # ROOT setup
 	source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/tbb/2020_U2/x86_64-centos7-gcc8-opt/tbb-env.sh
     source /cvmfs/sft.cern.ch/lcg/releases/LCG_102cuda/ROOT/6.26.04/x86_64-centos7-gcc8-opt/ROOT-env.sh
+elif [[ $HOSTNAME == *"cms2"* ]]; then
+	echo @@@@ Working on cms2
+	export WORKDIR="/data6/Users/choij/ChargedHiggsAnalysis"
+	echo @@@@ WORKDIR=$WORKDIR
+	source $HOME/miniconda3/bin/activate
+	conda activate torch
 else
     echo @@@@ Working in local...
     export WORKDIR="$HOME/workspace/ChargedHiggsAnalysis"
