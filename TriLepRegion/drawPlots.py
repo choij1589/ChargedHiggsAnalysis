@@ -3,7 +3,7 @@ import argparse
 import ROOT
 from math import pow, sqrt
 from Plotter import ComparisonCanvas, KinematicCanvas
-from histConfigs import histConfigs
+from TriLepRegion.histConfigs import histConfigs
 
 # NO graphics
 ROOT.gROOT.SetBatch(True)
@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--era", required=True, type=str, help="era")
 parser.add_argument("--key", required=True, type=str, help="histkey")
 parser.add_argument("--channel", required=True, type=str, help="channel")
-parser.add_argument("--network", required=True, type=str, help="ML model architecture (DenseNet / GraphNet)")
+parser.add_argument("--network", default="GraphNet", type=str, help="ML model architecture (DenseNet / GraphNet)")
 parser.add_argument("--blind", action="store_true", help="blind mode")
 args = parser.parse_args()
 
@@ -48,8 +48,10 @@ if "3Mu" in args.channel:
     convSFLowPT = ConvSF["LowPT3Mu"]
     convSFHighPT = ConvSF["HighPT3Mu"]
 
-
-MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+if "MHc" in args.key:
+    MASSPOINTs = [args.key.split("/")[0]]
+else:
+    MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
 #### Systematics
 SYSTEMATICs = [["L1PrefireUp", "L1PrefireDown"],
                ["PileupReweightUp", "PileupReweightDown"],
@@ -102,7 +104,7 @@ for bin in range(fake.GetNcells()):
     thisError += pow(max(systUp, systDown), 2)
     thisError = sqrt(thisError)
     fake.SetBinError(bin, thisError)
-HISTs["fake"] = fake
+HISTs["nonprompt"] = fake
 
 ## Conversion
 fstring = f"{WORKDIR}/data/PromptEstimator/{args.era}/Skim3Mu__{args.network}__ScaleVar__WeightVar__/PromptEstimator_SkimTree_SS2lOR3l_DYJets.root"
@@ -188,25 +190,25 @@ def addHist(name, hist, histDict):
         histDict[name].Add(hist)
 
 temp_dict = {}
-temp_dict["fake"] = None
-temp_dict["conv"] = None
+temp_dict["nonprompt"] = None
+temp_dict["conversion"] = None
 temp_dict["ttX"] = None
-temp_dict["VV"] = None
-temp_dict["rare"] = None
+temp_dict["diboson"] = None
+temp_dict["others"] = None
 
-addHist("fake", HISTs['fake'], temp_dict)
+addHist("nonprompt", HISTs['nonprompt'], temp_dict)
 for sample in CONV:
     if not sample in HISTs.keys(): continue
-    addHist("conv", HISTs[sample], temp_dict)
+    addHist("conversion", HISTs[sample], temp_dict)
 for sample in TTX:
     if not sample in HISTs.keys(): continue
     addHist("ttX", HISTs[sample], temp_dict)
 for sample in VV:
     if not sample in HISTs.keys(): continue
-    addHist("VV", HISTs[sample], temp_dict)
+    addHist("diboson", HISTs[sample], temp_dict)
 for sample in RARE:
     if not sample in HISTs.keys(): continue
-    addHist("rare", HISTs[sample], temp_dict)
+    addHist("others", HISTs[sample], temp_dict)
 
 #### remove none histogram
 BKGs = {}
@@ -214,16 +216,16 @@ for key, value in temp_dict.items():
     if temp_dict[key] is None: continue
     BKGs[key] = value
 
-colorList = [ROOT.kGray, ROOT.kBlue, ROOT.kBlack, ROOT.kRed]
+colorList = [ROOT.kBlack, ROOT.kBlue, ROOT.kGray, ROOT.kRed]
 for i, masspoint in enumerate(MASSPOINTs):
     COLORs[masspoint] = colorList[i]
 
 COLORs["data"] = ROOT.kBlack
-COLORs['fake'] = ROOT.kGray+2
+COLORs['nonprompt'] = ROOT.kGray+2
 COLORs["ttX"] = ROOT.kBlue
-COLORs["conv"] = ROOT.kViolet
-COLORs["VV"] = ROOT.kGreen
-COLORs["rare"] = ROOT.kAzure
+COLORs["conversion"] = ROOT.kViolet
+COLORs["diboson"] = ROOT.kGreen
+COLORs["others"] = ROOT.kAzure
 
 #### draw plots
 if args.blind:

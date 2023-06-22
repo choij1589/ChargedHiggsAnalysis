@@ -21,7 +21,7 @@ class KinematicCanvas():
         self.config = config
         
         # initialize default settings
-        self.cvs = TCanvas("c", "", 720, 900)
+        self.cvs = TCanvas("c", "", 800, 800)
         self.cvs.SetLeftMargin(0.115)
         self.cvs.SetRightMargin(0.08)
         self.lumi = TLatex()
@@ -38,10 +38,10 @@ class KinematicCanvas():
         self.backgrounds = None
         self.stack = THStack("stack", "")
         self.systematics = None
-        self.sigLegend = TLegend(0.65, 0.6, 0.95, 0.8)
+        self.sigLegend = TLegend(0.67, 0.6, 0.9, 0.8)
         self.sigLegend.SetFillStyle(0)
         self.sigLegend.SetBorderSize(0)
-        self.bkgLegend = TLegend(0.5, 0.6, 0.65, 0.8)
+        self.bkgLegend = TLegend(0.5, 0.6, 0.67, 0.8)
         self.bkgLegend.SetFillStyle(0)
         self.bkgLegend.SetBorderSize(0)
         
@@ -121,11 +121,11 @@ class KinematicCanvas():
         self.stack.GetHistogram().GetYaxis().SetTitleSize(0.04)
         self.stack.GetHistogram().GetYaxis().SetLabelSize(0.04)
 
-        maximum = self.stack.GetHistogram().GetMaximum()
+        maximum = max([h.GetMaximum() for h in self.signals.values()] +[self.stack.GetHistogram().GetMaximum()])
         if self.logy:
-            self.stack.GetHistogram().GetYaxis().SetRangeUser(1e-2, maximum*100.)
+            self.stack.GetHistogram().GetYaxis().SetRangeUser(1e-2, maximum*500.)
             for hist in self.signals.values():
-                hist.GetYaxis().SetRangeUser(1e-2, maximum*100.)
+                hist.GetYaxis().SetRangeUser(1e-2, maximum*500.)
         else:
             self.stack.GetHistogram().GetYaxis().SetRangeUser(0., maximum*2.)
             for hist in self.signals.values():
