@@ -132,7 +132,7 @@ def rtfileToDataListV2(rtfile, isSignal, maxSize=-1):
             data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt, MT]], dtype=torch.float)
         else:
             print(f"Wrong size of muons {len(muons)} and electrons {len(electrons)}")
-            exit(1)
+            raise(ValueError)
         dataList.append(data)
 
         if len(dataList) == maxSize: break
