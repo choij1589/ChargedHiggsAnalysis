@@ -4,7 +4,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
  
 # Style and pads
-ERA = "2017"
+ERA = "FullRun2"
 CHANNEL = "Skim3Mu"
 
 lumiDict = {
@@ -45,12 +45,12 @@ DrawLimitBand(pads[0], graphs_low, draw=['exp2', 'exp1', 'exp0'])
 DrawLimitBand(pads[0], graphs_med, draw=['exp2', 'exp1', 'exp0'], legend=legend)
 DrawLimitBand(pads[0], graphs_high, draw=['exp2', 'exp1', 'exp0'])
 
-leftLine = ROOT.TLine(65, 0., 65, 7.);
+leftLine = ROOT.TLine(65, 0.1, 65, 3.5);
 leftLine.SetLineColor(ROOT.kBlack)
 leftLine.SetLineWidth(2)
 leftLine.Draw("same")
 
-rightLine = ROOT.TLine(120, 0., 120, 7.);
+rightLine = ROOT.TLine(120, 0.1, 120, 3.5);
 rightLine.SetLineColor(ROOT.kBlack)
 rightLine.SetLineWidth(2)
 rightLine.Draw("same")
@@ -68,7 +68,7 @@ pads[0].GetFrame().Draw()
 # Adjust the y-axis range such that the maximum graph value sits 25% below
 # the top of the frame. Fix the minimum to zero.
 #FixBothRanges(pads[0], 0, 0, GetPadYMax(pads[0]), 0.25)
-FixBothRanges(pads[0], 0, 0, 12, 0.25)
+FixBothRanges(pads[0], 0, 0, 7, 0.25)
 
 # Standard CMS logo
 DrawCMSLogo(pads[0], 'CMS', 'Internal', 11, 0.045, 0.035, 1.2, '', 0.8)

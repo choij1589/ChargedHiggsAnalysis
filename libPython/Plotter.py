@@ -21,7 +21,7 @@ class KinematicCanvas():
         self.config = config
         
         # initialize default settings
-        self.cvs = TCanvas("c", "", 800, 800)
+        self.cvs = TCanvas("c", "", 1600, 1600)
         self.cvs.SetLeftMargin(0.115)
         self.cvs.SetRightMargin(0.08)
         self.lumi = TLatex()
@@ -38,10 +38,10 @@ class KinematicCanvas():
         self.backgrounds = None
         self.stack = THStack("stack", "")
         self.systematics = None
-        self.sigLegend = TLegend(0.67, 0.6, 0.9, 0.8)
+        self.sigLegend = TLegend(0.67, 0.65, 0.9, 0.85)
         self.sigLegend.SetFillStyle(0)
         self.sigLegend.SetBorderSize(0)
-        self.bkgLegend = TLegend(0.5, 0.6, 0.67, 0.8)
+        self.bkgLegend = TLegend(0.5, 0.65, 0.67, 0.85)
         self.bkgLegend.SetFillStyle(0)
         self.bkgLegend.SetBorderSize(0)
         
@@ -66,8 +66,8 @@ class KinematicCanvas():
             hist.SetStats(0)
             color = colors[hist.GetName()]
             hist.SetLineColor(color)
-            hist.SetLineWidth(3)
-            hist.SetMarkerColor(color)
+            hist.SetLineWidth(4)
+            hist.SetFillColorAlpha(color, 0.2)
 
         # X axis
         xRange = None
@@ -96,7 +96,7 @@ class KinematicCanvas():
         for hist in self.backgrounds.values():
             hist.SetStats(0)
             color = colors[hist.GetName()]
-            hist.SetFillColorAlpha(color, 0.65)
+            hist.SetFillColorAlpha(color, 0.5)
 
         for hist in self.backgrounds.values():
             self.stack.Add(hist)
@@ -152,7 +152,7 @@ class KinematicCanvas():
         self.systematics.Draw("e2&f&same")
         for hist in self.signals.values():
             hist.Draw("hist&same")
-            hist.Draw("p&hist&same")
+            hist.Draw("f&hist&same")
         self.sigLegend.Draw()
         self.bkgLegend.Draw()
         self.lumi.DrawLatexNDC(0.61, 0.91, self.lumiString)

@@ -21,18 +21,39 @@ do
     BASEDIR=${HOMEDIR}/results/${ERA}/${CHANNEL}__${METHOD}__/${MASSPOINT}
     # prepare datacard
     mkdir -p $BASEDIR
-    python3 createCard.py --era $ERA --channel $CHANNEL --masspoint $MASSPOINT --method $METHOD >> ${BASEDIR}/datacard.txt
-    cd ${BASEDIR}
+    if [ $ERA == "FullRun2" ]; then
+        combineCards.py era2016a=results/2016preVFP/Skim3Mu__${METHOD}__/${MASSPOINT}/datacard.txt \
+                        era2016b=results/2016postVFP/Skim3Mu__${METHOD}__/${MASSPOINT}/datacard.txt \
+                        era2017=results/2017/Skim3Mu__${METHOD}__/${MASSPOINT}/datacard.txt \
+                        era2018=results/2018/Skim3Mu__${METHOD}__/${MASSPOINT}/datacard.txt >> datacard.txt
 
-    # run combine
-	text2workspace.py datacard.txt -o workspace.root
-    combine -M AsymptoticLimits workspace.root -t -1
-    combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.025     # 95% down
-    combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.160     # 68% down
-    combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.500     # median
-    combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.840     # 68% up
-    combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.975     # 95% up
-    combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24
+        # run combine
+        text2workspace.py datacard.txt -o workspace.root
+        combine -M AsymptoticLimits workspace.root -t -1
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 48 --expectedFromGrid 0.025     # 95% down
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 48 --expectedFromGrid 0.160     # 68% down
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 48 --expectedFromGrid 0.500     # median
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 48 --expectedFromGrid 0.840     # 68% up
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 48 --expectedFromGrid 0.975     # 95% up
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 48
 
-    cd $HOMEDIR
+        # clean up directory for the next run
+        mv datacard.txt $BASEDIR
+        mv workspace.root $BASEDIR
+        mv higgsCombineTest.*.root $BASEDIR
+    else
+        python3 createCard.py --era $ERA --channel $CHANNEL --masspoint $MASSPOINT --method $METHOD >> ${BASEDIR}/datacard.txt
+        cd ${BASEDIR}
+        # run combine
+        text2workspace.py datacard.txt -o workspace.root
+        combine -M AsymptoticLimits workspace.root -t -1
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.025     # 95% down
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.160     # 68% down
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.500     # median
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.840     # 68% up
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.975     # 95% up
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24
+
+        cd $HOMEDIR
+    fi
 done

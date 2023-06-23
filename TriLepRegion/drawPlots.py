@@ -52,6 +52,8 @@ if "MHc" in args.key:
     MASSPOINTs = [args.key.split("/")[0]]
 else:
     MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-130_MA-90", "MHc-160_MA-155"]
+
+MASSPOINTs = ["MHc-70_MA-15", "MHc-100_MA-60", "MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120", "MHc-160_MA-155"]
 #### Systematics
 SYSTEMATICs = [["L1PrefireUp", "L1PrefireDown"],
                ["PileupReweightUp", "PileupReweightDown"],
@@ -216,7 +218,8 @@ for key, value in temp_dict.items():
     if temp_dict[key] is None: continue
     BKGs[key] = value
 
-colorList = [ROOT.kBlack, ROOT.kBlue, ROOT.kGray, ROOT.kRed]
+colorList = [ROOT.kGray, ROOT.kGreen, ROOT.kCyan, ROOT.kBlue, ROOT.kBlack, ROOT.kInvertedDarkBodyRadiator, ROOT.kRed, ROOT.kOrange]
+
 for i, masspoint in enumerate(MASSPOINTs):
     COLORs[masspoint] = colorList[i]
 
