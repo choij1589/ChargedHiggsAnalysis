@@ -29,6 +29,7 @@ BKG = args.background
 lenGenerations = 5
 lenChromosomes = 12
 nModels = 10
+nGraphFeatures = 4 if CHANNEL == "Skim1E2Mu" else 6
 
 def getChromosomes(SIG, BKG, top=10):
     BASEDIR = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}" 
@@ -171,7 +172,7 @@ models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
     modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    model = ParticleNetV2(9, 6, 2, nNodes, dropout_p=0.4)
+    model = ParticleNetV2(9, nGraphFeatures, 2, nNodes, dropout_p=0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
     models[idx] = model
