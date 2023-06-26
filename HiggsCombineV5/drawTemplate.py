@@ -65,6 +65,7 @@ def drawTemplate(signal):
     text.SetTextSize(0.035)
     text.SetTextFont(42)
     text.DrawLatexNDC(0.7, 0.912, lumiString[args.era])
+    lg.Draw("same")
     
     c.SaveAs(f"plots/template.{args.era}.{args.channel}.{args.method}.{signal}.png")
     f.Close()
