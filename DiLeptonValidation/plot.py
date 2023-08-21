@@ -19,8 +19,6 @@ config["era"] = args.era
 
 #### Sample list
 DataStream = ""
-if "EMu" in args.channel:   DataStream = "MuonEG"
-if "DiMu" in args.channel:  DataStream = "DoubleMuon"
 
 W  = ["WJets_MG"]
 DY = ["DYJets", "DYJets10to50_MG"]
@@ -31,26 +29,48 @@ ST = ["SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl
 MCList = W + DY + TT + VV + ST
 
 #### Systematics
-SYSTs = [("L1PrefireUp", "L1PrefireDown"),
-         ("PileupReweightUp", "PileupReweightDown"),
-         ("MuonIDSFUp", "MuonIDSFDown"),
-         ("DblMuTrigSFUp", "DblMuTrigSFDown"),
-         ("MuonEnUp", "MuonEnDown"),
-         ("JetEnUp", "JetEnDown"),
-         ("JetResUp", "JetResDown")]
+if args.channel == "DiMu":
+    DataStream = "DoubleMuon"
+    SYSTs = [("L1PrefireUp", "L1PrefireDown"),
+             ("PileupReweightUp", "PileupReweightDown"),
+             ("MuonIDSFUp", "MuonIDSFDown"),
+             ("DblMuTrigSFUp", "DblMuTrigSFDown"),
+             ("MuonEnUp", "MuonEnDown"),
+             ("ElectronEnUp", "ElectronEnDown"),
+             ("ElectronResUp", "ElectronResDown"),
+             ("JetEnUp", "JetEnDown"),
+             ("JetResUp", "JetResDown")]
+elif args.channel == "EMu":
+    DataStream = "MuonEG"
+    SYSTs = [("L1PrefireUp", "L1PrefireDown"),
+             ("PileupReweightUp", "PileupReweightDown"),
+             ("MuonIDSFUp", "MuonIDSFDown"),
+             ("ElectronIDSFUp", "ElectronIDSFDown"),
+             ("EMuTrigSFUp", "EMuTrigSFDown"),
+             ("HeavyTagUpUnCorr", "HeavyTagDownUnCorr"),
+             ("HeavyTagUpCorr", "HeavyTagDownCorr"),
+             ("LightTagUpUnCorr", "LightTagDownUnCorr"),
+             ("LightTagUpCorr", "LightTagDownCorr"),
+             ("MuonEnUp", "MuonEnDown"),
+             ("ElectronEnUp", "ElectronEnDown"),
+             ("ElectronResUp", "ElectronResDown"),
+             ("JetEnUp", "JetEnDown"),
+             ("JetResUp", "JetResDown")]
+
 
 #### Get histograms
 HISTs = {}
 COLORs = {}
 
-file_path = f"{WORKDIR}/data/DiLeptonValidation/{args.era}/RunDiMu__/DATA/DiLeptonValidation_{DataStream}.root"
+file_path = f"{WORKDIR}/data/DiLeptonValidation/{args.era}/Run{args.channel}__/DATA/DiLeptonValidation_{DataStream}.root"
 assert os.path.exists(file_path)
 f = ROOT.TFile.Open(file_path)
 data = f.Get(f"{args.channel}/Central/{args.key}"); data.SetDirectory(0)
 f.Close()
 
 for sample in MCList:
-    file_path = f"{WORKDIR}/data/DiLeptonValidation/{args.era}/RunDiMu__RunSyst__/DiLeptonValidation_{sample}.root" 
+    file_path = f"{WORKDIR}/data/DiLeptonValidation/{args.era}/Run{args.channel}__RunSyst__/DiLeptonValidation_{sample}.root" 
+    #file_path = f"{WORKDIR}/data/DiLeptonValidation/{args.era}/Run{args.channel}__/DiLeptonValidation_{sample}.root" 
     #print(file_path)
     assert os.path.exists(file_path)
     f = ROOT.TFile.Open(file_path)

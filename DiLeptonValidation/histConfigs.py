@@ -1,12 +1,12 @@
 # {histkey: {key: config}}
 histConfigs = {
         "muons/1/pt": {"xTitle": "p_{T}(#mu1) [GeV]",
-                       "yTitle": "Events / 5GeV",
+                       "yTitle": "Events / 5 GeV",
                        "xRange": [0., 300.],
                        "rebin": 5
                        },
         "muons/2/pt": {"xTitle": "p_{T}(#mu2) [GeV]",
-                       "yTitle": "Events / 5GeV",
+                       "yTitle": "Events / 5 GeV",
                        "xRange": [0., 300.],
                        "rebin": 5
                        },
@@ -26,6 +26,19 @@ histConfigs = {
                         "yTitle": "Events",
                         "xRange": [-3.2, 3.2]
                         },
+        "electrons/1/pt": {"xTitle": "p_{T}(e) [GeV]",
+                           "yTitle": "Events / 5 GeV",
+                           "xRange": [0., 300.],
+                           "rebin": 5
+                           },
+        "electrons/1/eta": {"xTitle": "#eta(e)",
+                            "yTitle": "Events",
+                            "xRange": [-2.5, 2.5]
+                           },
+        "electrons/1/phi": {"xTitle": "#phi(e)",
+                            "yTitle": "Events",
+                            "xRange": [-3.2, 3.2]
+                            },
         "jets/1/pt": {"xTitle": "p_{T}(j1) [GeV]",
                       "yTitle": "Events / 5 GeV",
                       "xRange": [0., 300.],
