@@ -46,6 +46,7 @@ COLORs = {}
 file_path = f"{WORKDIR}/data/DiLeptonValidation/{args.era}/RunDiMu__/DATA/DiLeptonValidation_{DataStream}.root"
 assert os.path.exists(file_path)
 f = ROOT.TFile.Open(file_path)
+print(f"{args.channel}/Central/{args.key}")
 data = f.Get(f"{args.channel}/Central/{args.key}"); data.SetDirectory(0)
 f.Close()
 
