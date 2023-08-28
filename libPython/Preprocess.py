@@ -128,8 +128,10 @@ def rtfileToDataListV2(rtfile, isSignal, maxSize=-1):
             MT3 = (muons[2]+METv).Mt()
             data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt, MT1, MT2, MT3]], dtype=torch.float)
         elif len(electrons) == 1 and  len(muons) == 2:
-            MT = (electrons[0]+METv).Mt()
-            data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt, MT]], dtype=torch.float)
+            MT1 = (electrons[0]+METv).Mt()
+            MT2 = (muons[0]+METv).Mt()
+            MT3 = (muons[1]+METv).Mt()
+            data.graphInput = torch.tensor([[len(jets), len(bjets), evt.METvPt, MT1, MT2, MT3]], dtype=torch.float)
         else:
             print(f"Wrong size of muons {len(muons)} and electrons {len(electrons)}")
             raise(ValueError)

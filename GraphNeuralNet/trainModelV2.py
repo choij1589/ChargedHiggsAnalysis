@@ -76,14 +76,15 @@ trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
 validset = GraphDataset(dataList[int(len(dataList)*0.6):int(len(dataList)*0.7)])
 testset  = GraphDataset(dataList[int(len(dataList)*0.7):])
 
-trainLoader = DataLoader(trainset, batch_size=2048, pin_memory=True, shuffle=True)
-validLoader = DataLoader(validset, batch_size=2048, pin_memory=True, shuffle=False)
-testLoader = DataLoader(testset, batch_size=2048, pin_memory=True, shuffle=False)
+trainLoader = DataLoader(trainset, batch_size=1024, pin_memory=True, shuffle=True)
+validLoader = DataLoader(validset, batch_size=1024, pin_memory=True, shuffle=False)
+testLoader = DataLoader(testset, batch_size=1024, pin_memory=True, shuffle=False)
 
 #### setup
 print(f"@@@@ Using model {args.model}...")
 nFeatures = 9
-nGraphFeatures = 6 if args.channel == "Skim3Mu" else 4
+nGraphFeatures = 6
+#nGraphFeatures = 6 if args.channel == "Skim3Mu" else 4
 nClasses = 2
 if args.model == "GCN":
     model = GCN(nFeatures, nClasses).to(args.device)

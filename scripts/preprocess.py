@@ -12,7 +12,8 @@ CHANNEL = "Skim1E2Mu"
 
 # no. of events to copy
 SIGNALs = ["MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"]
-NONPROMPTs = ["TTLL_powheg", "DYJetsToMuMu_MiNNLO"]
+NONPROMPTs = ["TTLL_powheg"]
+#NONPROMPTs = ["TTLL_powheg", "DYJetsToMuMu_MiNNLO"]
 #NONPROMPTs = ["TTLL_powheg", "DYJets_MG"]
 DIBOSONs = ["WZTo3LNu_mllmin0p1_powheg", "ZZTo4L_powheg"]
 TTZ = ["ttZToLLNuNu"]
@@ -20,12 +21,17 @@ BACKGROUNDs = NONPROMPTs + DIBOSONs + TTZ
 
 
 ERAs = ["2016preVFP", "2016postVFP", "2017", "2018"]
-nEvtsToCopy = {"signal": [20000, 20000, 40000, 60000],
-               "TTLL_powheg": [17000, 17000, 35500, 54000],
-               "DYJetsToMuMu_MiNNLO": [3000, 3000, 4500, 6000],
-               "WZTo3LNu_mllmin0p1_powheg": [10000, 10000, 20000, 30000],
-               "ZZTo4L_powheg": [10000, 10000, 20000, 30000],
-               "ttZToLLNuNu": [20000, 20000, 40000, 60000]}
+#nEvtsToCopy = {"signal": [20000, 20000, 40000, 60000],
+#               "TTLL_powheg": [17000, 17000, 35500, 54000],
+#               "DYJetsToMuMu_MiNNLO": [3000, 3000, 4500, 6000],
+#               "WZTo3LNu_mllmin0p1_powheg": [10000, 10000, 20000, 30000],
+#               "ZZTo4L_powheg": [10000, 10000, 20000, 30000],
+#               "ttZToLLNuNu": [20000, 20000, 40000, 60000]}
+nEvtsToCopy = {"signal": [15000, 15000, 30000, 45000],
+               "TTLL_powheg": [15000, 15000, 30000, 45000],
+               "WZTo3LNu_mllmin0p1_powheg": [7500, 7500, 15000, 22500],
+               "ZZTo4L_powheg": [7500, 7500, 15000, 22500],
+               "ttZToLLNuNu": [15000, 15000, 30000, 45000]}
 
 # input features
 features = []
@@ -219,7 +225,7 @@ for bkg in BACKGROUNDs:
     os.system(f"hadd -f {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{bkg}.root {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{bkg}_*.root")
     os.system(f"rm {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{bkg}_*.root")
 # nonprompt
-os.system(f"hadd -f {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/nonprompt.root {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/TTLL_powheg.root {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/DYJets*.root")
+os.system(f"hadd -f {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/nonprompt.root {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/TTLL_powheg.root")
 # diboson
 os.system(f"hadd -f {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/diboson.root {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/WZ*.root {WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/ZZ*.root")
 # ttZ
