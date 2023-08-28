@@ -28,7 +28,7 @@ class GeneticModule():
                                "fitness": None}
         self.population = population
         
-    def updatePopulation(self, nnType, signal, background, channel):
+    def updatePopulation(self, nnType, signal, background, channel, maxEpoch):
         # get hyperparams
         for idx in range(len(self.population)):
             if nnType == "DenseNeuralNet":
@@ -37,7 +37,7 @@ class GeneticModule():
             elif nnType == "GraphNeuralNet":
                 nNodes, optimizer, initLR, scheduler = self.population[idx]['chromosome']
                 modelName = f"ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.','p')}_{scheduler}"
-            path = f"{os.environ['WORKDIR']}/{nnType}/{channel}/{signal}_vs_{background}/CSV/{modelName}.csv"
+            path = f"{os.environ['WORKDIR']}/{nnType}/{channel}/epoch{maxEpoch}/{signal}_vs_{background}/CSV/{modelName}.csv"
             csv = pd.read_csv(path)
             trainLoss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/train'])
             validLoss = float(csv.sort_values('loss/valid').iloc[0].loc['loss/valid'])

@@ -9,16 +9,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--signal", required=True, type=str, help="signal mass point")
 parser.add_argument("--background", required=True, type=str, help="background")
 parser.add_argument("--channel", required=True, type=str, help="channel")
+parser.add_argument("--epochs", required=True, type=str, help="max epochs")
 args = parser.parse_args()
 
 WORKDIR = os.environ['WORKDIR']
-modelPath = f"{WORKDIR}/GraphNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/models"
+modelPath = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal}_vs_{args.background}/models"
 os.makedirs(modelPath)
 os.makedirs(modelPath.replace("models", "CSV"))
 
 # Let's run the model linearly first
 #### Hyper parameters
-nNodes = [32, 64, 128]
+nNodes = [64, 128]
 optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
 #optimizers = ["RMSprop", "Adam", "NAdam", "RAdam"]
 schedulers = ["StepLR", "CyclicLR"]
@@ -26,7 +27,7 @@ schedulers = ["StepLR", "CyclicLR"]
 initLRs = [0.0001, 0.0005, 0.001, 0.002, 0.01]
 nBatch = 1024
 # criteria = lambda x: "RMSprop" in x or "CyclicLR" not in x
-nPop = 5
+nPop = 11
 thresholds = [0.5, 0.5, 0.5, 0.5]
 maxIter = 5
 
@@ -39,12 +40,14 @@ def evalFitness(population):
         nNodes, optimizer, initLR, scheduler = population[idx]['chromosome']
         command = f"python {WORKDIR}/GraphNeuralNet/trainModelV2.py --signal {args.signal} --background {args.background}"
         command += f" --channel {args.channel}"
+        command += f" --epochs {args.epochs}"
         command += f" --model ParticleNet"
         command += f" --nNodes {nNodes}"
         command += f" --optimizer {optimizer}"
         command += f" --initLR {initLR}"
         command += f" --scheduler {scheduler}"
         command += f" --device cuda"
+        #command += f" --pilot"
         print(f"sumbit {command}...")
         proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         procs.append(proc)
@@ -65,16 +68,16 @@ gaModule.generatePool()
 
 gaModule.randomGeneration(nPop=nPop)
 evalFitness(gaModule.population)
-gaModule.updatePopulation("GraphNeuralNet", args.signal, args.background, args.channel)
+gaModule.updatePopulation("GraphNeuralNet", args.signal, args.background, args.channel, args.epochs)
 print("@@@@ generation 0")
 print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-path = f"{WORKDIR}/GraphNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/CSV/GAOptimGen0.csv"
+path = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal}_vs_{args.background}/CSV/GAOptimGen0.csv"
 gaModule.savePopulation(path=path)
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
     gaModule.evolution(thresholds=thresholds, ratio=0.5)
     evalFitness(gaModule.population)
-    gaModule.updatePopulation("GraphNeuralNet", args.signal, args.background, args.channel)
+    gaModule.updatePopulation("GraphNeuralNet", args.signal, args.background, args.channel, args.epochs)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
-    path = f"{WORKDIR}/GraphNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/CSV/GAOptimGen{iter}.csv"
+    path = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal}_vs_{args.background}/CSV/GAOptimGen{iter}.csv"
     gaModule.savePopulation(path=path)

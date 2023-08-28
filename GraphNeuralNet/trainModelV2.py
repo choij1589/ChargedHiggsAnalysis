@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--signal", required=True, type=str, help="signal")
 parser.add_argument("--background", required=True, type=str, help="background")
 parser.add_argument("--channel", required=True, type=str, help="channel")
+parser.add_argument("--epochs", required=True, type=int, help="max epochs")
 parser.add_argument("--model", required=True, type=str, help="model type")
 parser.add_argument("--nNodes", required=True, type=int, help="number of nodes for each layer")
 parser.add_argument("--dropout_p", default=0.4, type=float, help="dropout_p")
@@ -165,12 +166,12 @@ def test(model, loader):
 if __name__ == "__main__":
     modelName = f"{args.model}-nNodes{args.nNodes}_{args.optimizer}_initLR-{str(args.initLR).replace('.','p')}_{args.scheduler}"
     print(f"@@@@ Start training...")
-    checkptpath = f"{WORKDIR}/GraphNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/models/{modelName}.pt"
-    summarypath = f"{WORKDIR}/GraphNeuralNet/{args.channel}/{args.signal}_vs_{args.background}/CSV/{modelName}.csv"
+    checkptpath = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal}_vs_{args.background}/models/{modelName}.pt"
+    summarypath = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal}_vs_{args.background}/CSV/{modelName}.csv"
     earlyStopper = EarlyStopper(patience=15, path=checkptpath)
     summaryWriter = SummaryWriter(name=modelName)
 
-    for epoch in range(120):
+    for epoch in range(args.epochs):
         train(model, optimizer, scheduler)
         trainLoss, trainAcc = test(model, trainLoader)
         validLoss, validAcc = test(model, validLoader)

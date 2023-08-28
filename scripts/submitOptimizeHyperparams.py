@@ -9,6 +9,7 @@ parser.add_argument("--train", "-t", required=True, type=str, help="DNN / GNN")
 parser.add_argument("--signal", "-s", required=True, type=str, help="Signal mass point")
 parser.add_argument("--background", "-b", required=True, type=str, help="background")
 parser.add_argument("--channel", "-c", required=True, type=str, help="channel")
+parser.add_argument("--epochs", "-e", required=True, stye=str, help="max epochs")
 args = parser.parse_args()
 
 # make random string
@@ -40,7 +41,7 @@ def makeRunSh():
     f.write("cd $WORKDIR\n")
     f.write("source /opt/conda/bin/activate\n")
     f.write("conda activate torch\n")
-    f.write(f"python {args.train}/optimizeHyperParams.py --signal {args.signal} --background {args.background} --channel {args.channel}")
+    f.write(f"python {args.train}/optimizeHyperParams.py --signal {args.signal} --background {args.background} --channel {args.channel} --epochs {args.epochs}")
     f.close()
 
 if __name__ == "__main__":
