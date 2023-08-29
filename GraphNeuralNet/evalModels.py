@@ -19,20 +19,22 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--channel", type=str, required=True, help="channel")
 parser.add_argument("--signal", type=str, required=True, help="signal")
 parser.add_argument("--background", type=str, required=True, help="background")
+parser.add_argument("--epochs", type=str, required=True, help="max epochs")
 args = parser.parse_args()
 
 WORKDIR = os.environ['WORKDIR']
 CHANNEL = args.channel
 SIG = args.signal
 BKG = args.background
+EPOCHS = args.epochs
 
 lenGenerations = 5
-lenChromosomes = 12
+lenChromosomes = 11
 nModels = 10
-nGraphFeatures = 4 if CHANNEL == "Skim1E2Mu" else 6
+nGraphFeatures = 6
 
 def getChromosomes(SIG, BKG, top=10):
-    BASEDIR = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}" 
+    BASEDIR = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}" 
     chromosomes = {}
     for i in range(lenGenerations):
         csv = pd.read_csv(f"{BASEDIR}/CSV/GAOptimGen{i}.csv").transpose()
@@ -124,7 +126,7 @@ def plotROC(model, trainLoader, validLoader, testLoader, path):
 
 def plotTrainingStage(idx, path):
     nNodes, optimizer, initLR, scheduler = list(chromosomes.keys())[idx]
-    csvPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/CSV/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
+    csvPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}/CSV/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.csv"
     record = pd.read_csv(csvPath, index_col=0).transpose()
 
     trainLoss = list(record.loc['loss/train'])
@@ -171,7 +173,7 @@ chromosomes = getChromosomes(SIG, BKG, top=nModels)
 models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
-    modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
+    modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
     model = ParticleNetV2(9, nGraphFeatures, 2, nNodes, dropout_p=0.4)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
@@ -179,7 +181,7 @@ for idx, chromosome in enumerate(chromosomes.keys()):
 
  
 #### prepare directories
-outputPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/results/temp.png"
+outputPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}/results/temp.png"
 if not os.path.exists(os.path.dirname(outputPath)): os.makedirs(os.path.dirname(outputPath))
 
 #### save score distributions
@@ -268,7 +270,7 @@ tree.Write()
 f.Close()
 
 #### load tree and start estimation
-f = TFile.Open(f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/results/scores.root")
+f = TFile.Open(f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}/results/scores.root")
 tree = f.Get("Events")
 
 scores = {}
@@ -304,7 +306,7 @@ f.Close()
 #### write selection
 selectionInfo = f"{SIG}, {BKG}, {bestModelIdx}, {nNodes}, {optimizer}, {initLR}, {scheduler}, {trainAUC}, {validAUC}, {testAUC}, {ksProbSig}, {ksProbBkg}"
 print(f"[evalModels] {SIG}_vs_{BKG} summary: {selectionInfo}")
-with open(f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/{SIG}_vs_{BKG}/results/summary.txt", "w") as f:
+with open(f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}/results/summary.txt", "w") as f:
     f.write(f"{selectionInfo}\n")
 
 #### make plots
