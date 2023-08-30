@@ -154,10 +154,23 @@ def plotTrainingStage(idx, path):
     plt.close()
 
 #### load datasets
-rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{SIG}.root")
-rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{BKG}.root")
-sigDataList = shuffle(rtfileToDataListV2(rtSig, isSignal=True), random_state=953); rtSig.Close()
-bkgDataList = shuffle(rtfileToDataListV2(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
+if args.channel == "Combined":
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim1E2Mu__/{args.signal}.root")
+    sigDataList1E2Mu = shuffle(rtfileToDataListV2(rtSig, isSignal=True), random_state=953); rtSig.Close()
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim3Mu__/{args.signal}.root")
+    sigDataList3Mu = shuffle(rtfileToDataListV2(rtSig, isSignal=True), random_state=953); rtSig.Close()
+    sigDataList = shuffle(sigDataList1E2Mu+sigDataList3Mu, random_state=953)
+
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim1E2Mu__/{args.background}.root")
+    bkgDataList1E2Mu = shuffle(rtfileToDataListV2(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/Skim3Mu__/{args.background}.root")
+    bkgDataList3Mu = shuffle(rtfileToDataListV2(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
+    bkgDataList = shuffle(bkgDataList1E2Mu+bkgDataList3Mu, random_state=953)
+else:
+    rtSig = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{SIG}.root")
+    rtBkg = TFile.Open(f"{WORKDIR}/data/DataPreprocess/Combined/{CHANNEL}__/{BKG}.root")
+    sigDataList = shuffle(rtfileToDataListV2(rtSig, isSignal=True), random_state=953); rtSig.Close()
+    bkgDataList = shuffle(rtfileToDataListV2(rtBkg, isSignal=False), random_state=953); rtBkg.Close()
 dataList = shuffle(sigDataList+bkgDataList, random_state=42)
 
 trainset = GraphDataset(dataList[:int(len(dataList)*0.6)])
