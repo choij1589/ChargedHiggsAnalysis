@@ -29,7 +29,7 @@ BKG = args.background
 EPOCHS = args.epochs
 
 lenGenerations = 5
-lenChromosomes = 11
+lenChromosomes = 12
 nModels = 10
 nGraphFeatures = 6
 
