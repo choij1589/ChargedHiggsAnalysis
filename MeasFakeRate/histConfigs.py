@@ -150,6 +150,10 @@ histConfigs = {
         "pair/mass": {"xTitle": "M(#mu^{+}#mu^{-}) [GeV]",
                       "yTitle": "Events / GeV",
                       "xRange": [10., 300.]
-                      }
+                      },
+        "MT": {"xTitle": "M_{T}(l, #vec{p_{T}}^{miss})",
+               "yTitle": "Events / GeV",
+               "xRange": [0., 300.]
+               }
 }
 

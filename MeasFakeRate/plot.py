@@ -10,21 +10,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--era", required=True, type=str, help="era")
 parser.add_argument("--key", required=True, type=str, help="histkey")
 parser.add_argument("--channel", required=True, type=str, help="channel")
-parser.add_argument("--hltpath", required=True, type=str, help="HLT trigger path")
+parser.add_argument("--region", required=True, type=str, help="Inclusive / QCDEnriched / WEnriched / ZEnriched")
 parser.add_argument("--id", required=True, type=str, help="loose or tight ID")
 args = parser.parse_args()
 
 WORKDIR = os.environ["WORKDIR"]
 config = histConfigs[args.key]
 config["era"] = args.era
-
-#### check arguments
-if not args.era in ["2016preVFP", "2016postVFP", "2017", "2018"]:
-    print(f"Wrong era {args.era}")
-    raise(KeyError)
-if not args.channel in ["MeasNormEl", "MeasNormMu", "MeasFakeEl", "MeasFakeMu"]:
-    print(f"Wrong channel {args.channel}")
-    raise(KeyError)
 
 #### Sample list
 DataStream = ""
@@ -72,31 +64,31 @@ if args.channel == "MeasNormMu":
 HISTs = {}
 COLORs = {}
 
-file_path = f"{WORKDIR}/data/MeasFakeRate/{args.era}/{args.channel}__/DATA/MeasFakeRate_{DataStream}.root"
+file_path = f"{WORKDIR}/data/MeasFakeRateV3/{args.era}/{args.channel}__/DATA/MeasFakeRateV3_{DataStream}.root"
 assert os.path.exists(file_path)
 f = ROOT.TFile.Open(file_path)
-data = f.Get(f"{args.channel}_{args.hltpath}/{args.id}/Central/{args.key}"); data.SetDirectory(0)
+data = f.Get(f"{args.region}/{args.id}/Central/{args.key}"); data.SetDirectory(0)
 f.Close()
 
 for sample in MCList:
-    file_path = f"{WORKDIR}/data/MeasFakeRate/{args.era}/{args.channel}__RunSyst__/MeasFakeRate_{sample}.root"
+    file_path = f"{WORKDIR}/data/MeasFakeRateV3/{args.era}/{args.channel}__RunSyst__/MeasFakeRateV3_{sample}.root"
     assert os.path.exists(file_path)
     # get central histogram
     try:
         f = ROOT.TFile.Open(file_path)
-        h = f.Get(f"{args.channel}_{args.hltpath}/{args.id}/Central/{args.key}");   h.SetDirectory(0)
+        h = f.Get(f"{args.region}/{args.id}/Central/{args.key}");   h.SetDirectory(0)
         # get systematic histograms
         hSysts = []
         for systset in SYSTs:
             if len(systset) == 2:
                 systUp, systDown = systset
-                h_up = f.Get(f"{args.channel}_{args.hltpath}/{args.id}/{systUp}/{args.key}"); h_up.SetDirectory(0)
-                h_down = f.Get(f"{args.channel}_{args.hltpath}/{args.id}/{systDown}/{args.key}"); h_down.SetDirectory(0) 
+                h_up = f.Get(f"{args.region}/{args.id}/{systUp}/{args.key}"); h_up.SetDirectory(0)
+                h_down = f.Get(f"{args.region}/{args.id}/{systDown}/{args.key}"); h_down.SetDirectory(0) 
                 hSysts.append((h_up, h_down))
             else:
                 # only one systematic source
                 syst = systset
-                h_syst = f.Get(f"{args.channel}_{args.hltpath}/{args.id}/{syst}/{args.key}"); h_syst.SetDirectory(0)
+                h_syst = f.Get(f"{args.region}/{args.id}/{syst}/{args.key}"); h_syst.SetDirectory(0)
                 hSysts.append((h_syst))
         f.Close()
     except:
@@ -125,18 +117,8 @@ for sample in MCList:
             h.SetBinError(bin, total_unc)
     
     # now central scale
-    #h.Scale(0.0004666698761421234)      # mu8 / loose
-    #h.Scale(0.00046491272735481553)     # mu8 / tight
-    #h.Scale(0.009863553009773957)       # mu17 / loose
-    #h.Scale(0.00982909250066214)        # mu17 / tight
-    #h.Scale(0.0002553083370310111)       # ele8 / loose
-    #h.Scale(0.00025392261051571335)       # ele8 / tight
-    #h.Scale(0.0006430996717951915)        # ele12 / loose
-    #h.Scale(0.0006427655173425494)         # ele12 / tight
-    #h.Scale(0.0029913087409136822)          # ele23 / loose
-    h.Scale(0.002991235686483029)           # ele23 / tight
-    
-    
+    #h.Scale(0.00045052908036432963)      # mu8 / loose
+    h.Scale(0.00044480904623369185)      # mu8 / tight 
     HISTs[sample] = h.Clone(sample)
     
 #### merge backgrounds
@@ -191,15 +173,7 @@ c.drawRatio()
 c.drawLegend()
 c.finalize()
 
-hist_path = f"{WORKDIR}/MeasFakeRate/plots/{args.era}/{args.channel}_{args.hltpath}/{args.id}/{args.key.replace('/', '_')}.png"
+hist_path = f"{WORKDIR}/MeasFakeRate/plots/{args.era}/{args.channel}/{args.region}/{args.id}/{args.key.replace('/', '_')}.png"
 os.makedirs(os.path.dirname(hist_path), exist_ok=True)
 c.savefig(hist_path)
-
-        
-
-
-
-
-
-
 
