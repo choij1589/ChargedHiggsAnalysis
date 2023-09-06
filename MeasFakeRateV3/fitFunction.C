@@ -4,6 +4,8 @@
 #include <TString.h>
 #include <TFile.h>
 #include <TH1D.h>
+#include <TLegend.h>
+#include <TLegendEntry.h>
 #include <TCanvas.h>
 #include <RooRealVar.h>
 #include <RooDataHist.h>
@@ -14,7 +16,7 @@
 #include <RooArgList.h>
 using namespace RooFit;
 
-RooArgList fitMT(const TString ERA, const TString HLT, const TString ID, const TString SYST) {
+RooFitResult* fitMT(const TString ERA, const TString HLT, const TString ID, const TString SYST) {
 //void doFit() {
     // settings
     //const TString ERA  = "2016preVFP";
@@ -49,7 +51,8 @@ RooArgList fitMT(const TString ERA, const TString HLT, const TString ID, const T
     for (const auto &sample: QCD) MCSamples.emplace_back(sample);
 
     const vector<TString> KEYs = {"QCD", "W", "DY", "TT", "ST", "VV"};
-    TString histkey = "Inclusive/"+ID+"/"+SYST+"/MT";
+    const TString histkey_central = "Inclusive/"+ID+"/Central/MT";
+    const TString histkey = "Inclusive/"+ID+"/"+SYST+"/MT";
 
     // construct templates
     map<TString, TH1D*> HISTs;
@@ -61,7 +64,7 @@ RooArgList fitMT(const TString ERA, const TString HLT, const TString ID, const T
     TFile *f = nullptr;
     // data
     f = new TFile("../data/MeasFakeRateV3/"+ERA+"/"+HLT+"__/DATA/MeasFakeRateV3_"+DATASTREAM+".root");
-    TH1D *h_data = (TH1D*)f->Get(histkey.ReplaceAll(SYST, "Central")); h_data->SetDirectory(0); f->Close();
+    TH1D *h_data = (TH1D*)f->Get(histkey_central); h_data->SetDirectory(0); f->Close();
     RooDataHist *data = new RooDataHist("dh_"+DATASTREAM, "", MT, Import(*h_data));
 
     // prefit - get normalized scale to data
@@ -144,32 +147,45 @@ RooArgList fitMT(const TString ERA, const TString HLT, const TString ID, const T
     for (const auto &key: KEYs) {
         RooRealVar *coef;
         if (key.Contains("QCD")) coef = new RooRealVar("coef_"+key, "", SCALEs[key], 0., 1.);
-        else                     coef = new RooRealVar("coef_"+key, "", SCALEs[key], SCALEs[key]*0.7, SCALEs[key]*1.3);
+        else                     coef = new RooRealVar("coef_"+key, "", SCALEs[key], SCALEs[key]*0.5, SCALEs[key]*2.);
         COEFs[key] = coef;
     }
 
     // Make model
     RooAddPdf *model;
     model = new RooAddPdf("model", "", 
-                    RooArgList(*TEMPLATEs["QCD"], *TEMPLATEs["W"], *TEMPLATEs["DY"], *TEMPLATEs["TT"], *TEMPLATEs["ST"], *TEMPLATEs["VV"]),
-                    RooArgList(*COEFs["QCD"], *COEFs["W"], *COEFs["DY"], *COEFs["TT"], *COEFs["ST"]), kFALSE);
+                    RooArgList(*TEMPLATEs["W"], *TEMPLATEs["DY"], *TEMPLATEs["TT"], *TEMPLATEs["ST"], *TEMPLATEs["VV"], *TEMPLATEs["QCD"]),
+                    RooArgList(*COEFs["W"], *COEFs["DY"], *COEFs["TT"], *COEFs["ST"], *COEFs["VV"]), kFALSE);
 
-    RooFitResult *fitResult = model->chi2FitTo(*data, Save());
+    RooFitResult *fitResult = model->chi2FitTo(*data, Save(), PrintLevel(-1));
     RooPlot *frame = MT.frame();
-    data->plotOn(frame);
-    model->plotOn(frame);
-    model->plotOn(frame, Components("template_QCD"), LineColor(kBlack), LineStyle(kDashed));
-    model->plotOn(frame, Components("template_DY"), LineColor(kRed), LineStyle(kDashed));
-    model->plotOn(frame, Components("template_W"), LineColor(kBlue), LineStyle(kDashed));
-    model->plotOn(frame, Components("template_TT"), LineColor(kViolet), LineStyle(kDashed));
-    model->plotOn(frame, Components("template_ST"), LineColor(kAzure), LineStyle(kDashed));
-    model->plotOn(frame, Components("template_VV"), LineColor(kOrange), LineStyle(kDashed));
+    data->plotOn(frame, Name("data"));
+    model->plotOn(frame, Name("MC"));
+    model->plotOn(frame, Name("QCD"), Components("template_QCD"), LineColor(kBlack), LineStyle(kDashed));
+    model->plotOn(frame, Name("DY"), Components("template_DY"), LineColor(kRed), LineStyle(kDashed));
+    model->plotOn(frame, Name("W"), Components("template_W"), LineColor(kBlue), LineStyle(kDashed));
+    model->plotOn(frame, Name("TT"), Components("template_TT"), LineColor(kViolet), LineStyle(kDashed));
+    model->plotOn(frame, Name("ST"), Components("template_ST"), LineColor(kAzure), LineStyle(kDashed));
+    model->plotOn(frame, Name("VV"), Components("template_VV"), LineColor(kOrange), LineStyle(kDashed));
+
     TCanvas *cvs = new TCanvas("cvs", "", 800, 600);
+    TLegend *legend = new TLegend(0.6, 0.6, 0.85, 0.85);
+    legend->SetBorderSize(0);
+    legend->AddEntry("data", "data", "p");
+    //legend->AddEntry("postfit", "postfit", "l");
+    legend->AddEntry("QCD", "QCD", "l");
+    //legend->AddEntry("DY", "DY", "l");
+    //legend->AddEntry("W", "W", "l");
+    //legend->AddEntry("TT", "TT", "l");
+    //legend->AddEntry("ST", "ST", "l");
+    //legend->AddEntry("VV", "VV", "l");
+
     cvs->cd();
     frame->Draw();
-    cvs->SaveAs("results/"+ERA+"/"+HLT+"_"+ID+".png");
+    legend->Draw();
+    cvs->SaveAs("results/"+ERA+"/plots/"+HLT+"_"+ID+"_"+SYST+".png");
+    return fitResult;
 
-    RooArgList coefList = fitResult->floatParsFinal();
-    return coefList;
+    //RooArgList coefList = fitResult->floatParsFinal();
     //coefList.Print("v");
 }

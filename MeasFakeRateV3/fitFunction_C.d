@@ -67,6 +67,13 @@
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TVectorFfwd.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TVectorDfwd.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TFitResultPtr.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TLegend.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TPave.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TBox.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TAttBBox2D.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/GuiTypes.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TAttText.h
+./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TLegendEntry.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TCanvas.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TPad.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TVirtualPad.h
@@ -75,9 +82,7 @@
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TVirtualQConnection.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TInterpreter.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TInterpreterValue.h
-./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/GuiTypes.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/Buttons.h
-./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TAttBBox2D.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/TAttCanvas.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/RooRealVar.h
 ./fitFunction_C.so: /home/choij/miniconda3/envs/torch/include/RooAbsRealLValue.h
