@@ -80,11 +80,19 @@ RooFitResult* fitMT(const TString ERA, const TString HLT, const TString ID, cons
     // make mc templates
     for (const auto &sample: QCD) {
         f = new TFile("../data/MeasFakeRateV3/"+ERA+"/"+HLT+"__RunSyst__/MeasFakeRateV3_"+sample+".root");
-        TH1D *h = (TH1D*)f->Get(histkey); h->SetDirectory(0); f->Close();
-        //h->Scale(prescale);
-        map<TString, TH1D*>::iterator it = HISTs.find("QCD");
-        if (it == HISTs.end()) HISTs["QCD"] = (TH1D*)h->Clone("h_QCD");
-        else                   HISTs["QCD"]->Add(h);
+        //std::cout << sample << std::endl;
+        TH1D *h = dynamic_cast<TH1D*>(f->Get(histkey)); 
+        if (h) {
+            h->SetDirectory(0);
+            //h->Scale(prescale);
+            map<TString, TH1D*>::iterator it = HISTs.find("QCD");
+            if (it == HISTs.end()) HISTs["QCD"] = (TH1D*)h->Clone("h_QCD");
+            else                   HISTs["QCD"]->Add(h);
+        }
+        else {
+            std::cout << "no MT distribution for " << sample << std::endl;
+        }
+        f->Close();
     }
     
     for (const auto &sample: W) {
