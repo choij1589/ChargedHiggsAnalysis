@@ -155,7 +155,7 @@ RooFitResult* fitMT(const TString ERA, const TString HLT, const TString ID, cons
     for (const auto &key: KEYs) {
         RooRealVar *coef;
         if (key.Contains("QCD")) coef = new RooRealVar("coef_"+key, "", SCALEs[key], 0., 1.);
-        else                     coef = new RooRealVar("coef_"+key, "", SCALEs[key], SCALEs[key]*0.5, SCALEs[key]*2.);
+        else                     coef = new RooRealVar("coef_"+key, "", SCALEs[key], SCALEs[key]*0.6, SCALEs[key]*1.4);
         COEFs[key] = coef;
     }
 
