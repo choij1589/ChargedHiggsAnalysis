@@ -1,5 +1,5 @@
 from ROOT import TLorentzVector
-
+from ROOT import TMath
 # Base class for all objects
 class Particle(TLorentzVector):
     def __init__(self, pt, eta, phi, mass):
@@ -17,6 +17,10 @@ class Particle(TLorentzVector):
     def BtagScore(self):
         return self.btagScore
     
+    def MT(self, part):
+        dPhi = self.DeltaPhi(part)
+        return TMath.Sqrt(2*self.Pt()*part.Pt()*(1.-TMath.Cos(dPhi)))
+
     def IsMuon(self):
         return self.isMuon
     
