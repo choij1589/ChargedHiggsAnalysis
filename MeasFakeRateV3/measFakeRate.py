@@ -24,7 +24,7 @@ elif args.measure == "electron":
 
 W = ["WJets_MG"]
 DY = ["DYJets", "DYJets10to50_MG"]
-TT = ["TTLL_powheg", "TTLJ_powheg"]
+TT = ["TTLL_powheg"]
 VV = ["WW_pythia", "WZ_pythia", "ZZ_pythia"]
 ST = ["SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl",
       "SingleTop_tW_top_NoFullyHad", "SingleTop_tW_antitop_NoFullyHad"]
@@ -57,9 +57,9 @@ def add_mc_hists(samples, hltpath, histkey):
 def get_hists(hltpath, id, syst="Central"):
     out = {}
     if syst in ["Central", "PromptNormUp", "PromptNormDown"]:
-        histkey = f"Inclusive/{id}/Central/abseta_ptcorr"
+        histkey = f"Inclusive/{id}/Central/abseta_ptCorr"
     else:
-        histkey = f"Inclusive/{id}/{syst}/abseta_ptcorr"
+        histkey = f"Inclusive/{id}/{syst}/abseta_ptCorr"
     # get data
     f = ROOT.TFile(f"../data/MeasFakeRateV3/{args.era}/{hltpath}__/DATA/MeasFakeRateV3_{DATASTREAM}.root")
     h = f.Get(histkey.replace(syst, "Central"))
@@ -97,8 +97,8 @@ def get_hists(hltpath, id, syst="Central"):
     return out
 
 def get_qcd_fakerate(hltpath):
-    h_loose = add_mc_hists(QCD, hltpath, "Inclusive/loose/Central/abseta_ptcorr")
-    h_tight = add_mc_hists(QCD, hltpath, "Inclusive/tight/Central/abseta_ptcorr")
+    h_loose = add_mc_hists(QCD, hltpath, "Inclusive/loose/Central/abseta_ptCorr")
+    h_tight = add_mc_hists(QCD, hltpath, "Inclusive/tight/Central/abseta_ptCorr")
     fakerate = h_tight.Clone(f"fakerate_{hltpath}_QCD")
     fakerate.Divide(h_loose)
     fakerate.SetDirectory(0)

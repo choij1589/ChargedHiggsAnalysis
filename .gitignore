@@ -3,7 +3,7 @@ data/*
 *.root
 .vscode/*
 condor/*
-libCpp/*.d
-libCpp/*.pcm
-libCpp/*.so
+*.d
+*.pcm
+*.so
 
