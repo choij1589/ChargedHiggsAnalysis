@@ -74,7 +74,7 @@ def findbin(ptCorr, abseta):
     # find bin index for abseta
     for i in range(len(abseta_bins)-1):
         if abseta_bins[i] < abseta+1e-5 < abseta_bins[i+1]:
-            prefix += f"_abseta_{str(abseta_bins[i]).replace('.', 'p')}to{str(abseta_bins[i]).replace('.', 'p')}"
+            prefix += f"_abseta_{str(abseta_bins[i]).replace('.', 'p')}to{str(abseta_bins[i+1]).replace('.', 'p')}"
     return prefix
 
 def get_hist(sample, ptCorr, abseta, id, syst="Central"):
@@ -89,12 +89,13 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
         else:              channel = "MeasFakeEl23"
     file_path = ""
     if sample == DataStream:
-        file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__/DATA/MeasFakeRateV4_{sample}.root"
+        file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/DATA/MeasFakeRateV4_{sample}.root"
     else:
         file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/MeasFakeRateV4_{sample}.root"
     assert os.path.exists(file_path)
     f = ROOT.TFile.Open(file_path)
-    #print(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
+    print(sample)
+    print(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
     h = f.Get(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr"); h.SetDirectory(0)
     f.Close()
     return h
@@ -119,7 +120,11 @@ def make_data(sample, id):
                 rateList.append(err.value)
             else:
                 if sample == DataStream:
-                    rateList.append(0.)
+                    if syst in ["MotherJetPtUp", "MotherJetPtDown", "RequireHeavyTag"]:
+                        h = get_hist(sample, ptCorr, abseta, id, syst)
+                        rateList.append(h.Integral())
+                    else:
+                        rateList.append(0.)
                 else:
                     h = get_hist(sample, ptCorr, abseta, id, syst)
                     rateList.append(h.Integral())
@@ -150,5 +155,3 @@ for sample, id in product(MCList, ["loose", "tight"]):
     csv_path = f"results/{args.era}/CSV/{args.measure}/{sample}_{id}.csv"
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     df.to_csv(csv_path) 
-    
-
