@@ -51,8 +51,7 @@ elif args.measure == "muon":
     HLTPATHs = ["MeasFakeMu8", "MeasFakeMu17"]
 else:
     raise KeyError(f"Wrong measure {args.measure}")
-selectionVariation = ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "MotherJetPtDown", "RequireHeavyTag"]
-SelectionVariation = [["PromptNormUp", "PromptNormDown"],
+SelectionVartion = [["PromptNormUp", "PromptNormDown"],
                     ["MotherJetPtUp", "MotherJetPtDown"],
                     ["RequireHeavyTag"]]
 IDs = ["loose", "tight"]
@@ -79,15 +78,15 @@ def findbin(ptCorr, abseta):
     # find bin index for abseta
     for i in range(len(abseta_bins)-1):
         if abseta_bins[i] < abseta+1e-5 < abseta_bins[i+1]:
-            prefix += f"_abseta_{str(abseta_bins[i]).replace('.', 'p')}to{str(abseta_bins[i+1]).replace('.', 'p')}"
+            prefix += f"_abseta_{str(abseta_bins[i]).replace('.', 'p')}to{str(abseta_bins[i]).replace('.', 'p')}"
     return prefix
 
-#### first evaluate central scale for product(hltpaths, ids, systs)
+#### First evaluate central scale for product(hltpaths, ids)
 def get_prompt_scale(hltpath, id, syst):
-    file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{hltpath}__RunSyst__/DATA/MeasFakeRateV4_{DataStream}.root"
+    file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{hltpath}__/DATA/MeasFakeRateV4_{DataStream}.root"
     assert os.path.exists(file_path)
     f = ROOT.TFile.Open(file_path)
-    data = f.Get(f"ZEnriched/{id}/{syst}/pair/mass"); data.SetDirectory(0)
+    data = f.Get(f"ZEnriched/{id}/Central/pair/mass"); data.SetDirectory(0)
     f.Close()
     
     stat_data = c_double()
@@ -112,7 +111,6 @@ def get_prompt_scale(hltpath, id, syst):
     stat_mc = sqrt(stat_mc)
     
     scale = rate_data / rate_mc
-    #print(hltpath, id, syst, scale)
     scaleUp = (rate_data+stat_data) / (rate_mc-stat_mc)
     scaleDown = (rate_data-stat_data) / (rate_mc+stat_mc)
     return (scale, scaleUp, scaleDown)
@@ -137,126 +135,75 @@ def get_final_scale(hltpath, id):
     totalUnc = sqrt(totalUnc)
     return (scale, totalUnc, totalUnc/scale)
 
-#### Measure fke rates
+#### Measure fake rates
 #### For prompt normalization, assign 10% variation
 scaleDict = {}
-for hltpath, id, syst in product(HLTPATHs, IDs, selectionVariation):
-    if syst in ["Central", "PromptNormUp", "PromptNormDown"]:
-        scale, _, _ = get_prompt_scale(hltpath, id, syst="Central")
-        if syst == "PromptNormUp": scale *= 1.1
-        if syst == "PromptNormDown": scale *= 0.9
-        scaleDict[f"{hltpath}_{id}_{syst}"] = scale
-    else:
-        scale, _, _ = get_prompt_scale(hltpath, id, syst)
-        scaleDict[f"{hltpath}_{id}_{syst}"] = scale
+for hltpath, id in product(HLTPATHs, IDs):
+    scale, _, _ = get_prompt_scale(hltpath, id, syst="Central")
+    scaleDict[f"{hltpath}_{id}"] = scale
 
 index_col = []
 for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
     prefix = findbin(ptCorr, abseta)
     index_col.append(prefix)
-    
+
 data = {}
-for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "MotherJetPtDown", "RequireHeavyTag"]:
+for syst in ["Central", "StatUp", "StatDown",  "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "MotherJetPtDown", "RequireHeavyTag"]:
     fakeList = []
-    errList = []
-    if syst == "Central":
-        for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
-            prefix = findbin(ptCorr, abseta)
-            if ptCorr < 30.: hltpath = "MeasFakeMu8"
-            else:            hltpath = "MeasFakeMu17" 
-            df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
-            df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0)  
-            rate_data_loose = df_loose.loc[prefix, "Central"]
-            rate_data_tight = df_tight.loc[prefix, "Central"]
-            err_data_loose = df_loose.loc[prefix, "Stat"]
-            err_data_tight = df_tight.loc[prefix, "Stat"]
-            
-            # prompt
-            rate_prompt_loose = 0.
-            rate_prompt_tight = 0.
-            err_prompt_loose = 0.
-            err_prompt_tight = 0.
-            for sample in MCList:
-                df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_loose.csv", index_col=0)
-                df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_tight.csv", index_col=0) 
+    for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
+        prefix = findbin(ptCorr, abseta)
+    
+        if ptCorr < 30.: hltpath = "MeasFakeMu8"
+        else:            hltpath = "MeasFakeMu17"
+    
+        # data
+        df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
+        df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0) 
+        rate_data_loose = df_loose.loc[prefix, "Central"]
+        rate_data_tight = df_tight.loc[prefix, "Central"]
+        
+        if syst == "StatUp":
+            rate_data_loose += df_loose.loc[prefix, "Stat"]
+            rate_data_tight += df_tight.loc[prefix, "Stat"]
+        if syst == "StatDown":
+            rate_data_loose -= df_loose.loc[prefix, "Stat"]
+            rate_data_tight -= df_tight.loc[prefix, "Stat"]
+    
+        # prompt
+        rate_prompt_loose = 0.
+        rate_prompt_tight = 0.
+        for sample in MCList:
+            df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_loose.csv", index_col=0)
+            df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_tight.csv", index_col=0) 
+            if syst in ["Central", "PromptNormUp", "PromptNormDown"]:
                 rate_prompt_loose += df_loose.loc[prefix, "Central"]
                 rate_prompt_tight += df_tight.loc[prefix, "Central"]
-                err_prompt_loose += pow(df_loose.loc[prefix, "Stat"], 2)
-                err_prompt_tight += pow(df_tight.loc[prefix, "Stat"], 2)
-            err_prompt_loose = sqrt(err_prompt_loose)
-            err_prompt_tight = sqrt(err_prompt_tight)
-            
-            rate_prompt_loose *= scaleDict[f"{hltpath}_loose_Central"]
-            rate_prompt_tight *= scaleDict[f"{hltpath}_tight_Central"]
-            err_prompt_loose *= scaleDict[f"{hltpath}_loose_Central"]
-            err_prompt_tight *= scaleDict[f"{hltpath}_tight_Central"]
-            
-            #print(prefix)
-            #print(rate_data_loose, rate_prompt_loose)
-            #print(rate_data_tight, rate_prompt_tight)
-            fakerate = (rate_data_tight-rate_prompt_tight) / (rate_data_loose-rate_prompt_loose)
-            error = 0.
-            error += pow(err_data_tight/(rate_data_loose-rate_prompt_loose), 2)
-            error += pow(err_prompt_tight/(rate_data_loose-rate_prompt_loose), 2)
-            error += pow((rate_data_tight-rate_prompt_tight)/pow(rate_data_loose-rate_prompt_loose, 2)*err_data_loose, 2)
-            error += pow((rate_data_tight-rate_prompt_tight)/pow(rate_data_loose-rate_prompt_loose, 2)*err_data_tight, 2)
-            error = sqrt(error)
-            fakeList.append(fakerate)
-            errList.append(error)
-        data["Central"] = fakeList
-        data["Stat"] = errList
-    elif syst in ["PromptNormUp", "PromptNormDown"]:
-        for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
-            prefix = findbin(ptCorr, abseta)
-            if ptCorr < 30.: hltpath = "MeasFakeMu8"
-            else:            hltpath = "MeasFakeMu17"
-            df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
-            df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0)  
-            rate_data_loose = df_loose.loc[prefix, "Central"]
-            rate_data_tight = df_tight.loc[prefix, "Central"]
-            
-            rate_prompt_loose = 0.
-            rate_prompt_tight = 0.
-            for sample in MCList:
-                df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_loose.csv", index_col=0)
-                df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_tight.csv", index_col=0) 
-                rate_prompt_loose += df_loose.loc[prefix, "Central"]
-                rate_prompt_tight += df_tight.loc[prefix, "Central"]
-            
-            rate_prompt_loose *= scaleDict[f"{hltpath}_loose_{syst}"]
-            rate_prompt_tight *= scaleDict[f"{hltpath}_tight_{syst}"]
-            fakerate = (rate_data_tight-rate_prompt_tight) / (rate_data_loose-rate_prompt_loose) 
-            fakeList.append(fakerate)
-        data[syst] = fakeList
-    else:
-        for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
-            prefix = findbin(ptCorr, abseta)
-            if ptCorr < 30.: hltpath = "MeasFakeMu8"
-            else:            hltpath = "MeasFakeMu17"
-            df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
-            df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0)  
-            rate_data_loose = df_loose.loc[prefix, syst]
-            rate_data_tight = df_tight.loc[prefix, syst]
-            
-            rate_prompt_loose = 0.
-            rate_prompt_tight = 0.
-            for sample in MCList:
-                df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_loose.csv", index_col=0)
-                df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{sample}_tight.csv", index_col=0) 
+            elif syst == "StatUp":
+                rate_prompt_loose += (df_loose.loc[prefix, "Central"]+df_loose.loc[prefix, "Stat"])
+                rate_prompt_tight += (df_tight.loc[prefix, "Central"]+df_tight.loc[prefix, "Stat"])
+            elif syst == "StatDown":
+                rate_prompt_loose += (df_loose.loc[prefix, "Central"]-df_loose.loc[prefix, "Stat"])
+                rate_prompt_tight += (df_tight.loc[prefix, "Central"]-df_tight.loc[prefix, "Stat"])
+            else:
                 rate_prompt_loose += df_loose.loc[prefix, syst]
                 rate_prompt_tight += df_tight.loc[prefix, syst]
-            
-            rate_prompt_loose *= scaleDict[f"{hltpath}_loose_{syst}"]
-            rate_prompt_tight *= scaleDict[f"{hltpath}_tight_{syst}"]
-            fakerate = (rate_data_tight-rate_prompt_tight) / (rate_data_loose-rate_prompt_loose) 
-            fakeList.append(fakerate)
-        data[syst] = fakeList 
+        scale = 1.
+        if syst == "PromptNormUp":   scale = 1.1
+        if syst == "PromptNormDown": scale = 0.9
+        rate_prompt_loose *= scaleDict[f"{hltpath}_loose"]*scale
+        rate_prompt_tight *= scaleDict[f"{hltpath}_tight"]*scale
+    
+        #print(rate_data_loose, rate_prompt_loose)
+        #print(rate_data_tight, rate_prompt_tight)
+        fakerate = (rate_data_tight-rate_prompt_tight) / (rate_data_loose-rate_prompt_loose)
+        fakeList.append(fakerate)
+    data[syst] = fakeList
 df = pd.DataFrame(data=data, index=index_col)
 csv_path = f"results/{args.era}/CSV/{args.measure}/fakerate.csv"
 os.makedirs(os.path.dirname(csv_path), exist_ok=True)
 df.to_csv(csv_path)
 
-#### Now save the results to root file
+#### now save the results
 rtfile_path = f"results/{args.era}/ROOT/{args.measure}/fakerate.root"
 os.makedirs(os.path.dirname(rtfile_path), exist_ok=True)
 f = ROOT.TFile(rtfile_path, "recreate")
@@ -267,7 +214,7 @@ h.SetDirectory(0)
 hists["TotalUnc"] = h
 for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "MotherJetPtDown", "RequireHeavyTag"]:
     hists[syst] = h.Clone(f"fakerate_{syst}")
-    
+
 # save contents
 df = pd.read_csv(csv_path, index_col=0)
 for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
@@ -276,22 +223,22 @@ for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
     for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "MotherJetPtDown", "RequireHeavyTag"]:
         if syst == "Central":
             value = df.loc[prefix, "Central"]
-            stat = df.loc[prefix, "Stat"]
+            stat = max(abs(df.loc[prefix, "StatUp"] - df.loc[prefix, "Central"]), abs(df.loc[prefix, "StatDown"]))
         else:
             value = df.loc[prefix, syst]
             stat = 0.
         hists[syst].SetBinContent(thisbin, value)
         hists[syst].SetBinError(thisbin, stat)
-        
+
 # estimate total systematics
 for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
     prefix = findbin(ptCorr, abseta)
     thisbin = hists[syst].FindBin(abseta+1e-5, ptCorr+1e-5) 
     
     value = df.loc[prefix, "Central"]
-    stat = df.loc[prefix, "Stat"]
+    stat = max(abs(df.loc[prefix, "StatUp"] - df.loc[prefix, "Central"]), abs(df.loc[prefix, "StatDown"] - df.loc[prefix, "Central"]))
     totalUnc = pow(stat, 2)
-    for systList in SelectionVariation:
+    for systList in SelectionVartion:
         if len(systList) == 1:
             syst = systList[0]
             totalUnc += pow(df.loc[prefix, syst]-value, 2)
@@ -300,7 +247,7 @@ for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
             thisUnc = max(abs(df.loc[prefix, systUp]-value), abs(df.loc[prefix, systDown]-value))
             totalUnc += pow(thisUnc, 2)
     totalUnc = sqrt(totalUnc)
-    print(prefix, value, totalUnc, totalUnc/value)
+    print(prefix, value, totalUnc)
     hists["TotalUnc"].SetBinContent(thisbin, value)
     hists["TotalUnc"].SetBinError(thisbin, totalUnc)
 
@@ -308,3 +255,4 @@ for hist in hists.values():
     f.cd()
     hist.Write()
 f.Close()
+     

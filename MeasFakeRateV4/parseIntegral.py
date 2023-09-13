@@ -94,8 +94,8 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
         file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/MeasFakeRateV4_{sample}.root"
     assert os.path.exists(file_path)
     f = ROOT.TFile.Open(file_path)
-    print(sample)
-    print(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
+    #print(sample)
+    #print(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
     h = f.Get(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr"); h.SetDirectory(0)
     f.Close()
     return h
@@ -107,7 +107,6 @@ def make_data(sample, id):
     for syst in SYSTs:
         rateList = []
         for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
-            prefix = findbin(ptCorr, abseta)
             if syst == "Central":
                 h = get_hist(sample, ptCorr, abseta, id)
                 err = c_double()
