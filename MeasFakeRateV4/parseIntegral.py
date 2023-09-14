@@ -95,11 +95,15 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
         file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/DATA/MeasFakeRateV4_{sample}.root"
     else:
         file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/MeasFakeRateV4_{sample}.root"
-    assert os.path.exists(file_path)
+    try:
+        assert os.path.exists(file_path)
+    except:
+        raise NameError(f"{file_path} does not exists")
     f = ROOT.TFile.Open(file_path)
-    #print(sample)
-    #print(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
-    h = f.Get(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr"); h.SetDirectory(0)
+    try:
+        h = f.Get(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr"); h.SetDirectory(0)
+    except:
+        raise NameError(f"Wrong histogram path {prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
     f.Close()
     return h
     

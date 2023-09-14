@@ -87,6 +87,7 @@ def get_prompt_scale(hltpath, id, syst):
     file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{hltpath}__RunSyst__/DATA/MeasFakeRateV4_{DataStream}.root"
     assert os.path.exists(file_path)
     f = ROOT.TFile.Open(file_path)
+    print(f"ZEnriched/{id}/{syst}/pair/mass")
     data = f.Get(f"ZEnriched/{id}/{syst}/pair/mass"); data.SetDirectory(0)
     f.Close()
     
