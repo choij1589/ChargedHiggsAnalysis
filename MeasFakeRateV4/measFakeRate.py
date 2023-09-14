@@ -137,7 +137,7 @@ def get_final_scale(hltpath, id):
     totalUnc = sqrt(totalUnc)
     return (scale, totalUnc, totalUnc/scale)
 
-#### Measure fke rates
+#### Measure fake rates
 #### For prompt normalization, assign 10% variation
 scaleDict = {}
 for hltpath, id, syst in product(HLTPATHs, IDs, selectionVariation):
@@ -162,8 +162,13 @@ for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "Moth
     if syst == "Central":
         for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
             prefix = findbin(ptCorr, abseta)
-            if ptCorr < 30.: hltpath = "MeasFakeMu8"
-            else:            hltpath = "MeasFakeMu17" 
+            if args.measure == "electron":
+                if ptCorr < 20.:   hltpath = "MeasFakeEl8"
+                elif ptCorr < 35.: hltpath = "MeasFakeEl12"
+                else:              hltpath = "MeasFkaeEl23"  
+            if args.measure == "muon":
+                if ptCorr < 30.: hltpath = "MeasFakeMu8"
+                else:            hltpath = "MeasFakeMu17"
             df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
             df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0)  
             rate_data_loose = df_loose.loc[prefix, "Central"]
@@ -208,8 +213,13 @@ for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "Moth
     elif syst in ["PromptNormUp", "PromptNormDown"]:
         for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
             prefix = findbin(ptCorr, abseta)
-            if ptCorr < 30.: hltpath = "MeasFakeMu8"
-            else:            hltpath = "MeasFakeMu17"
+            if args.measure == "electron":
+                if ptCorr < 20.:   hltpath = "MeasFakeEl8"
+                elif ptCorr < 35.: hltpath = "MeasFakeEl12"
+                else:              hltpath = "MeasFkaeEl23"  
+            if args.measure == "muon":
+                if ptCorr < 30.: hltpath = "MeasFakeMu8"
+                else:            hltpath = "MeasFakeMu17"
             df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
             df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0)  
             rate_data_loose = df_loose.loc[prefix, "Central"]
@@ -231,8 +241,13 @@ for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "Moth
     else:
         for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
             prefix = findbin(ptCorr, abseta)
-            if ptCorr < 30.: hltpath = "MeasFakeMu8"
-            else:            hltpath = "MeasFakeMu17"
+            if args.measure == "electron":
+                if ptCorr < 20.:   hltpath = "MeasFakeEl8"
+                elif ptCorr < 35.: hltpath = "MeasFakeEl12"
+                else:              hltpath = "MeasFkaeEl23"  
+            if args.measure == "muon":
+                if ptCorr < 30.: hltpath = "MeasFakeMu8"
+                else:            hltpath = "MeasFakeMu17"
             df_loose = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_loose.csv", index_col=0)
             df_tight = pd.read_csv(f"results/{args.era}/CSV/{args.measure}/{DataStream}_tight.csv", index_col=0)  
             rate_data_loose = df_loose.loc[prefix, syst]

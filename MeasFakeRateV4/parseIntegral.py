@@ -16,12 +16,14 @@ DataStream = ""
 ptCorr_bins = []
 abseta_bins = []
 SYSTs = []
+
 if args.measure == "electron":
     if "2016" in args.era:  DataStream = "DoubleEG"
     if "2017" in args.era:  DataStream = "SingleElectron"
     if "2018" in args.era:  DataStream = "EGamma"
     ptCorr_bins = [10., 15., 20., 25., 35., 50., 100.]
     abseta_bins = [0., 0.8, 1.579, 2.5]
+    QCD = ["QCD_EMEnriched", "QCD_bcToE"]
     SYSTs = ["Central", "Stat",
              "PileupReweight",
              "L1PrefireUp", "L1PrefireDown",
@@ -37,6 +39,7 @@ elif args.measure == "muon":
     DataStream = "DoubleMuon"
     ptCorr_bins = [10., 15., 20., 30., 50., 100.]
     abseta_bins = [0., 0.9, 1.6, 2.4]
+    QCD = ["QCD_MuEnriched"]
     SYSTs = ["Central", "Stat",
              "PileupReweight",
              "L1PrefireUp", "L1PrefireDown",
@@ -57,7 +60,7 @@ TT = ["TTLL_powheg"]
 VV = ["WW_pythia", "WZ_pythia", "ZZ_pythia"]
 ST = ["SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl",
       "SingleTop_tW_top_NoFullyHad", "SingleTop_tW_antitop_NoFullyHad"]
-MCList = W + DY + TT + VV + ST
+MCList = W + DY + TT + VV + ST + QCD
 
 
 def findbin(ptCorr, abseta):
