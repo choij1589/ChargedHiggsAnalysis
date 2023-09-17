@@ -166,7 +166,7 @@ for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "Moth
             if args.measure == "electron":
                 if ptCorr < 20.:   hltpath = "MeasFakeEl8"
                 elif ptCorr < 35.: hltpath = "MeasFakeEl12"
-                else:              hltpath = "MeasFkaeEl23"  
+                else:              hltpath = "MeasFakeEl23"  
             if args.measure == "muon":
                 if ptCorr < 30.: hltpath = "MeasFakeMu8"
                 else:            hltpath = "MeasFakeMu17"
@@ -217,7 +217,7 @@ for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "Moth
             if args.measure == "electron":
                 if ptCorr < 20.:   hltpath = "MeasFakeEl8"
                 elif ptCorr < 35.: hltpath = "MeasFakeEl12"
-                else:              hltpath = "MeasFkaeEl23"  
+                else:              hltpath = "MeasFakeEl23"  
             if args.measure == "muon":
                 if ptCorr < 30.: hltpath = "MeasFakeMu8"
                 else:            hltpath = "MeasFakeMu17"
@@ -245,7 +245,7 @@ for syst in ["Central", "PromptNormUp", "PromptNormDown", "MotherJetPtUp", "Moth
             if args.measure == "electron":
                 if ptCorr < 20.:   hltpath = "MeasFakeEl8"
                 elif ptCorr < 35.: hltpath = "MeasFakeEl12"
-                else:              hltpath = "MeasFkaeEl23"  
+                else:              hltpath = "MeasFakeEl23"  
             if args.measure == "muon":
                 if ptCorr < 30.: hltpath = "MeasFakeMu8"
                 else:            hltpath = "MeasFakeMu17"

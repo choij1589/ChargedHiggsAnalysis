@@ -213,7 +213,10 @@ class ComparisonCanvas():
             self.logy = config['logy']
         if "era" in config.keys():
             era = config['era']
-            self.lumiString = "L_{int} = "+f"{LumiInfo[era]}"+" fb^{-1} (13TeV)"
+            if "lumiInfo" in config.keys():
+                self.lumiString = config["lumiInfo"]
+            else:
+                self.lumiString = "L_{int} = "+f"{LumiInfo[era]}"+" fb^{-1} (13TeV)"
     
     def drawSignals(self, hists, colors):
         self.signals = hists
@@ -344,7 +347,7 @@ class ComparisonCanvas():
             self.legend.AddEntry(hist, hist.GetName(), "f")
         self.legend.AddEntry(self.systematics, "stat+syst", "f")
         
-    def finalize(self, drawSignal=False):
+    def finalize(self, textInfo=None, drawSignal=False):
         # pad up
         if self.logy: self.padUp.SetLogy()
         self.padUp.cd()
@@ -359,9 +362,18 @@ class ComparisonCanvas():
                 hist.Draw("hist&same")
 
         self.legend.Draw()
-        self.lumi.DrawLatexNDC(0.64, 0.91, self.lumiString)
-        self.cms.DrawLatexNDC(0.17, 0.83, "CMS")
-        self.preliminary.DrawLatexNDC(0.17, 0.78, "Work in progress")
+        
+        if textInfo is None:
+            self.lumi.DrawLatexNDC(0.64, 0.91, self.lumiString)
+            self.cms.DrawLatexNDC(0.17, 0.83, "CMS")
+            self.preliminary.DrawLatexNDC(0.17, 0.78, "Work in progress")
+        else:
+            latex = TLatex()
+            for text, config in textInfo.items():
+                latex.SetTextSize(config[0])
+                latex.SetTextFont(config[1])
+                latex.DrawLatexNDC(config[2][0], config[2][1], text)
+            
         self.padUp.RedrawAxis()
         
         # pad down
