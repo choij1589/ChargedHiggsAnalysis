@@ -234,7 +234,6 @@ class ParticleNetV2(torch.nn.Module):
     def forward(self, x, edge_index, graph_input, batch=None):
         # Convolution layers
         x = self.gn0(x, batch=batch)
-        #y = self.bn0(graph_input)
         conv1 = self.conv1(x, edge_index, batch=batch)
         conv1 = self.gn1(conv1, batch=batch)
         conv2 = self.conv2(conv1, batch=batch)
