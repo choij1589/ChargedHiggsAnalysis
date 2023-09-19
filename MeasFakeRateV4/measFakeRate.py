@@ -59,7 +59,7 @@ IDs = ["loose", "tight"]
 
 W  = ["WJets_MG"]
 DY = ["DYJets", "DYJets10to50_MG"]
-TT = ["TTLL_powheg"]
+TT = ["TTLL_powheg", "TTLJ_powheg"]
 VV = ["WW_pythia", "WZ_pythia", "ZZ_pythia"]
 ST = ["SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl",
       "SingleTop_tW_top_NoFullyHad", "SingleTop_tW_antitop_NoFullyHad"]

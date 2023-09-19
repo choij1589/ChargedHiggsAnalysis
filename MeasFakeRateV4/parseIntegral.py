@@ -56,7 +56,7 @@ else:
 
 W  = ["WJets_MG"]
 DY = ["DYJets", "DYJets10to50_MG"]
-TT = ["TTLL_powheg"]
+TT = ["TTLL_powheg", "TTLJ_powheg"]
 VV = ["WW_pythia", "WZ_pythia", "ZZ_pythia"]
 ST = ["SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl",
       "SingleTop_tW_top_NoFullyHad", "SingleTop_tW_antitop_NoFullyHad"]
@@ -102,10 +102,11 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
     f = ROOT.TFile.Open(file_path)
     try:
         h = f.Get(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr"); h.SetDirectory(0)
+        f.Close()
+        return h
     except:
-        raise NameError(f"Wrong histogram path {prefix}/QCDEnriched1/{id}/{syst}/ptCorr")
-    f.Close()
-    return h
+        print(f"Wrong histogram path {prefix}/QCDEnriched1/{id}/{syst}/ptCorr for sample {sample}")
+        return None
     
 
 def make_data(sample, id):
@@ -133,7 +134,10 @@ def make_data(sample, id):
                         rateList.append(0.)
                 else:
                     h = get_hist(sample, ptCorr, abseta, id, syst)
-                    rateList.append(h.Integral())
+                    if h is None:
+                        rateList.append(-999.)
+                    else:
+                        rateList.append(h.Integral())
         data[syst] = rateList 
     return data
 
