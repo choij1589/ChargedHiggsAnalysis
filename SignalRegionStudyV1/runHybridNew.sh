@@ -1,5 +1,4 @@
 #!/bin/sh
-
 ERA=$1
 CHANNEL=$2
 METHOD=$3
@@ -47,12 +46,12 @@ do
         # run combine
         text2workspace.py datacard.txt -o workspace.root
         combine -M AsymptoticLimits workspace.root -t -1
+        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24
         combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.025     # 95% down
         combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.160     # 68% down
         combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.500     # median
         combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.840     # 68% up
         combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24 --expectedFromGrid 0.975     # 95% up
-        combine -M HybridNew --LHCmode LHC-limits workspace.root --saveHybridResult -t -1 --fork 24
 
         cd $HOMEDIR
     fi
