@@ -30,7 +30,7 @@ EPOCHS = args.epochs
 
 lenGenerations = 5
 lenChromosomes = 12
-nModels = 10
+nModels = 30
 nGraphFeatures = 6
 
 def getChromosomes(SIG, BKG, top=10):

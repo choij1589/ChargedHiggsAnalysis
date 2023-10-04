@@ -75,7 +75,7 @@ path = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal
 gaModule.savePopulation(path=path)
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
-    gaModule.evolution(thresholds=thresholds, ratio=0.5)
+    gaModule.evolution(thresholds=thresholds, ratio=1)
     evalFitness(gaModule.population)
     gaModule.updatePopulation("GraphNeuralNet", args.signal, args.background, args.channel, args.epochs)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
