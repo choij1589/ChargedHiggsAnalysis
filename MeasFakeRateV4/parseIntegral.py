@@ -22,8 +22,9 @@ if args.measure == "electron":
     if "2017" in args.era:  DataStream = "SingleElectron"
     if "2018" in args.era:  DataStream = "EGamma"
     ptCorr_bins = [10., 15., 20., 25., 35., 50., 100.]
-    abseta_bins = [0., 0.8, 1.579, 2.5]
+    abseta_bins = [0., 0.8, 1.479, 2.5]
     QCD = ["QCD_EMEnriched", "QCD_bcToE"]
+    #QCD = ["QCD"]
     SYSTs = ["Central", "Stat",
              "PileupReweight",
              "L1PrefireUp", "L1PrefireDown",
@@ -62,7 +63,6 @@ ST = ["SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl
       "SingleTop_tW_top_NoFullyHad", "SingleTop_tW_antitop_NoFullyHad"]
 MCList = W + DY + TT + VV + ST + QCD
 
-
 def findbin(ptCorr, abseta):
     if ptCorr > 100.:
         #print(f"ptCorr = {ptCorr}")
@@ -93,6 +93,8 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
     file_path = ""
     if sample == DataStream:
         file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/DATA/MeasFakeRateV4_{sample}.root"
+    elif "QCD" in sample:
+        file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__/MeasFakeRateV4_{sample}.root"
     else:
         file_path = f"{WORKDIR}/data/MeasFakeRateV4/{args.era}/{channel}__RunSyst__/MeasFakeRateV4_{sample}.root"
     try:
@@ -101,11 +103,12 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
         raise NameError(f"{file_path} does not exists")
     f = ROOT.TFile.Open(file_path)
     try:
-        h = f.Get(f"{prefix}/QCDEnriched1/{id}/{syst}/ptCorr"); h.SetDirectory(0)
+        h = f.Get(f"{prefix}/QCDEnriched/{id}/{syst}/ptCorr"); h.SetDirectory(0)
         f.Close()
         return h
     except:
-        print(f"Wrong histogram path {prefix}/QCDEnriched1/{id}/{syst}/ptCorr for sample {sample}")
+        print(f"Wrong histogram path {prefix}/QCDEnriched/{id}/{syst}/ptCorr for sample {sample}")
+        f.Close()
         return None
     
 
