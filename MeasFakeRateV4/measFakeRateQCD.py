@@ -21,8 +21,8 @@ if args.measure == "electron":
     ptCorr_bins = [10., 15., 20., 25., 35., 50., 100.]
     abseta_bins = [0., 0.8, 1.479, 2.5]
     #QCD = ["QCD_EMEnriched", "QCD_bcToE"]
-    QCD = ["QCD_EMEnriched"]
-    #QCD = ["QCD_bcToE"]
+    #QCD = ["QCD_EMEnriched"]
+    QCD = ["QCD_bcToE"]
 elif args.measure == "muon":
     DataStream = "DoubleMuon"
     ptCorr_bins = [10., 15., 20., 30., 50., 100.]
@@ -98,7 +98,7 @@ os.makedirs(os.path.dirname(csv_path), exist_ok=True)
 df.to_csv(csv_path)
 
 #### Now save the results to root file
-rtfile_path = f"results/{args.era}/ROOT/{args.measure}/fakerate_qcd_EMEnriched.root"
+rtfile_path = f"results/{args.era}/ROOT/{args.measure}/fakerate_qcd.root"
 os.makedirs(os.path.dirname(rtfile_path), exist_ok=True)
 f = ROOT.TFile(rtfile_path, "recreate")
 h = ROOT.TH2D(f"fakerate", "", len(abseta_bins)-1, array('d', abseta_bins), len(ptCorr_bins)-1, array('d', ptCorr_bins))
