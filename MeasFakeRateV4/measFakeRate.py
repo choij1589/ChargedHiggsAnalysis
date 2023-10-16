@@ -24,7 +24,7 @@ if args.measure == "electron":
     if "2017" in args.era:  DataStream = "SingleElectron"
     if "2018" in args.era:  DataStream = "EGamma"
     ptCorr_bins = [10., 15., 20., 25., 35., 50., 100.]
-    abseta_bins = [0., 0.8, 1.579, 2.5]
+    abseta_bins = [0., 0.8, 1.479, 2.5]
     PromptVariation = [["Stat"],
                        ["PileupReweight"],
                        ["L1PrefireUp", "L1PrefireDown"],

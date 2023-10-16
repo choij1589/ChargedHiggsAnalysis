@@ -16,11 +16,13 @@ args = parser.parse_args()
 WORKDIR = os.environ["WORKDIR"]
 ptCorr_bins = []
 abseta_bins = []
-QCD = None
+#QCD = ["QCD"]
 if args.measure == "electron":
     ptCorr_bins = [10., 15., 20., 25., 35., 50., 100.]
-    abseta_bins = [0., 0.8, 1.579, 2.5]
-    QCD = ["QCD_EMEnriched", "QCD_bcToE"]
+    abseta_bins = [0., 0.8, 1.479, 2.5]
+    #QCD = ["QCD_EMEnriched", "QCD_bcToE"]
+    #QCD = ["QCD_EMEnriched"]
+    QCD = ["QCD_bcToE"]
 elif args.measure == "muon":
     DataStream = "DoubleMuon"
     ptCorr_bins = [10., 15., 20., 30., 50., 100.]
