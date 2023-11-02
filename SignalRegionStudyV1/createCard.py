@@ -242,5 +242,5 @@ if __name__ == "__main__":
         print(manager.syststring(syst="JetRes", skip=["nonprompt", "conversion"]))
         print(manager.syststring(syst="JetEn", skip=["nonprompt", "conversion"]))
         print(manager.syststring(syst="MuonEn", skip=["nonprompt", "conversion"]))
-        print(manager.syststring(syst="Nonprompt", sysType="lnN", skip=["signal", "conversion", "diboson", "ttX", "others"]))
+        print(manager.syststring(syst="Nonprompt", sysType="lnN", value=1.3, skip=["signal", "conversion", "diboson", "ttX", "others"]))
         print(manager.syststring(syst="Conversion", sysType="lnN", skip=["signal", "nonprompt", "diboson", "ttX", "others"]))

@@ -4,9 +4,9 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
  
 # Style and pads
-ERA = "2017"
+ERA = "FullRun2"
 CHANNEL = "Skim3Mu"
-METHOD = "Shape"
+METHOD = "GNNOptim"
 
 
 lumiDict = {
@@ -23,7 +23,7 @@ canv = ROOT.TCanvas('limit.{}.{}.HybridNew.{}'.format(ERA, CHANNEL, METHOD))
 pads = OnePad()
 
 # Get limit TGraphs as a dictionary
-#graphs_gnn = StandardLimitsFromJSONFile('limits/limits.{}.{}.HybridNew.GNNOptim.json'.format(ERA, CHANNEL))
+graphs_gnn = StandardLimitsFromJSONFile('limits/limits.{}.{}.HybridNew.GNNOptim.json'.format(ERA, CHANNEL))
 graphs_shape = StandardLimitsFromJSONFile('limits/limits.{}.{}.HybridNew.Shape.json'.format(ERA, CHANNEL))
 if METHOD == "Shape":
     graphs = graphs_shape
@@ -79,7 +79,7 @@ pads[0].GetFrame().Draw()
 # Adjust the y-axis range such that the maximum graph value sits 25% below
 # the top of the frame. Fix the minimum to zero.
 #FixBothRanges(pads[0], 0, 0, GetPadYMax(pads[0]), 0.25)
-FixBothRanges(pads[0], 0, 0, 15, 0.25)
+FixBothRanges(pads[0], 0, 0, 10, 0.25)
 
 # Standard CMS logo
 DrawCMSLogo(pads[0], 'CMS', 'Internal', 11, 0.045, 0.035, 1.2, '', 0.8)

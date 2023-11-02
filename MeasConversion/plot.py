@@ -117,13 +117,10 @@ for sample in MCList:
     #h.SetDirectory(0)
     
     if sample in CONV:
-        h_up = h.Clone("up")
-        h_down = h.Clone("down")
         convsf, converr = ConvSF[f"{args.era}-{args.channel}"] 
         h.Scale(convsf)
         for bin in range(h.GetNcells()):
-            h.SetBinError(bin, h.GetBinContent(bin)*converr)
-    
+            h.SetBinError(bin, h.GetBinContent(bin)*(converr/convsf)) 
     else:
         hSysts = []
         for systUp, systDown in SYSTs:

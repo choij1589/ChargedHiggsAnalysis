@@ -120,7 +120,7 @@ def rtfileToDataListV2(rtfile, isSignal, maxSize=-1):
                              obj.IsMuon(), obj.IsElectron(), obj.IsJet()])
         # NOTE: Each event converted to a directed graph
         # for each node, find 4 nearest particles and connect
-        data = evtToGraph(nodeList, y=int(isSignal))
+        data = evtToGraph(nodeList, y=int(isSignal), k=6)
         # make MTs
         if len(muons) == 3:
             MT1 = muons[0].MT(METv)

@@ -5,12 +5,12 @@ import pandas as pd
 import joblib
 
 from helper.fitResults import getFitSigmaValue
-#from helper.MLResults import parseMLCut
+from helper.MLResults import parseMLCut
 ROOT.gROOT.SetBatch(True)
 
-ERA = "2018"
-CHANNEL = "Skim1E2Mu"
-METHOD = "Shape"    # Shape / GNNOptim
+ERA = "2016postVFP"
+CHANNEL = "Skim3Mu"
+METHOD = "GNNOptim"    # Shape / GNNOptim
 doOptim = True if "Optim" in METHOD else False
 
 SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
@@ -18,11 +18,9 @@ SIGNALs = ["MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
            "MHc-130_MA-15", "MHc-130_MA-55", "MHc-130_MA-90", "MHc-130_MA-125",
            "MHc-160_MA-15", "MHc-160_MA-85", "MHc-160_MA-120", "MHc-160_MA-155"]
 if doOptim:
-    SIGNALs = ["MHc-70_MA-65",
-               "MHc-100_MA-95",
+    SIGNALs = ["MHc-100_MA-95",
                "MHc-130_MA-90",
-               "MHc-160_MA-85",
-               "MHc-160_MA-120"]
+               "MHc-160_MA-85"]
 
 BACKGROUNDs = ["nonprompt", "conversion", "diboson", "ttX", "others"]
 
@@ -62,7 +60,7 @@ def getHist(processName, signal, syst="Central"):
     
     if doOptim:
         # eval score first
-        clf = joblib.load(f"results/{ERA}/{CHANNEL}__{METHOD}__/{signal}/classifier.pkl")
+        clf = joblib.load(f"results/{ERA}/{CHANNEL}__GNNOptim__/{signal}/classifier.pkl")
         cut = parseMLCut(ERA, CHANNEL, signal)
         inputs = []
         weights = []
@@ -75,7 +73,8 @@ def getHist(processName, signal, syst="Central"):
         for score, weight, mass in zip(scores, weights, masses):
             if score[1] > cut:
                 h.Fill(mass[0], weight)
-                h.Fill(mass[1], weight)
+                if CHANNEL == "Skim3Mu":
+                    h.Fill(mass[1], weight)
         h.SetDirectory(0)
     else:
         for evt in tree:

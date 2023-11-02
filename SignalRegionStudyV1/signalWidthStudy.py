@@ -3,12 +3,12 @@ import ROOT as R
 from ROOT import RooFit as RF
 R.gROOT.SetBatch(True)
 
-SIGNALs = ["MHc-70_MA-15", "MHc-100_MA-15", "MHc-130_MA-15", "MHc-160_MA-15",
+SIGNALs = ["MHc-70_MA-15",  "MHc-100_MA-15", "MHc-160_MA-15",
            "MHc-70_MA-40", "MHc-130_MA-55", "MHc-100_MA-60", "MHc-70_MA-65",
            "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120",
            "MHc-130_MA-125", "MHc-160_MA-155"]
-ERA = "2016postVFP"
-CHANNEL = "Skim1E2Mu"
+ERA = "2016preVFP"
+CHANNEL = "Skim3Mu"
 WORKDIR = os.getenv("WORKDIR")
 
 os.makedirs(f"plots/{ERA}/{CHANNEL}__", exist_ok=True)

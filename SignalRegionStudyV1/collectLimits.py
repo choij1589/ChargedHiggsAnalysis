@@ -13,7 +13,7 @@ MASSPOINTs = ["MHc-100_MA-15", "MHc-70_MA-40", "MHc-130_MA-55", "MHc-100_MA-60",
               "MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95",
               "MHc-160_MA-120", "MHc-130_MA-125", "MHc-160_MA-155"]
 
-MASSPOINTsGNN = ["MHc-70_MA-65", "MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95", "MHc-160_MA-120"]
+MASSPOINTsGNN = ["MHc-160_MA-85", "MHc-130_MA-90", "MHc-100_MA-95"]
 
 def parseAsymptoticLimit(masspoint):
     BASEDIR = f"results/{args.era}/{args.channel}__{args.method}__/{masspoint}"

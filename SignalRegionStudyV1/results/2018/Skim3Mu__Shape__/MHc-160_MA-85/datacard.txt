@@ -7,7 +7,7 @@ shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-160_MA-85	MHc-160_MA-85_$SYSTEMATIC
 --------------------------------------------------
 bin			signal_region
-observation		508.4646
+observation		507.1626
 --------------------------------------------------
 bin			signal_region	signal_region	signal_region	signal_region	signal_region	signal_region	
 process			signal		nonprompt	conversion	diboson		ttX		others		
@@ -23,5 +23,5 @@ DblMuTrigSF	lnN	1.002		-		-		1.002		1.002		1.002
 JetRes		shape	1		-		-		1		1		1		
 JetEn		shape	1		-		-		1		1		1		
 MuonEn		shape	1		-		-		1		1		1		
-Nonprompt	lnN	-		1.113		-		-		-		-		
-Conversion	lnN	-		-		1.345		-		-		-		
+Nonprompt	lnN	-		1.300		-		-		-		-		
+Conversion	lnN	-		-		1.264		-		-		-		

@@ -12,9 +12,9 @@ using namespace std;
 // NOTE: Signal cross section scaled to 5 fb
 
 // data field
-const TString ERA = "2018";
-const TString CHANNEL = "Skim1E2Mu";
-const TString DATASTREAM = "MuonEG";
+const TString ERA = "2016postVFP";
+const TString CHANNEL = "Skim3Mu";
+const TString DATASTREAM = "DoubleMuon";
 
 // signal samples
 const vector<TString> SIGNALs = {"MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
@@ -24,10 +24,10 @@ const vector<TString> SIGNALs = {"MHc-70_MA-15", "MHc-70_MA-40", "MHc-70_MA-65",
 // background samples
 const vector<TString> bkg_VV     = {"WZTo3LNu_amcatnlo", "ZZTo4L_powheg"};
 const vector<TString> bkg_ttX    = {"ttWToLNu", "ttZToLLNuNu", "ttHToNonbb"};
-const vector<TString> bkg_conv   = {"DYJets_MG", "DYJets10to50_MG", "ZGToLLG"};
+const vector<TString> bkg_conv   = {"DYJets_MG", "DYJets10to50_MG", "TTG", "WWG"};
 const vector<TString> bkg_others = {"WWW", "WWZ", "WZZ", "ZZZ",
                                     "GluGluHToZZTo4L", "VBF_HToZZTo4L",
-                                    "tZq", "tHq", "TTG", "WWG", "TTTT"};
+                                    "tZq", "tHq", "TTTT"};
 
 // systematics
 const vector<TString> matrixSysts = {"Central", "NonpromptUp", "NonpromptDown"};
@@ -43,7 +43,7 @@ TFile *getFile(const TString &sampleName, const bool isPrompt=true, const bool i
 void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const TString &signal, 
                  const TString &syst="Central", const bool isTrainedSample=false);
 double getAmass(const TString &signal);
-double getConvSF(const TString &region, int sys=0);
+double getConvSF(int sys=0);
 
 void setSystematics() {
     if (CHANNEL == "Skim1E2Mu") {
@@ -87,8 +87,7 @@ void preprocess() {
         TTree *tree = nullptr;
         TTree *outTree = nullptr;
         const double mA = getAmass(SIGNAL);
-        const bool isTrainedSample = false;
-        //const bool isTrainedSample = (60 < mA && mA > 125);
+        const bool isTrainedSample = (80 < mA && mA < 100);
 
         // fill events
         cout << "@@@@ processing signal..." << endl;
@@ -289,15 +288,10 @@ void fillOutTree(TTree *tree, TTree *outTree, const TString &sampleName, const T
         if (sampleName.Contains("MA"))         weight /= 3.;
 
         // conversion SF for DYJets / ZGToLLG samples
-        if (sampleName.Contains("DYJets")) {
-            if (syst == "ConversionUp")        weight *= getConvSF("LowPT", 1);
-            else if (syst == "ConversionDown") weight *= getConvSF("LowPT", -1);
-            else                               weight *= getConvSF("LowPT");
-        }
-        if (sampleName.Contains("ZGToLLG")) {
-            if (syst == "ConversionUp")        weight *= getConvSF("HighPT", 1);
-            else if (syst == "ConversionDown") weight *= getConvSF("HighPT", -1);
-            else                               weight *= getConvSF("HighPT");
+        if (sampleName.Contains("DYJets") || sampleName.Contains("TTG") || sampleName.Contains("WWG")) {
+            if (syst == "ConversionUp")        weight *= getConvSF(1);
+            else if (syst == "ConversionDown") weight *= getConvSF(-1);
+            else                               weight *= getConvSF();
         }
 
         if (CHANNEL.Contains("1E2Mu")) {
@@ -324,46 +318,22 @@ double getAmass(const TString &signal) {
     return mA;
 }
 
-double getConvSF(const TString &region, int sys) {
+double getConvSF(int sys) {
     if (CHANNEL.Contains("1E2Mu")) {
-        if (ERA.Contains("2016preVFP")) {
-            if (region == "LowPT") return 1.814 + sys*0.436;
-            if (region == "HighPT") return 2.374 + sys*0.346;
-        }
-        else if (ERA.Contains("2016postVFP")) {
-            if (region == "LowPT") return 2.193 + sys*0.386;
-            if (region == "HighPT") return 2.519 + sys*0.294;
-        }
-        else if (ERA.Contains("2017")) {
-            if (region == "LowPT") return 1.654 + sys*0.369;
-            if (region == "HighPT") return 2.166 + sys*0.358;
-        }
-        else if (ERA.Contains("2018")) {
-            if (region == "LowPT") return 1.588 + sys*0.403;
-            if (region == "HighPT") return 2.150 + sys*0.345;
-        }
+        if (ERA.Contains("2016preVFP"))       { return 0.851 + sys*0.046; }
+        else if (ERA.Contains("2016postVFP")) { return 1.001 + sys*0.054; }
+        else if (ERA.Contains("2017"))        { return 0.866 + sys*0.084; }
+        else if (ERA.Contains("2018"))        { return 0.810 + sys*0.094; }
         else {
             cerr << "Not implemented yet" << endl;
             exit(EXIT_FAILURE);
         }
     }
     if (CHANNEL.Contains("3Mu")) {
-        if (ERA.Contains("2016preVFP")) {
-            if (region == "LowPT") return 0.474 + sys*0.229;
-            if (region == "HighPT") return 1.273 + sys*0.079;
-        }
-        else if (ERA.Contains("2016postVFP")) {
-            if (region == "LowPT") return 0.630 + sys*0.365;
-            if (region == "HighPT") return 1.273 + sys*0.079;
-        }
-        else if (ERA.Contains("2017")) {
-            if (region == "LowPT") return 0.940 + sys*0.343;
-            if (region == "HighPT") return 0.964 + sys*0.09;
-        }
-        else if (ERA.Contains("2018")) {
-            if (region == "LowPT") return 0.773 + sys*0.297;
-            if (region == "HighPT") return 0.994 + sys*0.081;
-        }
+        if (ERA.Contains("2016preVFP"))       { return 0.645 + sys*0.134; }
+        else if (ERA.Contains("2016postVFP")) { return 0.604 + sys*0.215; }
+        else if (ERA.Contains("2017"))        { return 0.813 + sys*0.234; }
+        else if (ERA.Contains("2018"))        { return 0.806 + sys*0.213; }
         else {
             cerr << "Not implemented yet" << endl;
             exit(EXIT_FAILURE);

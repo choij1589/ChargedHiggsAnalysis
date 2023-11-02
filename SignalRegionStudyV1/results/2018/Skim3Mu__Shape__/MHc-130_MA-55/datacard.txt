@@ -7,7 +7,7 @@ shapes	*	*	shapes_input.root	$PROCESS	$PROCESS_$SYSTEMATIC
 shapes	signal	*	shapes_input.root	MHc-130_MA-55	MHc-130_MA-55_$SYSTEMATIC
 --------------------------------------------------
 bin			signal_region
-observation		158.0501
+observation		163.0694
 --------------------------------------------------
 bin			signal_region	signal_region	signal_region	signal_region	signal_region	signal_region	
 process			signal		nonprompt	conversion	diboson		ttX		others		
@@ -17,11 +17,11 @@ rate			-1		-1		-1		-1		-1		-1
 signal_region	autoMCStats	10
 lumi_13TeV	lnN	1.025		-		-		1.025		1.025		1.025		
 L1Prefire	lnN	1.002		-		-		1.002		1.002		1.002		
-PileupReweight	lnN	1.007		-		-		1.009		1.005		1.021		
-MuonIDSF	lnN	1.011		-		-		1.012		1.011		1.010		
+PileupReweight	lnN	1.007		-		-		1.009		1.005		1.001		
+MuonIDSF	lnN	1.011		-		-		1.012		1.011		1.011		
 DblMuTrigSF	lnN	1.002		-		-		1.002		1.002		1.002		
 JetRes		shape	1		-		-		1		1		1		
 JetEn		shape	1		-		-		1		1		1		
 MuonEn		shape	1		-		-		1		1		1		
-Nonprompt	lnN	-		1.106		-		-		-		-		
-Conversion	lnN	-		-		1.359		-		-		-		
+Nonprompt	lnN	-		1.300		-		-		-		-		
+Conversion	lnN	-		-		1.264		-		-		-		
