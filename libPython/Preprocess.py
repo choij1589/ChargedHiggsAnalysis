@@ -60,8 +60,8 @@ def getEdgeIndices(nodeList, k=4):
             if node is neigh: continue
             thisPart = TLorentzVector()
             neighPart = TLorentzVector()
-            thisPart.SetPxPyPzE(node[0], node[1], node[2], node[3])
-            neighPart.SetPxPyPzE(neigh[0], neigh[1], neigh[2], neigh[3])
+            thisPart.SetPxPyPzE(node[1], node[2], node[3], node[0])
+            neighPart.SetPxPyPzE(neigh[1], neigh[2], neigh[3], neigh[0])
             distances[j] = thisPart.DeltaR(neighPart)
         distances = dict(sorted(distances.items(), key=lambda item: item[1]))
         for n in list(distances.keys())[:k]:

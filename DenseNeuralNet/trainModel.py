@@ -157,5 +157,4 @@ if __name__ == "__main__":
         earlyStopper.update(validLoss, panelty, model)
         if earlyStopper.earlyStop:
             print(f"Early stopping in epoch {epoch}"); break
-    
-    summaryWriter.to_csv(summarypath)
+
