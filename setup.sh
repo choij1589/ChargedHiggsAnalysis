@@ -19,7 +19,7 @@ else
     export WORKDIR="$HOME/workspace/ChargedHiggsAnalysis"
 	echo @@@@ WORKDIR=$WORKDIR
     source $HOME/.conda-activate
-    conda activate torch
+    conda activate pyg
 fi
 
 alias compile-root="/usr/bin/g++ `root-config --cflags --ldflags --glibs`"

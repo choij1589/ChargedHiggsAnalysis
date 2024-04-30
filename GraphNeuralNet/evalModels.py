@@ -30,7 +30,7 @@ EPOCHS = args.epochs
 
 lenGenerations = 5
 lenChromosomes = 12
-nModels = 10
+nModels = 20
 nGraphFeatures = 6
 
 def getChromosomes(SIG, BKG, top=10):
@@ -187,7 +187,7 @@ models = {}
 for idx, chromosome in enumerate(chromosomes.keys()):
     nNodes, optimizer, initLR, scheduler = chromosome
     modelPath = f"{WORKDIR}/GraphNeuralNet/{CHANNEL}/epoch{EPOCHS}/{SIG}_vs_{BKG}/models/ParticleNet-nNodes{nNodes}_{optimizer}_initLR-{str(initLR).replace('.', 'p')}_{scheduler}.pt"
-    model = ParticleNetV2(9, nGraphFeatures, 2, nNodes, dropout_p=0.4)
+    model = ParticleNetV2(9, nGraphFeatures, 2, nNodes, dropout_p=0.25)
     model.load_state_dict(torch.load(modelPath, map_location=torch.device('cpu')))
 
     models[idx] = model

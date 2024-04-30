@@ -38,10 +38,10 @@ class KinematicCanvas():
         self.backgrounds = None
         self.stack = THStack("stack", "")
         self.systematics = None
-        self.sigLegend = TLegend(0.67, 0.65, 0.9, 0.85)
+        self.sigLegend = TLegend(0.35, 0.6, 0.6, 0.85)
         self.sigLegend.SetFillStyle(0)
         self.sigLegend.SetBorderSize(0)
-        self.bkgLegend = TLegend(0.5, 0.65, 0.67, 0.85)
+        self.bkgLegend = TLegend(0.65, 0.6, 0.9, 0.85)
         self.bkgLegend.SetFillStyle(0)
         self.bkgLegend.SetBorderSize(0)
         
@@ -123,16 +123,16 @@ class KinematicCanvas():
 
         maximum = max([h.GetMaximum() for h in self.signals.values()] +[self.stack.GetHistogram().GetMaximum()])
         if self.logy:
-            self.stack.GetHistogram().GetYaxis().SetRangeUser(1e-2, maximum*500.)
+            self.stack.GetHistogram().GetYaxis().SetRangeUser(0.5, maximum*500.)
             for hist in self.signals.values():
-                hist.GetYaxis().SetRangeUser(1e-2, maximum*500.)
+                hist.GetYaxis().SetRangeUser(0.5, maximum*500.)
         else:
             self.stack.GetHistogram().GetYaxis().SetRangeUser(0., maximum*2.)
             for hist in self.signals.values():
                 hist.GetYaxis().SetRangeUser(0., maximum*2.)
             
         self.systematics.SetStats(0)
-        self.systematics.SetFillColorAlpha(12, 0.6)
+        self.systematics.SetFillColorAlpha(12, 0.99)
         self.systematics.SetFillStyle(3144)
         self.systematics.GetXaxis().SetLabelSize(0)
         
@@ -141,7 +141,7 @@ class KinematicCanvas():
             self.bkgLegend.AddEntry(hist, hist.GetName(), "f")
         self.bkgLegend.AddEntry(self.systematics, "stat+syst", "f")
         for hist in self.signals.values():
-            self.sigLegend.AddEntry(hist, hist.GetName(), "lep")
+            self.sigLegend.AddEntry(hist, hist.GetName(), "f")
         
     def finalize(self):
         if self.logy: self.cvs.SetLogy()
@@ -156,8 +156,8 @@ class KinematicCanvas():
         self.sigLegend.Draw()
         self.bkgLegend.Draw()
         self.lumi.DrawLatexNDC(0.61, 0.91, self.lumiString)
-        self.cms.DrawLatexNDC(0.15, 0.83, "CMS")
-        self.preliminary.DrawLatexNDC(0.15, 0.78, "Work in progress") 
+        self.cms.DrawLatexNDC(0.12, 0.91, "CMS")
+        self.preliminary.DrawLatexNDC(0.22, 0.91, "Work in progress") 
         self.cvs.RedrawAxis()
         
     def draw(self):
@@ -203,7 +203,7 @@ class ComparisonCanvas():
         self.systematics = None
         self.ratio = None
         self.ratio_syst = None
-        self.legend = TLegend(0.65, 0.55, 0.90, 0.80)
+        self.legend = TLegend(0.6, 0.45, 0.85, 0.85)
         self.legend.SetFillStyle(0)
         self.legend.SetBorderSize(0)
         
@@ -213,7 +213,10 @@ class ComparisonCanvas():
             self.logy = config['logy']
         if "era" in config.keys():
             era = config['era']
-            self.lumiString = "L_{int} = "+f"{LumiInfo[era]}"+" fb^{-1} (13TeV)"
+            if "lumiInfo" in config.keys():
+                self.lumiString = config["lumiInfo"]
+            else:
+                self.lumiString = "L_{int} = "+f"{LumiInfo[era]}"+" fb^{-1} (13TeV)"
     
     def drawSignals(self, hists, colors):
         self.signals = hists
@@ -261,7 +264,7 @@ class ComparisonCanvas():
             else:                        self.systematics.Add(hist)
         self.stack.Draw()
         self.stack.GetHistogram().GetXaxis().SetLabelSize(0)
-        self.systematics.SetFillColorAlpha(12, 0.6)
+        self.systematics.SetFillColorAlpha(12, 0.95)
         self.systematics.SetFillStyle(3144)
         self.systematics.GetXaxis().SetLabelSize(0)
         
@@ -276,7 +279,7 @@ class ComparisonCanvas():
         # y axis
         maximum = self.stack.GetHistogram().GetMaximum()
         for hist in self.backgrounds.values():
-            if self.logy: hist.GetYaxis().SetRangeUser(1e-2, maximum*100.)
+            if self.logy: hist.GetYaxis().SetRangeUser(0.1, maximum*1000.)
             else:         hist.GetYaxis().SetRangeUser(0, maximum*2.)
     
     def drawData(self, data):
@@ -302,7 +305,7 @@ class ComparisonCanvas():
         self.data.SetMarkerColor(1)
         
         maximum = self.stack.GetHistogram().GetMaximum() 
-        if self.logy: self.data.GetYaxis().SetRangeUser(1e-2, maximum*100.)
+        if self.logy: self.data.GetYaxis().SetRangeUser(1e-1, maximum*1000.)
         else:         self.data.GetYaxis().SetRangeUser(0, maximum*2.)
         
         
@@ -344,7 +347,7 @@ class ComparisonCanvas():
             self.legend.AddEntry(hist, hist.GetName(), "f")
         self.legend.AddEntry(self.systematics, "stat+syst", "f")
         
-    def finalize(self, drawSignal=False):
+    def finalize(self, textInfo=None, drawSignal=False):
         # pad up
         if self.logy: self.padUp.SetLogy()
         self.padUp.cd()
@@ -359,9 +362,18 @@ class ComparisonCanvas():
                 hist.Draw("hist&same")
 
         self.legend.Draw()
-        self.lumi.DrawLatexNDC(0.64, 0.91, self.lumiString)
-        self.cms.DrawLatexNDC(0.17, 0.83, "CMS")
-        self.preliminary.DrawLatexNDC(0.17, 0.78, "Work in progress")
+        
+        if textInfo is None:
+            self.lumi.DrawLatexNDC(0.64, 0.91, self.lumiString)
+            self.cms.DrawLatexNDC(0.12, 0.91, "CMS")
+            self.preliminary.DrawLatexNDC(0.22, 0.91, "Work in progress")
+        else:
+            latex = TLatex()
+            for text, config in textInfo.items():
+                latex.SetTextSize(config[0])
+                latex.SetTextFont(config[1])
+                latex.DrawLatexNDC(config[2][0], config[2][1], text)
+            
         self.padUp.RedrawAxis()
         
         # pad down

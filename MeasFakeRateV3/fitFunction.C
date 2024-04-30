@@ -36,7 +36,8 @@ RooFitResult* fitMT(const TString ERA, const TString HLT, const TString ID, cons
                                  "QCD_Pt_2400to3200", "QCD_Pt_3200toInf"};
     const vector<TString> W   = {"WJets_MG"};
     const vector<TString> DY  = {"DYJets", "DYJets10to50_MG"};
-    const vector<TString> TT  = {"TTLL_powheg", "TTLJ_powheg"};
+    //const vector<TString> TT  = {"TTLL_powheg", "TTLJ_powheg"};
+    const vector<TString> TT  = {"TTLL_powheg"};
     const vector<TString> VV  = {"WW_pythia", "WZ_pythia", "ZZ_pythia"};
     const vector<TString> ST  = {"SingleTop_sch_Lep", "SingleTop_tch_top_Incl", "SingleTop_tch_antitop_Incl",
                                 "SingleTop_tW_top_NoFullyHad", "SingleTop_tW_antitop_NoFullyHad"};
@@ -51,8 +52,8 @@ RooFitResult* fitMT(const TString ERA, const TString HLT, const TString ID, cons
     for (const auto &sample: QCD) MCSamples.emplace_back(sample);
 
     const vector<TString> KEYs = {"QCD", "W", "DY", "TT", "ST", "VV"};
-    const TString histkey_central = "Inclusive/"+ID+"/Central/MT";
-    const TString histkey = "Inclusive/"+ID+"/"+SYST+"/MT";
+    const TString histkey_central = "Inclusive/"+ID+"/Central/MTfix";
+    const TString histkey = "Inclusive/"+ID+"/"+SYST+"/MTfix";
 
     // construct templates
     map<TString, TH1D*> HISTs;
@@ -165,7 +166,7 @@ RooFitResult* fitMT(const TString ERA, const TString HLT, const TString ID, cons
                     RooArgList(*TEMPLATEs["W"], *TEMPLATEs["DY"], *TEMPLATEs["TT"], *TEMPLATEs["ST"], *TEMPLATEs["VV"], *TEMPLATEs["QCD"]),
                     RooArgList(*COEFs["W"], *COEFs["DY"], *COEFs["TT"], *COEFs["ST"], *COEFs["VV"]), kFALSE);
 
-    RooFitResult *fitResult = model->chi2FitTo(*data, Save(), PrintLevel(-1));
+    RooFitResult *fitResult = model->fitTo(*data, Save(), PrintLevel(-1));
     RooPlot *frame = MT.frame();
     data->plotOn(frame, Name("data"));
     model->plotOn(frame, Name("MC"));

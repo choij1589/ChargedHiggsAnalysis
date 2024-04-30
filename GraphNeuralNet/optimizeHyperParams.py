@@ -19,7 +19,7 @@ os.makedirs(modelPath.replace("models", "CSV"))
 
 # Let's run the model linearly first
 #### Hyper parameters
-nNodes = [64, 128]
+nNodes = [48, 64, 128]
 optimizers = ["RMSprop", "Adam", "AdamW", "Adadelta"]
 #optimizers = ["RMSprop", "Adam", "NAdam", "RAdam"]
 schedulers = ["StepLR", "CyclicLR"]
@@ -75,7 +75,7 @@ path = f"{WORKDIR}/GraphNeuralNet/{args.channel}/epoch{args.epochs}/{args.signal
 gaModule.savePopulation(path=path)
 for iter in range(1, maxIter):
     print(f"@@@@ generation {iter}")
-    gaModule.evolution(thresholds=thresholds, ratio=0.5)
+    gaModule.evolution(thresholds=thresholds, ratio=1)
     evalFitness(gaModule.population)
     gaModule.updatePopulation("GraphNeuralNet", args.signal, args.background, args.channel, args.epochs)
     print(f"@@@@ mean fitness: {gaModule.meanFitness()}")
