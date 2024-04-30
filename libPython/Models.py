@@ -287,5 +287,30 @@ class ParticleNetV2(torch.nn.Module):
         x = self.bn2(x)
         x = F.dropout1d(x, p=self.dropout_p, training=self.training)
         x = self.output(x)
+def forward(self, x, edge_index, graph_input, batch=None):
+        # Convolution layers
+        x = self.gn0(x, batch=batch)
+        conv1 = self.conv1(x, edge_index, batch=batch)
+        conv1 = self.gn1(conv1, batch=batch)
+        conv2 = self.conv2(conv1, batch=batch)
+        conv2 = self.gn2(conv2, batch=batch)
+        conv3 = self.conv3(conv2, batch=batch)
+        conv3 = self.gn3(conv3, batch=batch)
+        x = conv1 + conv2 + conv3
 
+        # readout layers
+        x = global_mean_pool(x, batch=batch)
+        x = torch.cat([x, graph_input], dim=1)
+        x = self.bn0(x)
+
+        # dense layers
+        x = F.relu(self.dense1(x))
+        x = self.bn1(x)
+        x = F.dropout1d(x, p=self.dropout_p, training=self.training)
+        x = F.relu(self.dense2(x))
+        x = self.bn2(x)
+        x = F.dropout1d(x, p=self.dropout_p, training=self.training)
+        x = self.output(x)
+
+        return F.softmax(x, dim=1)
         return F.softmax(x, dim=1)
