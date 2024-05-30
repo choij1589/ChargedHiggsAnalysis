@@ -1,0 +1,4 @@
+[ libMeasFakeUtils.so ]
+# List of selected classes
+class FitMT
+header FitMT.h
