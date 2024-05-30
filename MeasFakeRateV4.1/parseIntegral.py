@@ -114,8 +114,12 @@ def get_hist(sample, ptCorr, abseta, id, syst="Central"):
 
 def make_data(sample, id):
     data = {}
-    
-    for syst in SYSTs:
+    if "QCD" in sample:
+        systs = ["Central", "Stat"]
+    else:
+        systs = SYSTs
+
+    for syst in systs:
         rateList = []
         for ptCorr, abseta in product(ptCorr_bins[:-1], abseta_bins[:-1]):
             if syst == "Central":
